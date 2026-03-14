@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adobe Connect – Admin Portal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #E83D3D;
+    --red-light: #fdf0f0;
+    --red-mid: #f8d0d0;
+    --dark: #1a1a2e;
+    --mid: #4a4a6a;
+    --muted: #8888aa;
+    --border: #e8e8f0;
+    --bg: #f4f4f9;
+    --white: #ffffff;
+    --sidebar-w: 52px;
+    --sidebar-expanded-w: 240px;
+    --green: #22c55e;
+    --green-light: #f0fdf4;
+    --orange: #f97316;
+    --orange-light: #fff7ed;
+    --blue: #3b82f6;
+    --blue-light: #eff6ff;
+    --yellow: #eab308;
+    --yellow-light: #fefce8;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+  }
+
+  html.dark {
+    --red: #ff5555;
+    --red-light: #2a1515;
+    --dark: #e8e8f8;
+    --mid: #a8a8c8;
+    --muted: #6868a0;
+    --border: #2a2a42;
+    --bg: #0f0f1a;
+    --white: #1a1a2e;
+    --green-light: #0d2010;
+    --blue-light: #0d1a2e;
+    --orange-light: #2a1a08;
+    --yellow-light: #2a200a;
+  }
+  html.dark .topbar { background: #14142a; border-color: #2a2a42; }
+  html.dark .sidebar { background: #14142a; border-color: #2a2a42; }
+  html.dark .stat-card, html.dark .content-card, html.dark .chart-card, html.dark .table-card { background: #1e1e34; border-color: #2a2a42; }
+  html.dark .nav-item:hover { background: #252540; }
+  html.dark .topbar-search { background: #0f0f1a; border-color: #2a2a42; }
+  html.dark .topbar-icon { background: #1e1e34; border-color: #2a2a42; }
+  html.dark .topbar-search input { color: #d0d0f0; }
+  html.dark .modal-overlay { background: rgba(0,0,0,0.7); }
+  html.dark .modal-box { background: #1e1e34; border-color: #2a2a42; }
+  html.dark .form-input, html.dark .form-select, html.dark .form-textarea { background: #0f0f1a; border-color: #2a2a42; color: #d0d0f0; }
+  html.dark .preview-box { background: #0f0f1a; border-color: #2a2a42; }
+  html.dark .table-row:hover { background: #252540; }
+  html.dark .badge-draft { background: #252540; color: #8888b8; }
+  html.dark .tab-btn { color: #8888aa; }
+  html.dark .tab-btn.active { color: var(--red); }
+  html.dark .section-header { border-color: #2a2a42; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 58px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+    box-shadow: 0 1px 10px rgba(0,0,0,.07);
+  }
+  .topbar-logo {
+    display: flex; align-items: center; gap: 9px;
+    font-weight: 700; font-size: 15px; color: var(--dark);
+    white-space: nowrap;
+  }
+  .topbar-logo .logo-icon {
+    width: 32px; height: 32px; background: var(--red);
+    border-radius: 9px; display: grid; place-items: center;
+    color: white; font-size: 14px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .admin-badge {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--red);
+    background: var(--red-light); border: 1px solid var(--red-mid);
+    border-radius: 5px; padding: 2px 7px; flex-shrink: 0;
+  }
+  .topbar-center {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%;
+  }
+  .topbar-search {
+    width: 100%; max-width: 480px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 0 16px; height: 38px;
+    color: var(--muted); font-size: 13px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .topbar-search:focus-within { border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,61,61,.08); }
+  .topbar-search input { border: none; background: transparent; outline: none; font-family: inherit; font-size: 13px; color: var(--dark); width: 100%; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  .topbar-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--white);
+    display: grid; place-items: center; cursor: pointer;
+    color: var(--mid); font-size: 15px; transition: all .18s;
+    position: relative;
+  }
+  .topbar-icon:hover { background: var(--bg); color: var(--dark); }
+  .notif-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--red); border: 1.5px solid white; }
+  .topbar-user {
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border); border-radius: 24px;
+    padding: 3px 12px 3px 4px; cursor: pointer; transition: background .18s;
+  }
+  .topbar-user:hover { background: var(--bg); }
+  .avatar-sm {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, #E83D3D, #c0392b);
+    display: grid; place-items: center; color: white;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .topbar-user-name { font-size: 12px; font-weight: 600; color: var(--dark); }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: calc(100vh - 58px);
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    position: fixed; top: 58px; left: 0; bottom: 0;
+    overflow: hidden;
+    padding: 12px 0;
+    display: flex; flex-direction: column;
+    transition: width .25s cubic-bezier(.4,0,.2,1), box-shadow .25s;
+    z-index: 90;
+  }
+  .sidebar:hover { width: var(--sidebar-expanded-w); box-shadow: 4px 0 24px rgba(0,0,0,.10); }
+  .nav-label {
+    font-size: 9px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--muted);
+    padding: 10px 0 3px 16px; white-space: nowrap; overflow: hidden;
+    opacity: 0; transition: opacity .18s .05s;
+  }
+  .sidebar:hover .nav-label { opacity: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0 9px 15px; cursor: pointer;
+    color: var(--mid); font-size: 13px; font-weight: 500;
+    transition: background .15s, color .15s;
+    position: relative; white-space: nowrap; overflow: hidden;
+  }
+  .nav-item:hover { background: var(--bg); color: var(--dark); }
+  .nav-item.active { background: var(--red-light); color: var(--red); font-weight: 600; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 3px; background: var(--red); border-radius: 0 3px 3px 0; }
+  .nav-icon { width: 22px; height: 22px; display: grid; place-items: center; flex-shrink: 0; }
+  .nav-text { opacity: 0; transition: opacity .15s .08s; font-size: 13px; }
+  .sidebar:hover .nav-text { opacity: 1; }
+  .nav-badge {
+    margin-left: auto; margin-right: 12px;
+    font-size: 9px; font-weight: 700; background: var(--red);
+    color: white; border-radius: 10px; padding: 1px 6px;
+    opacity: 0; transition: opacity .15s;
+  }
+  .sidebar:hover .nav-badge { opacity: 1; }
+  .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding: 12px 0 0; }
+
+  /* ── LAYOUT ── */
+  .layout { display: flex; padding-top: 58px; }
+  .main { margin-left: var(--sidebar-w); flex: 1; padding: 28px 32px 60px; max-width: 100%; transition: margin-left .25s; }
+
+  /* ── STAT CARDS ── */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; cursor: pointer;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    box-shadow: var(--shadow-sm);
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: #d0d0e8; }
+  .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .stat-icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; }
+  .stat-icon.red { background: var(--red-light); color: var(--red); }
+  .stat-icon.green { background: var(--green-light); color: var(--green); }
+  .stat-icon.blue { background: var(--blue-light); color: var(--blue); }
+  .stat-icon.orange { background: var(--orange-light); color: var(--orange); }
+  .stat-delta { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 6px; }
+  .stat-delta.up { background: var(--green-light); color: var(--green); }
+  .stat-delta.down { background: var(--red-light); color: var(--red); }
+  .stat-value { font-size: 28px; font-weight: 800; color: var(--dark); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--dark); }
+  .section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── TABS ── */
+  .tabs-bar {
+    display: flex; gap: 2px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 4px; margin-bottom: 20px;
+  }
+  .tab-btn {
+    padding: 7px 16px; border-radius: 9px; border: none;
+    background: transparent; font-size: 13px; font-weight: 500;
+    cursor: pointer; color: var(--muted); transition: all .18s;
+    font-family: inherit;
+  }
+  .tab-btn:hover { color: var(--dark); background: var(--white); }
+  .tab-btn.active { background: var(--white); color: var(--red); font-weight: 600; box-shadow: var(--shadow-sm); }
+
+  /* ── CONTENT PANELS ── */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── CONTENT TABLE ── */
+  .table-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);
+  }
+  .table-head {
+    display: grid; padding: 12px 20px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--muted);
+  }
+  .table-head.events-grid, .table-row.events-grid { grid-template-columns: 2fr 1fr 1fr 1fr 140px; }
+  .table-head.training-grid, .table-row.training-grid { grid-template-columns: 2fr 1fr 1fr 1fr 140px; }
+  .table-head.newsletter-grid, .table-row.newsletter-grid { grid-template-columns: 2fr 1fr 1fr 1fr 140px; }
+  .table-head.techtalk-grid, .table-row.techtalk-grid { grid-template-columns: 2fr 1fr 1fr 1fr 140px; }
+  .table-head.nom-grid, .table-row.nom-grid { grid-template-columns: 2fr 1.2fr 1fr 1fr 140px; }
+  .table-head.ind-grid, .table-row.ind-grid { grid-template-columns: 2fr 1fr 1fr 1fr 140px; }
+  .table-row {
+    display: grid; align-items: center; padding: 14px 20px;
+    border-bottom: 1px solid var(--border); font-size: 13px;
+    transition: background .15s; cursor: default;
+  }
+  .table-row:last-child { border-bottom: none; }
+  .table-row:hover { background: var(--bg); }
+  .item-title { font-weight: 600; color: var(--dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 12px; }
+  .item-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .item-meta { color: var(--mid); font-size: 12px; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .badge-published { background: var(--green-light); color: #16a34a; }
+  .badge-published::before { background: var(--green); }
+  .badge-draft { background: #f1f5f9; color: #64748b; }
+  .badge-draft::before { background: #94a3b8; }
+  .badge-scheduled { background: var(--blue-light); color: #1d4ed8; }
+  .badge-scheduled::before { background: var(--blue); }
+  .badge-review { background: var(--yellow-light); color: #a16207; }
+  .badge-review::before { background: var(--yellow); }
+
+  /* ── ACTION BUTTONS ── */
+  .action-btns { display: flex; align-items: center; gap: 6px; }
+  .btn-action {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--white); font-size: 11px; font-weight: 600;
+    cursor: pointer; transition: all .15s; color: var(--mid);
+    font-family: inherit; white-space: nowrap;
+  }
+  .btn-action:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
+  .btn-action.btn-publish {
+    background: var(--red); color: white; border-color: var(--red);
+  }
+  .btn-action.btn-publish:hover { background: #c0392b; border-color: #c0392b; }
+  .btn-action.btn-published {
+    background: var(--green-light); color: #16a34a; border-color: #bbf7d0;
+    cursor: default;
+  }
+  .btn-action.btn-published:hover { background: var(--green-light); color: #16a34a; border-color: #bbf7d0; }
+
+  /* ── ADD BUTTON ── */
+  .btn-add {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border-radius: 10px;
+    background: var(--red); color: white; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background .18s, transform .15s;
+    font-family: inherit;
+  }
+  .btn-add:hover { background: #c0392b; transform: translateY(-1px); }
+
+  /* ── CHART CARD ── */
+  .chart-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+  }
+  .chart-title { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+  .chart-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+
+  /* ── ATTENDANCE HEATMAP ── */
+  .attendance-wrap { overflow-x: auto; }
+  .attendance-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .attendance-table th { text-align: left; padding: 8px 12px; color: var(--muted); font-weight: 600; font-size: 11px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .attendance-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .attendance-table tr:last-child td { border-bottom: none; }
+  .employee-info { display: flex; align-items: center; gap: 9px; }
+  .avatar-xs { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: white; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .emp-name { font-weight: 600; color: var(--dark); font-size: 13px; }
+  .emp-role { font-size: 11px; color: var(--muted); }
+  .attend-cell {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: inline-grid; place-items: center;
+    font-size: 13px;
+  }
+  .attend-yes { background: var(--green-light); color: var(--green); }
+  .attend-no { background: var(--red-light); color: var(--red); }
+  .attend-na { background: var(--bg); color: var(--muted); }
+  .attend-late { background: var(--yellow-light); color: var(--yellow); }
+  .attend-rate { font-weight: 700; font-size: 13px; }
+  .attend-bar { height: 6px; border-radius: 3px; background: var(--border); margin-top: 4px; overflow: hidden; }
+  .attend-bar-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+
+  /* ── BAR CHART ── */
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 140px; padding: 0 4px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .bar-value { font-size: 10px; font-weight: 700; color: var(--mid); }
+  .bar { width: 100%; border-radius: 6px 6px 0 0; min-height: 6px; transition: height .5s ease; cursor: pointer; }
+  .bar:hover { opacity: .8; }
+  .bar-label { font-size: 10px; color: var(--muted); text-align: center; white-space: nowrap; }
+
+  /* ── DONUT ── */
+  .donut-wrap { display: flex; align-items: center; gap: 28px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-label { color: var(--mid); }
+  .legend-val { font-weight: 700; color: var(--dark); margin-left: auto; min-width: 30px; text-align: right; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(15,15,26,.55); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 20px; width: 100%; max-width: 680px;
+    box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto;
+    animation: modalIn .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes modalIn { from { transform: scale(.94) translateY(12px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 24px 18px; border-bottom: 1px solid var(--border);
+  }
+  .modal-title { font-size: 16px; font-weight: 700; color: var(--dark); }
+  .modal-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .modal-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid var(--border); background: transparent;
+    cursor: pointer; display: grid; place-items: center;
+    color: var(--muted); transition: all .15s; font-size: 16px;
+  }
+  .modal-close:hover { background: var(--red-light); color: var(--red); border-color: var(--red-mid); }
+  .modal-body { padding: 22px 24px; }
+  .modal-footer {
+    padding: 16px 24px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end; align-items: center;
+  }
+
+  /* ── FORM ── */
+  .form-row { margin-bottom: 16px; }
+  .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--mid); margin-bottom: 6px; display: block; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 9px 13px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--white);
+    font-size: 13px; color: var(--dark); font-family: inherit;
+    transition: border-color .18s, box-shadow .18s; outline: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,61,61,.08);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; }
+  .form-select { appearance: none; cursor: pointer; }
+
+  /* ── PREVIEW BOX ── */
+  .preview-toggle { display: flex; gap: 0; margin-bottom: 16px; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .preview-tab {
+    flex: 1; padding: 8px; text-align: center; font-size: 12px; font-weight: 600;
+    cursor: pointer; background: transparent; border: none; color: var(--muted);
+    font-family: inherit; transition: all .15s;
+  }
+  .preview-tab.active { background: var(--red); color: white; }
+  .form-panel, .prev-panel { display: none; }
+  .form-panel.active, .prev-panel.active { display: block; }
+  .preview-box {
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 22px; min-height: 200px;
+  }
+  .prev-title { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .prev-meta { display: flex; gap: 16px; margin-bottom: 12px; }
+  .prev-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+  .prev-desc { font-size: 13px; color: var(--mid); line-height: 1.6; }
+  .prev-cover {
+    width: 100%; height: 120px; border-radius: 10px; margin-bottom: 14px;
+    background: linear-gradient(135deg, var(--red) 0%, #c0392b 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 24px; opacity: .7;
+  }
+
+  /* ── DASHBOARD OVERVIEW ── */
+  .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .overview-grid.full { grid-template-columns: 1fr; }
+  .activity-list { display: flex; flex-direction: column; gap: 12px; }
+  .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .activity-item:last-child { border-bottom: none; }
+  .act-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .act-text { font-size: 13px; color: var(--mid); line-height: 1.4; }
+  .act-text strong { color: var(--dark); }
+  .act-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ── QUICK ACTIONS ── */
+  .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .qa-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; cursor: pointer;
+    transition: all .2s; display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+    box-shadow: var(--shadow-sm);
+  }
+  .qa-card:hover { border-color: var(--red); background: var(--red-light); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .qa-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; }
+  .qa-title { font-size: 13px; font-weight: 600; color: var(--dark); }
+  .qa-sub { font-size: 11px; color: var(--muted); }
+
+  /* ── PAGE HEADER ── */
+  .page-header { margin-bottom: 24px; }
+  .page-title { font-size: 22px; font-weight: 800; color: var(--dark); }
+  .page-breadcrumb { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .page-breadcrumb span { color: var(--red); font-weight: 600; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 800px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    .form-row-2 { grid-template-columns: 1fr; }
+    .main { padding: 20px 16px 60px; }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .stat-card, .chart-card, .table-card, .qa-card { animation: fadeIn .3s ease both; }
+  .stat-card:nth-child(1) { animation-delay: .05s; }
+  .stat-card:nth-child(2) { animation-delay: .1s; }
+  .stat-card:nth-child(3) { animation-delay: .15s; }
+  .stat-card:nth-child(4) { animation-delay: .2s; }
+
+  /* ── TOOLTIP ── */
+  [data-tip] { position: relative; }
+  [data-tip]:hover::after {
+    content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%); background: var(--dark); color: white;
+    font-size: 11px; padding: 4px 8px; border-radius: 6px; white-space: nowrap;
+    pointer-events: none; z-index: 9999;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ TOPBAR ═══════════════ -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon">A</div>
+    <span>Adobe Connect</span>
+    <div class="admin-badge">Admin</div>
+  </div>
+  <div class="topbar-center">
+    <div class="topbar-search">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search content, events, employees…">
+      <span style="font-size:10px;background:var(--border);border-radius:5px;padding:1px 6px;color:var(--muted);white-space:nowrap;">⌘K</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-icon" id="themeToggle" title="Toggle dark mode" style="cursor:pointer;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </div>
+    <div class="topbar-icon notif" title="Notifications">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div class="notif-dot"></div>
+    </div>
+    <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
+    <div class="topbar-user">
+      <div class="avatar-sm">SA</div>
+      <span class="topbar-user-name">Super Admin</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ LAYOUT ═══════════════ -->
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="showSection('dashboard')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+        <span class="nav-text">Dashboard</span>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Content</div>
+      <div class="nav-item" onclick="showSection('events')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></span>
+        <span class="nav-text">Events</span>
+        <span class="nav-badge">4</span>
+      </div>
+      <div class="nav-item" onclick="showSection('training')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
+        <span class="nav-text">Training</span>
+        <span class="nav-badge">6</span>
+      </div>
+      <div class="nav-item" onclick="showSection('newsletter')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+        <span class="nav-text">Newsletter</span>
+      </div>
+      <div class="nav-item" onclick="showSection('techtalk')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+        <span class="nav-text">Tech Talk</span>
+      </div>
+      <div class="nav-item" onclick="showSection('nominations')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>
+        <span class="nav-text">Nominations</span>
+      </div>
+      <div class="nav-item" onclick="showSection('industry')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+        <span class="nav-text">Industry Updates</span>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Analytics</div>
+      <div class="nav-item" onclick="showSection('analytics')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        <span class="nav-text">Analytics</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="window.open('community-platform-v28 (1).html','_blank')">
+        <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+        <span class="nav-text">View Public Site</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
+
+    <!-- ════ DASHBOARD ════ -->
+    <div id="sec-dashboard" class="section">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-breadcrumb">Admin Portal → <span>Overview</span></div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card" onclick="showSection('events')">
+          <div class="stat-header">
+            <div class="stat-icon red"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg></div>
+            <span class="stat-delta up">+2 this week</span>
+          </div>
+          <div class="stat-value">12</div>
+          <div class="stat-label">Active Events</div>
+        </div>
+        <div class="stat-card" onclick="showSection('training')">
+          <div class="stat-header">
+            <div class="stat-icon blue"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+            <span class="stat-delta up">78% attend.</span>
+          </div>
+          <div class="stat-value">8</div>
+          <div class="stat-label">Training Sessions</div>
+        </div>
+        <div class="stat-card" onclick="showSection('newsletter')">
+          <div class="stat-header">
+            <div class="stat-icon green"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
+            <span class="stat-delta up">62% open rate</span>
+          </div>
+          <div class="stat-value">3</div>
+          <div class="stat-label">Newsletters Sent</div>
+        </div>
+        <div class="stat-card" onclick="showSection('analytics')">
+          <div class="stat-header">
+            <div class="stat-icon orange"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg></div>
+            <span class="stat-delta down">3 absent today</span>
+          </div>
+          <div class="stat-value">248</div>
+          <div class="stat-label">Total Employees</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="qa-card" onclick="openModal('events')">
+          <div class="qa-icon" style="background:var(--red-light);color:var(--red);"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="qa-title">Add New Event</div>
+          <div class="qa-sub">Create and publish events</div>
+        </div>
+        <div class="qa-card" onclick="openModal('training')">
+          <div class="qa-icon" style="background:var(--blue-light);color:var(--blue);"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="qa-title">Add Training</div>
+          <div class="qa-sub">Schedule a training session</div>
+        </div>
+        <div class="qa-card" onclick="openModal('newsletter')">
+          <div class="qa-icon" style="background:var(--green-light);color:var(--green);"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="qa-title">Send Newsletter</div>
+          <div class="qa-sub">Draft and send newsletters</div>
+        </div>
+        <div class="qa-card" onclick="openModal('techtalk')">
+          <div class="qa-icon" style="background:var(--orange-light);color:var(--orange);"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="qa-title">Post Tech Talk</div>
+          <div class="qa-sub">Share tech articles</div>
+        </div>
+        <div class="qa-card" onclick="openModal('nominations')">
+          <div class="qa-icon" style="background:var(--yellow-light);color:var(--yellow);"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="qa-title">Add Nomination</div>
+          <div class="qa-sub">Recognise employees</div>
+        </div>
+        <div class="qa-card" onclick="openModal('industry')">
+          <div class="qa-icon" style="background:#f3f0ff;color:#7c3aed;"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="qa-title">Industry Update</div>
+          <div class="qa-sub">Post industry news</div>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="chart-card">
+          <div class="chart-title">Monthly Engagement</div>
+          <div class="chart-sub">Content interactions across all channels</div>
+          <div class="bar-chart" id="barChart"></div>
+          <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:3px;background:var(--red);"></div>Events</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:3px;background:var(--blue);"></div>Training</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><div style="width:10px;height:10px;border-radius:3px;background:var(--green);"></div>Newsletter</div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Content Status</div>
+          <div class="chart-sub">Distribution by publish state</div>
+          <div class="donut-wrap">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="48" fill="none" stroke="var(--border)" stroke-width="18"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#22c55e" stroke-width="18" stroke-dasharray="180 121.5" stroke-dashoffset="0" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#3b82f6" stroke-width="18" stroke-dasharray="90 211.5" stroke-dashoffset="-180" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#eab308" stroke-width="18" stroke-dasharray="36 265.5" stroke-dashoffset="-270" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="48" fill="none" stroke="#94a3b8" stroke-width="18" stroke-dasharray="18 283.5" stroke-dashoffset="-306" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+              <text x="60" y="56" text-anchor="middle" font-size="18" font-weight="800" fill="var(--dark)">32</text>
+              <text x="60" y="70" text-anchor="middle" font-size="10" fill="var(--muted)">items</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div><span class="legend-label">Published</span><span class="legend-val">18</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div><span class="legend-label">Scheduled</span><span class="legend-val">9</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#eab308;"></div><span class="legend-label">In Review</span><span class="legend-val">3</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div><span class="legend-label">Draft</span><span class="legend-val">2</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="section-header">
+          <div>
+            <div class="chart-title">Recent Activity</div>
+            <div class="chart-sub">Latest admin actions</div>
+          </div>
+        </div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--green);"></div>
+            <div>
+              <div class="act-text"><strong>AI in Product Design: Practical Applications for 2026</strong> was published to Events</div>
+              <div class="act-time">2 hours ago · by Super Admin</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--blue);"></div>
+            <div>
+              <div class="act-text"><strong>Figma Deep Dive – Variables & Auto Layout</strong> training was scheduled for Mar 18</div>
+              <div class="act-time">5 hours ago · by Super Admin</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--yellow);"></div>
+            <div>
+              <div class="act-text"><strong>March Newsletter</strong> moved to review — awaiting approval</div>
+              <div class="act-time">Yesterday · by Super Admin</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="act-dot" style="background:var(--red);"></div>
+            <div>
+              <div class="act-text"><strong>Connect BuildFest 2026</strong> event registration closed — 142 attendees</div>
+              <div class="act-time">2 days ago · by Super Admin</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ EVENTS ════ -->
+    <div id="sec-events" class="section" style="display:none;">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <div class="page-title">Events</div>
+          <div class="page-breadcrumb">Admin Portal → <span>Events</span></div>
+        </div>
+        <button class="btn-add" onclick="openModal('events')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Event
+        </button>
+      </div>
+
+      <div class="tabs-bar">
+        <button class="tab-btn active" onclick="filterTable('events','all',this)">All (4)</button>
+        <button class="tab-btn" onclick="filterTable('events','published',this)">Published (2)</button>
+        <button class="tab-btn" onclick="filterTable('events','scheduled',this)">Scheduled (1)</button>
+        <button class="tab-btn" onclick="filterTable('events','draft',this)">Drafts (1)</button>
+      </div>
+
+      <div class="table-card">
+        <div class="table-head events-grid">
+          <div>Event</div><div>Date</div><div>Attendees</div><div>Status</div><div>Actions</div>
+        </div>
+        <div class="table-row events-grid" data-status="published">
+          <div><div class="item-title">UX Research in the Age of AI</div><div class="item-sub">Category: Workshop</div></div>
+          <div class="item-meta">Mar 15, 2026</div>
+          <div class="item-meta">124 interested</div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('event','UX Research in the Age of AI')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('event','UX Research in the Age of AI','Workshop · Mar 15, 2026 · 2:00 PM','Explore how AI tools are reshaping user research workflows — best practices for AI-assisted synthesis and maintaining research integrity at scale.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published" data-tip="Published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row events-grid" data-status="published">
+          <div><div class="item-title">AI in Product Design: Practical Applications for 2026</div><div class="item-sub">Category: Seminar</div></div>
+          <div class="item-meta">Mar 22, 2026</div>
+          <div class="item-meta">89 interested</div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('event','AI in Product Design')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('event','AI in Product Design','Seminar · Mar 22, 2026 · 3:00 PM','Discover how leading product teams are integrating AI — from AI-assisted wireframing to automated accessibility audits and smart component suggestions.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published" data-tip="Published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row events-grid" data-status="scheduled">
+          <div><div class="item-title">Adobe Connect Community Mixer – Q1 2026</div><div class="item-sub">Category: Networking</div></div>
+          <div class="item-meta">Apr 5, 2026</div>
+          <div class="item-meta">56 interested</div>
+          <div><span class="badge badge-scheduled">Scheduled</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('event','Community Mixer')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('event','Adobe Connect Community Mixer','Networking · Apr 5, 2026 · 5:00 PM','Connect with fellow community members over virtual coffee. A great way to meet people across teams and build lasting professional relationships.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-publish" onclick="publishItem(this,'Event')" data-tip="Publish">Publish</button>
+          </div>
+        </div>
+        <div class="table-row events-grid" data-status="draft">
+          <div><div class="item-title">Connect BuildFest 2026 – Design Hackathon</div><div class="item-sub">Category: Hackathon</div></div>
+          <div class="item-meta">TBD</div>
+          <div class="item-meta">—</div>
+          <div><span class="badge badge-draft">Draft</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('event','BuildFest 2026')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('event','Connect BuildFest 2026','Hackathon · Date TBD · 48 hours','Form a team of 2–4 and build something using Adobe Connect APIs. Prizes for Best UX, Most Innovative Use Case, and Community Favourite.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-publish" onclick="publishItem(this,'Event')" data-tip="Publish">Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ TRAINING ════ -->
+    <div id="sec-training" class="section" style="display:none;">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <div class="page-title">Training</div>
+          <div class="page-breadcrumb">Admin Portal → <span>Training</span></div>
+        </div>
+        <button class="btn-add" onclick="openModal('training')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Training
+        </button>
+      </div>
+
+      <div class="tabs-bar">
+        <button class="tab-btn active" onclick="filterTable('training','all',this)">All (6)</button>
+        <button class="tab-btn" onclick="filterTable('training','published',this)">Published (4)</button>
+        <button class="tab-btn" onclick="filterTable('training','scheduled',this)">Upcoming (1)</button>
+        <button class="tab-btn" onclick="filterTable('training','draft',this)">Drafts (1)</button>
+      </div>
+
+      <div class="table-card" style="margin-bottom:24px;">
+        <div class="table-head training-grid">
+          <div>Training Session</div><div>Date</div><div>Attendance</div><div>Status</div><div>Actions</div>
+        </div>
+        <div class="table-row training-grid" data-status="published">
+          <div><div class="item-title">Figma Deep Dive – Variables & Auto Layout</div><div class="item-sub">Intermediate · 2h session</div></div>
+          <div class="item-meta">Mar 18, 2026</div>
+          <div><div style="font-size:12px;font-weight:700;color:var(--green);">38/40 ✓</div><div class="item-sub">95% attendance</div></div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('training','Figma Deep Dive')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('training','Figma Deep Dive – Variables & Auto Layout','Intermediate · Mar 18, 2026 · 2h session','Structured session for intermediate-to-advanced Figma users. Covers Variables, auto-layout, high-fidelity prototyping, and Dev Mode handoff best practices.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row training-grid" data-status="published">
+          <div><div class="item-title">Plain Language & Global Content Writing</div><div class="item-sub">All levels · 1.5h session</div></div>
+          <div class="item-meta">Mar 10, 2026</div>
+          <div><div style="font-size:12px;font-weight:700;color:var(--orange);">28/40 ✓</div><div class="item-sub">70% attendance</div></div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('training','Plain Language')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('training','Plain Language & Global Content Writing','All levels · Mar 10, 2026 · 1.5h','Practical training on plain language principles, cultural sensitivity in copy, writing for accessibility, and creating content that resonates across global audiences.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row training-grid" data-status="published">
+          <div><div class="item-title">API Security Fundamentals</div><div class="item-sub">Advanced · 3h session</div></div>
+          <div class="item-meta">Feb 28, 2026</div>
+          <div><div style="font-size:12px;font-weight:700;color:var(--red);">22/40 ✓</div><div class="item-sub">55% attendance</div></div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('training','API Security')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('training','API Security Fundamentals','Advanced · Feb 28, 2026 · 3h','Deep dive into API authentication, authorization patterns, OAuth 2.0, JWT handling, and practical security auditing techniques for backend developers.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row training-grid" data-status="published">
+          <div><div class="item-title">Accessibility & Inclusive Design</div><div class="item-sub">All levels · 2h session</div></div>
+          <div class="item-meta">Feb 20, 2026</div>
+          <div><div style="font-size:12px;font-weight:700;color:var(--green);">36/40 ✓</div><div class="item-sub">90% attendance</div></div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('training','Accessibility')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('training','Accessibility & Inclusive Design','All levels · Feb 20, 2026 · 2h','Covers WCAG 2.2, ARIA best practices, color contrast, keyboard navigation, screen-reader testing, and building accessible component libraries.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row training-grid" data-status="scheduled">
+          <div><div class="item-title">React Performance Optimisation</div><div class="item-sub">Advanced · 2.5h session</div></div>
+          <div class="item-meta">Apr 2, 2026</div>
+          <div><div style="font-size:12px;font-weight:700;color:var(--blue);">12 enrolled</div><div class="item-sub">Registration open</div></div>
+          <div><span class="badge badge-scheduled">Scheduled</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('training','React Performance')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('training','React Performance Optimisation','Advanced · Apr 2, 2026 · 2.5h','Profiling, memoization, lazy loading, concurrent rendering, and avoiding common React anti-patterns that slow down large applications.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-publish" onclick="publishItem(this,'Training')">Publish</button>
+          </div>
+        </div>
+        <div class="table-row training-grid" data-status="draft">
+          <div><div class="item-title">Data Visualisation with D3.js</div><div class="item-sub">Intermediate · 3h session</div></div>
+          <div class="item-meta">TBD</div>
+          <div><div style="font-size:12px;color:var(--muted);">—</div></div>
+          <div><span class="badge badge-draft">Draft</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('training','D3.js')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('training','Data Visualisation with D3.js','Intermediate · Date TBD · 3h','Building interactive charts and data-driven documents using the D3.js library. Covers scales, axes, transitions, and real-world dashboard patterns.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-publish" onclick="publishItem(this,'Training')">Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ NEWSLETTER ════ -->
+    <div id="sec-newsletter" class="section" style="display:none;">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <div class="page-title">Newsletter</div>
+          <div class="page-breadcrumb">Admin Portal → <span>Newsletter</span></div>
+        </div>
+        <button class="btn-add" onclick="openModal('newsletter')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Compose Newsletter
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-head newsletter-grid">
+          <div>Newsletter</div><div>Sent Date</div><div>Open Rate</div><div>Status</div><div>Actions</div>
+        </div>
+        <div class="table-row newsletter-grid" data-status="published">
+          <div><div class="item-title">March 2026 — Community Highlights</div><div class="item-sub">248 recipients</div></div>
+          <div class="item-meta">Mar 1, 2026</div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--green);">64%</div><div class="item-sub">158 opens</div></div>
+          <div><span class="badge badge-published">Sent</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('newsletter','March 2026')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('newsletter','March 2026 — Community Highlights','Monthly Newsletter · Sent Mar 1, 2026 · 248 recipients','This month\'s highlights from the Adobe Connect community — events recap, training outcomes, upcoming sessions, and spotlight on employee nominations.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Sent</button>
+          </div>
+        </div>
+        <div class="table-row newsletter-grid" data-status="published">
+          <div><div class="item-title">February 2026 — AI Tools Deep Dive</div><div class="item-sub">244 recipients</div></div>
+          <div class="item-meta">Feb 1, 2026</div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--blue);">58%</div><div class="item-sub">141 opens</div></div>
+          <div><span class="badge badge-published">Sent</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('newsletter','February 2026')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('newsletter','February 2026 — AI Tools Deep Dive','Monthly Newsletter · Sent Feb 1, 2026','A curated look at the most impactful AI tools our teams have been using, with tips and workflows shared by members of the community.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Sent</button>
+          </div>
+        </div>
+        <div class="table-row newsletter-grid" data-status="review">
+          <div><div class="item-title">April 2026 — Q2 Kickoff Edition</div><div class="item-sub">Pending approval</div></div>
+          <div class="item-meta">Apr 1, 2026</div>
+          <div><div style="font-size:12px;color:var(--muted);">—</div></div>
+          <div><span class="badge badge-review">In Review</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('newsletter','April 2026')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('newsletter','April 2026 — Q2 Kickoff Edition','Draft · Scheduled for Apr 1, 2026','Celebrating the start of Q2 with new community initiatives, upcoming events, training programmes, and a look at industry trends shaping our work.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-publish" onclick="publishItem(this,'Newsletter')">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ TECH TALK ════ -->
+    <div id="sec-techtalk" class="section" style="display:none;">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <div class="page-title">Tech Talk</div>
+          <div class="page-breadcrumb">Admin Portal → <span>Tech Talk</span></div>
+        </div>
+        <button class="btn-add" onclick="openModal('techtalk')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Tech Talk
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-head techtalk-grid">
+          <div>Article</div><div>Posted</div><div>Views</div><div>Status</div><div>Actions</div>
+        </div>
+        <div class="table-row techtalk-grid" data-status="published">
+          <div><div class="item-title">LLMs in Production: Lessons Learned</div><div class="item-sub">by Admin · Engineering</div></div>
+          <div class="item-meta">Mar 8, 2026</div>
+          <div class="item-meta">312 views</div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('techtalk','LLMs in Production')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('techtalk','LLMs in Production: Lessons Learned','Tech Talk · Mar 8, 2026 · Engineering','A candid look at what we\'ve learned deploying large language models in production environments — latency, costs, hallucinations, and the surprisingly hard parts.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row techtalk-grid" data-status="published">
+          <div><div class="item-title">Understanding Edge Computing at Scale</div><div class="item-sub">by Admin · Infrastructure</div></div>
+          <div class="item-meta">Feb 22, 2026</div>
+          <div class="item-meta">198 views</div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('techtalk','Edge Computing')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('techtalk','Understanding Edge Computing at Scale','Tech Talk · Feb 22, 2026 · Infrastructure','How edge computing is changing application architecture, what trade-offs to expect, and real-world use cases from our infrastructure teams.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row techtalk-grid" data-status="draft">
+          <div><div class="item-title">WebAssembly: The Future of Browser Performance</div><div class="item-sub">Draft · Frontend</div></div>
+          <div class="item-meta">—</div>
+          <div class="item-meta">—</div>
+          <div><span class="badge badge-draft">Draft</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('techtalk','WebAssembly')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('techtalk','WebAssembly: The Future of Browser Performance','Draft · Frontend','An exploration of WASM capabilities, browser support landscape, and how teams can start adopting WebAssembly in their frontend stacks today.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-publish" onclick="publishItem(this,'Tech Talk')">Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ NOMINATIONS ════ -->
+    <div id="sec-nominations" class="section" style="display:none;">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <div class="page-title">Nominations</div>
+          <div class="page-breadcrumb">Admin Portal → <span>Nominations</span></div>
+        </div>
+        <button class="btn-add" onclick="openModal('nominations')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Nomination
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-head nom-grid">
+          <div>Nominee</div><div>Category</div><div>Nominated by</div><div>Status</div><div>Actions</div>
+        </div>
+        <div class="table-row nom-grid" data-status="published">
+          <div><div class="item-title">Priya Menon</div><div class="item-sub">Senior UX Designer · Design</div></div>
+          <div class="item-meta">Innovation Award</div>
+          <div class="item-meta">Team Lead</div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('nomination','Priya Menon')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('nomination','Priya Menon — Innovation Award','Senior UX Designer · Nominated by Team Lead','Priya\'s groundbreaking work on the AI-assisted prototyping workflow has saved the team hundreds of hours and set a new standard for design velocity at Adobe.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row nom-grid" data-status="published">
+          <div><div class="item-title">Rahul Sharma</div><div class="item-sub">Backend Engineer · Platform</div></div>
+          <div class="item-meta">Team Player</div>
+          <div class="item-meta">Manager</div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('nomination','Rahul Sharma')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('nomination','Rahul Sharma — Team Player Award','Backend Engineer · Nominated by Manager','Rahul consistently goes above and beyond to help teammates debug complex issues, often staying late to ensure the team hits its sprint goals.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row nom-grid" data-status="draft">
+          <div><div class="item-title">Aisha Nkosi</div><div class="item-sub">Product Manager · Growth</div></div>
+          <div class="item-meta">Leadership Award</div>
+          <div class="item-meta">Director</div>
+          <div><span class="badge badge-draft">Draft</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('nomination','Aisha Nkosi')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('nomination','Aisha Nkosi — Leadership Award','Product Manager · Nominated by Director','Aisha led the Q1 growth initiative with remarkable clarity of vision, rallying cross-functional teams across three time zones to deliver results on time.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-publish" onclick="publishItem(this,'Nomination')">Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ INDUSTRY UPDATES ════ -->
+    <div id="sec-industry" class="section" style="display:none;">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <div class="page-title">Industry Updates</div>
+          <div class="page-breadcrumb">Admin Portal → <span>Industry Updates</span></div>
+        </div>
+        <button class="btn-add" onclick="openModal('industry')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Update
+        </button>
+      </div>
+      <div class="table-card">
+        <div class="table-head ind-grid">
+          <div>Article</div><div>Published</div><div>Reads</div><div>Status</div><div>Actions</div>
+        </div>
+        <div class="table-row ind-grid" data-status="published">
+          <div><div class="item-title">Adobe's 2026 Creative Cloud Roadmap Revealed</div><div class="item-sub">Source: TechCrunch · Adobe News</div></div>
+          <div class="item-meta">Mar 10, 2026</div>
+          <div class="item-meta">284 reads</div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('industry','Adobe 2026 Roadmap')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('industry','Adobe\'s 2026 Creative Cloud Roadmap Revealed','Industry Update · Mar 10, 2026 · Adobe News','A comprehensive look at the upcoming features and integrations planned for the Creative Cloud suite in 2026, with a heavy emphasis on AI-powered tools.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row ind-grid" data-status="published">
+          <div><div class="item-title">State of UX Design Tools 2026 Report</div><div class="item-sub">Source: Nielsen Norman Group</div></div>
+          <div class="item-meta">Feb 28, 2026</div>
+          <div class="item-meta">156 reads</div>
+          <div><span class="badge badge-published">Published</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('industry','State of UX 2026')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('industry','State of UX Design Tools 2026 Report','Industry Update · Feb 28, 2026','The annual NNG survey reveals shifting tool preferences, the rise of AI-assisted prototyping, and how remote collaboration continues to reshape the UX discipline.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-published">✓ Live</button>
+          </div>
+        </div>
+        <div class="table-row ind-grid" data-status="draft">
+          <div><div class="item-title">How AI is Reshaping Enterprise Software in 2026</div><div class="item-sub">Draft · Curated article</div></div>
+          <div class="item-meta">—</div>
+          <div class="item-meta">—</div>
+          <div><span class="badge badge-draft">Draft</span></div>
+          <div class="action-btns">
+            <button class="btn-action" onclick="openEditModal('industry','AI Reshaping Enterprise')" data-tip="Edit">✏️</button>
+            <button class="btn-action" onclick="openPreview('industry','How AI is Reshaping Enterprise Software in 2026','Industry Update · Draft','Analysis of how AI automation, copilots, and intelligent workflows are fundamentally changing the enterprise software landscape — and what it means for product teams.')" data-tip="Preview">👁️</button>
+            <button class="btn-action btn-publish" onclick="publishItem(this,'Update')">Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ ANALYTICS ════ -->
+    <div id="sec-analytics" class="section" style="display:none;">
+      <div class="page-header">
+        <div class="page-title">Analytics</div>
+        <div class="page-breadcrumb">Admin Portal → <span>Analytics</span></div>
+      </div>
+
+      <!-- Training Attendance Heatmap -->
+      <div class="chart-card">
+        <div class="chart-title">Training Attendance Tracker</div>
+        <div class="chart-sub">Employee attendance across all training sessions this quarter</div>
+        <div class="attendance-wrap">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Figma Deep Dive</th>
+                <th>Plain Language</th>
+                <th>API Security</th>
+                <th>Accessibility</th>
+                <th>React Perf.</th>
+                <th>Attend. Rate</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceBody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);"><div class="attend-cell attend-yes" style="width:18px;height:18px;font-size:10px;">✓</div>Attended</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);"><div class="attend-cell attend-no" style="width:18px;height:18px;font-size:10px;">✗</div>Absent</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);"><div class="attend-cell attend-late" style="width:18px;height:18px;font-size:10px;">~</div>Late/Partial</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);"><div class="attend-cell attend-na" style="width:18px;height:18px;font-size:10px;">—</div>Not Enrolled</div>
+        </div>
+      </div>
+
+      <!-- Two charts -->
+      <div class="overview-grid">
+        <div class="chart-card">
+          <div class="chart-title">Event Interest by Month</div>
+          <div class="chart-sub">Number of employees who clicked "Interested"</div>
+          <div class="bar-chart" id="eventBarChart"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Content Published per Category</div>
+          <div class="chart-sub">Total items published this quarter</div>
+          <div class="bar-chart" id="categoryChart"></div>
+        </div>
+      </div>
+
+      <!-- Dropout / skip leaderboard -->
+      <div class="chart-card">
+        <div class="chart-title" style="color:var(--red);">⚠ Training Skippers — Needs Attention</div>
+        <div class="chart-sub">Employees who missed 2 or more training sessions this quarter</div>
+        <div class="table-card" style="margin-top:16px;box-shadow:none;border:1px solid var(--border);">
+          <div class="table-head" style="grid-template-columns:2fr 1fr 1fr 1fr;display:grid;padding:12px 20px;">
+            <div>Employee</div><div>Sessions Missed</div><div>Last Attended</div><div>Action</div>
+          </div>
+          <div id="skippersBody"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════ MODAL: ADD/EDIT CONTENT ═══════════ -->
+<div class="modal-overlay" id="contentModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">Add Event</div>
+        <div class="modal-sub" id="modalSub">Fill in the details, then Preview before Publishing</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('contentModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="preview-toggle">
+        <button class="preview-tab active" onclick="switchTab('form',this)">✏️ Edit</button>
+        <button class="preview-tab" onclick="switchTab('preview',this)">👁 Preview</button>
+      </div>
+
+      <!-- FORM -->
+      <div id="formPanel" class="form-panel active">
+        <div class="form-row">
+          <label class="form-label" id="titleLabel">Event Title *</label>
+          <input type="text" id="formTitle" class="form-input" placeholder="Enter a clear, descriptive title…">
+        </div>
+        <div class="form-row-2">
+          <div>
+            <label class="form-label" id="dateLabel">Date *</label>
+            <input type="date" id="formDate" class="form-input">
+          </div>
+          <div id="timeRow">
+            <label class="form-label">Time</label>
+            <input type="time" id="formTime" class="form-input">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div id="categoryRow">
+            <label class="form-label" id="categoryLabel">Category</label>
+            <select id="formCategory" class="form-select">
+              <option>Workshop</option>
+              <option>Seminar</option>
+              <option>Networking</option>
+              <option>Hackathon</option>
+              <option>Webinar</option>
+            </select>
+          </div>
+          <div id="levelRow">
+            <label class="form-label" id="levelLabel">Level / Audience</label>
+            <select id="formLevel" class="form-select">
+              <option>All levels</option>
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Description *</label>
+          <textarea id="formDesc" class="form-textarea" placeholder="Write a compelling description…"></textarea>
+        </div>
+        <div class="form-row" id="locationRow">
+          <label class="form-label">Location / Link</label>
+          <input type="text" id="formLocation" class="form-input" placeholder="Virtual link or physical venue…">
+        </div>
+        <div class="form-row" id="tagsRow">
+          <label class="form-label">Tags</label>
+          <input type="text" id="formTags" class="form-input" placeholder="ai, design, engineering…">
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div id="previewPanel" class="prev-panel">
+        <div class="preview-box">
+          <div class="prev-cover" id="prevCover">🎯</div>
+          <div class="prev-title" id="prevTitle">—</div>
+          <div class="prev-meta">
+            <div class="prev-meta-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span id="prevDate">—</span>
+            </div>
+            <div class="prev-meta-item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              <span id="prevCat">—</span>
+            </div>
+          </div>
+          <div class="prev-desc" id="prevDesc">Your description will appear here…</div>
+        </div>
+        <div style="margin-top:12px;padding:12px;background:var(--yellow-light);border-radius:10px;font-size:12px;color:#92400e;">
+          💡 This is how the content will look to employees on the public site. Review carefully before publishing.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action" onclick="saveDraft()" style="font-size:13px;padding:8px 16px;">Save as Draft</button>
+      <button class="btn-add" onclick="publishFromModal()" style="font-size:13px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Publish Now
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: PREVIEW ═══════════ -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Content Preview</div>
+        <div class="modal-sub">How this appears to employees on the public site</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('previewModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="preview-box">
+        <div class="prev-cover" id="pmCover">🎯</div>
+        <div class="prev-title" id="pmTitle">—</div>
+        <div class="prev-meta">
+          <div class="prev-meta-item">📅 <span id="pmDate">—</span></div>
+          <div class="prev-meta-item">🏷 <span id="pmCat">—</span></div>
+        </div>
+        <div class="prev-desc" id="pmDesc">—</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action" onclick="closeModal('previewModal')" style="font-size:13px;padding:8px 16px;">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL: PUBLISH CONFIRM ═══════════ -->
+<div class="modal-overlay" id="publishModal">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">🚀 Publish Content?</div>
+        <div class="modal-sub" id="publishModalSub">This will be immediately visible to all employees.</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('publishModal')">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:28px 24px;">
+      <div style="font-size:48px;margin-bottom:12px;">📢</div>
+      <div style="font-size:14px;color:var(--mid);line-height:1.6;" id="publishModalMsg">This content will be published to the public site and visible to all 248 employees immediately.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-action" onclick="closeModal('publishModal')" style="font-size:13px;padding:8px 16px;">Cancel</button>
+      <button class="btn-add" id="publishConfirmBtn" style="font-size:13px;">Confirm Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;z-index:999;display:none;">
+  <div style="background:var(--dark);color:white;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:8px;">
+    <span id="toastIcon">✓</span>
+    <span id="toastMsg">Published successfully!</span>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────
+const EMPLOYEES = [
+  { name:'Priya Menon', role:'UX Designer', color:'#667eea', attend:[1,1,0,1,1] },
+  { name:'Rahul Sharma', role:'Backend Eng.', color:'#E83D3D', attend:[1,1,1,1,0] },
+  { name:'Aisha Nkosi', role:'Product Manager', color:'#22c55e', attend:[1,0,0,1,1] },
+  { name:'Kenji Yamamoto', role:'Frontend Dev.', color:'#f97316', attend:[0,0,1,1,0] },
+  { name:'Sofia Alvarez', role:'Data Scientist', color:'#a855f7', attend:[1,1,1,1,1] },
+  { name:'Marcus Chen', role:'DevOps Eng.', color:'#06b6d4', attend:[0,1,0,0,1] },
+  { name:'Fatima Al-Rashid', role:'Design Lead', color:'#ec4899', attend:[1,1,1,1,1] },
+  { name:'Thomas Erikson', role:'QA Engineer', color:'#84cc16', attend:[0,0,0,1,0] },
+  { name:'Amara Osei', role:'Content Writer', color:'#eab308', attend:[1,0,1,0,2] },
+  { name:'Daniel Park', role:'iOS Developer', color:'#64748b', attend:[1,1,0,1,2] },
+];
+
+const SESSIONS = ['Figma Deep Dive','Plain Language','API Security','Accessibility','React Perf.'];
+
+// ── SECTION NAVIGATION ────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).style.display = 'block';
+
+  const map = { dashboard:0, events:1, training:2, newsletter:3, techtalk:4, nominations:5, industry:6, analytics:7 };
+  const items = document.querySelectorAll('.nav-item');
+  if (items[map[id]]) items[map[id]].classList.add('active');
+
+  if (id === 'analytics') buildAnalytics();
+  if (id === 'dashboard') buildBarChart();
+}
+
+// ── TABS (filter by status) ───────────────────────────────
+function filterTable(section, status, btn) {
+  btn.closest('.tabs-bar').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const section_el = document.getElementById('sec-' + section);
+  section_el.querySelectorAll('.table-row').forEach(row => {
+    if (status === 'all' || row.dataset.status === status) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+
+// ── MODAL LOGIC ───────────────────────────────────────────
+const MODAL_CONFIG = {
+  events:      { title:'Add Event',          sub:'Fill in event details · Preview · Publish', icon:'🎯', cat:'Workshop', dateLabel:'Event Date *', catLabel:'Category', catOptions:['Workshop','Seminar','Networking','Hackathon','Webinar'] },
+  training:    { title:'Add Training',        sub:'Schedule a new training session',           icon:'📚', cat:'Intermediate', dateLabel:'Session Date *', catLabel:'Level', catOptions:['All levels','Beginner','Intermediate','Advanced'] },
+  newsletter:  { title:'Compose Newsletter',  sub:'Draft a newsletter for all employees',      icon:'📧', cat:'Monthly', dateLabel:'Send Date *', catLabel:'Type', catOptions:['Monthly','Weekly','Special Edition'] },
+  techtalk:    { title:'Post Tech Talk',       sub:'Share an article or tech discussion',       icon:'💬', cat:'Engineering', dateLabel:'Publish Date *', catLabel:'Category', catOptions:['Engineering','Design','Data','Product','Security'] },
+  nominations: { title:'Add Nomination',       sub:'Recognise an outstanding employee',         icon:'⭐', cat:'Innovation Award', dateLabel:'Announcement Date *', catLabel:'Award Type', catOptions:['Innovation Award','Team Player','Leadership Award','Rising Star'] },
+  industry:    { title:'Add Industry Update',  sub:'Curate and publish an industry article',    icon:'📰', cat:'Technology', dateLabel:'Publish Date *', catLabel:'Category', catOptions:['Technology','Design','Business','AI','Other'] },
+};
+
+let currentModalType = 'events';
+let pendingPublishBtn = null;
+
+function openModal(type) {
+  currentModalType = type;
+  const cfg = MODAL_CONFIG[type];
+  document.getElementById('modalTitle').textContent = cfg.title;
+  document.getElementById('modalSub').textContent = cfg.sub;
+  document.getElementById('formTitle').value = '';
+  document.getElementById('formDesc').value = '';
+  document.getElementById('formLocation').value = '';
+  document.getElementById('formTags').value = '';
+
+  // Rebuild category options
+  const sel = document.getElementById('formCategory');
+  sel.innerHTML = cfg.catOptions.map(o => `<option>${o}</option>`).join('');
+
+  // Switch back to form tab
+  switchTab('form', document.querySelector('.preview-tab'));
+  document.querySelectorAll('.preview-tab')[0].classList.add('active');
+  document.querySelectorAll('.preview-tab')[1].classList.remove('active');
+
+  document.getElementById('contentModal').classList.add('open');
+}
+
+function openEditModal(type, name) {
+  openModal(type);
+  document.getElementById('modalTitle').textContent = 'Edit ' + (MODAL_CONFIG[type]?.title.replace('Add ','').replace('Compose ','').replace('Post ','') || '');
+  document.getElementById('formTitle').value = name;
+  document.getElementById('formDesc').value = 'Existing content description for ' + name + '. Edit as needed.';
+}
+
+function openPreview(type, title, meta, desc) {
+  const icons = { event:'🎯', training:'📚', newsletter:'📧', techtalk:'💬', nomination:'⭐', industry:'📰' };
+  document.getElementById('pmCover').textContent = icons[type] || '📄';
+  document.getElementById('pmTitle').textContent = title;
+  const parts = meta.split(' · ');
+  document.getElementById('pmDate').textContent = parts[1] || meta;
+  document.getElementById('pmCat').textContent = parts[0] || '';
+  document.getElementById('pmDesc').textContent = desc;
+  document.getElementById('previewModal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.preview-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  if (tab === 'preview') {
+    document.getElementById('formPanel').classList.remove('active');
+    document.getElementById('previewPanel').classList.add('active');
+    // Update preview from form
+    const t = document.getElementById('formTitle').value || 'Untitled';
+    const d = document.getElementById('formDate').value;
+    const c = document.getElementById('formCategory').value;
+    const desc = document.getElementById('formDesc').value || 'No description provided.';
+    const cfg = MODAL_CONFIG[currentModalType];
+    document.getElementById('prevCover').textContent = cfg.icon;
+    document.getElementById('prevTitle').textContent = t;
+    document.getElementById('prevDate').textContent = d || 'Date not set';
+    document.getElementById('prevCat').textContent = c;
+    document.getElementById('prevDesc').textContent = desc;
+  } else {
+    document.getElementById('previewPanel').classList.remove('active');
+    document.getElementById('formPanel').classList.add('active');
+  }
+}
+
+function publishItem(btn, label) {
+  pendingPublishBtn = btn;
+  document.getElementById('publishModalSub').textContent = label + ' will be immediately visible to all employees.';
+  document.getElementById('publishModalMsg').textContent = 'This ' + label.toLowerCase() + ' will be published to the public site and visible to all 248 employees immediately. This action cannot be undone.';
+  document.getElementById('publishConfirmBtn').onclick = () => confirmPublish(btn, label);
+  document.getElementById('publishModal').classList.add('open');
+}
+
+function confirmPublish(btn, label) {
+  closeModal('publishModal');
+  // Update UI
+  btn.textContent = '✓ Live';
+  btn.classList.remove('btn-publish');
+  btn.classList.add('btn-published');
+  btn.onclick = null;
+  // Update badge in same row
+  const row = btn.closest('.table-row');
+  if (row) {
+    const badge = row.querySelector('.badge');
+    if (badge) {
+      badge.className = 'badge badge-published';
+      badge.textContent = 'Published';
+    }
+    row.dataset.status = 'published';
+  }
+  showToast('✓', label + ' published successfully!');
+}
+
+function publishFromModal() {
+  const t = document.getElementById('formTitle').value;
+  if (!t) { showToast('⚠', 'Please add a title first!'); return; }
+  closeModal('contentModal');
+  showToast('✓', 'Content published to public site!');
+}
+
+function saveDraft() {
+  const t = document.getElementById('formTitle').value;
+  closeModal('contentModal');
+  showToast('💾', (t || 'Content') + ' saved as draft');
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(icon, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastMsg').textContent = msg;
+  t.style.display = 'block';
+  t.style.animation = 'none';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────
+function buildAnalytics() {
+  buildAttendance();
+  buildEventBarChart();
+  buildCategoryChart();
+  buildSkippers();
+}
+
+function buildAttendance() {
+  const body = document.getElementById('attendanceBody');
+  if (!body || body.children.length > 0) return;
+
+  EMPLOYEES.forEach(emp => {
+    const attended = emp.attend.filter(a => a === 1).length;
+    const total = emp.attend.filter(a => a !== 2).length; // 2 = not enrolled
+    const rate = total > 0 ? Math.round((attended / total) * 100) : 0;
+    const color = rate >= 80 ? 'var(--green)' : rate >= 60 ? 'var(--orange)' : 'var(--red)';
+
+    const cells = emp.attend.map(a => {
+      if (a === 2) return `<td><div class="attend-cell attend-na">—</div></td>`;
+      if (a === 1) return `<td><div class="attend-cell attend-yes">✓</div></td>`;
+      if (a === 0) return `<td><div class="attend-cell attend-no">✗</div></td>`;
+    }).join('');
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div class="employee-info">
+          <div class="avatar-xs" style="background:${emp.color};">${emp.name.split(' ').map(n=>n[0]).join('')}</div>
+          <div><div class="emp-name">${emp.name}</div><div class="emp-role">${emp.role}</div></div>
+        </div>
+      </td>
+      ${cells}
+      <td>
+        <div class="attend-rate" style="color:${color};">${rate}%</div>
+        <div class="attend-bar"><div class="attend-bar-fill" style="width:${rate}%;background:${color};"></div></div>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+function buildEventBarChart() {
+  const el = document.getElementById('eventBarChart');
+  if (!el || el.children.length > 0) return;
+  const data = [
+    { label:'Jan', val:62 },
+    { label:'Feb', val:89 },
+    { label:'Mar', val:124 },
+    { label:'Apr', val:45 },
+    { label:'May', val:78 },
+    { label:'Jun', val:95 },
+  ];
+  const max = Math.max(...data.map(d=>d.val));
+  data.forEach(d => {
+    const h = Math.round((d.val / max) * 110);
+    el.innerHTML += `<div class="bar-wrap">
+      <div class="bar-value">${d.val}</div>
+      <div class="bar" style="height:${h}px;background:var(--red);"></div>
+      <div class="bar-label">${d.label}</div>
+    </div>`;
+  });
+}
+
+function buildCategoryChart() {
+  const el = document.getElementById('categoryChart');
+  if (!el || el.children.length > 0) return;
+  const data = [
+    { label:'Events', val:12, color:'var(--red)' },
+    { label:'Training', val:8, color:'var(--blue)' },
+    { label:'Newsletter', val:3, color:'var(--green)' },
+    { label:'Tech Talk', val:6, color:'var(--orange)' },
+    { label:'Nominations', val:5, color:'var(--yellow)' },
+    { label:'Industry', val:4, color:'#a855f7' },
+  ];
+  const max = Math.max(...data.map(d=>d.val));
+  data.forEach(d => {
+    const h = Math.round((d.val / max) * 110);
+    el.innerHTML += `<div class="bar-wrap">
+      <div class="bar-value">${d.val}</div>
+      <div class="bar" style="height:${h}px;background:${d.color};"></div>
+      <div class="bar-label">${d.label}</div>
+    </div>`;
+  });
+}
+
+function buildSkippers() {
+  const body = document.getElementById('skippersBody');
+  if (!body || body.children.length > 0) return;
+  const skippers = EMPLOYEES
+    .map(e => ({ ...e, missed: e.attend.filter(a => a === 0).length }))
+    .filter(e => e.missed >= 2)
+    .sort((a,b) => b.missed - a.missed);
+
+  skippers.forEach(emp => {
+    const div = document.createElement('div');
+    div.className = 'table-row';
+    div.style.gridTemplateColumns = '2fr 1fr 1fr 1fr';
+    div.innerHTML = `
+      <div>
+        <div class="employee-info">
+          <div class="avatar-xs" style="background:${emp.color};">${emp.name.split(' ').map(n=>n[0]).join('')}</div>
+          <div><div class="emp-name">${emp.name}</div><div class="emp-role">${emp.role}</div></div>
+        </div>
+      </div>
+      <div><span class="badge badge-draft" style="background:var(--red-light);color:var(--red);font-size:12px;">${emp.missed} missed</span></div>
+      <div class="item-meta">Feb 20, 2026</div>
+      <div><button class="btn-action" style="font-size:11px;" onclick="showToast('📧','Reminder sent to ${emp.name}!')">Send Reminder</button></div>
+    `;
+    body.appendChild(div);
+  });
+}
+
+// ── DASHBOARD BAR CHART ───────────────────────────────────
+function buildBarChart() {
+  const el = document.getElementById('barChart');
+  if (!el || el.children.length > 0) return;
+  const months = ['Oct','Nov','Dec','Jan','Feb','Mar'];
+  const events   = [45, 52, 38, 61, 78, 89];
+  const training = [30, 42, 28, 55, 60, 72];
+  const news     = [20, 25, 18, 30, 35, 42];
+  const maxV = Math.max(...events, ...training, ...news);
+
+  months.forEach((m, i) => {
+    el.innerHTML += `<div class="bar-wrap" style="gap:2px;">
+      <div class="bar-value" style="font-size:9px;">${events[i]}</div>
+      <div style="display:flex;gap:2px;align-items:flex-end;height:110px;">
+        <div class="bar" style="width:10px;height:${Math.round(events[i]/maxV*100)}px;background:var(--red);border-radius:3px 3px 0 0;"></div>
+        <div class="bar" style="width:10px;height:${Math.round(training[i]/maxV*100)}px;background:var(--blue);border-radius:3px 3px 0 0;"></div>
+        <div class="bar" style="width:10px;height:${Math.round(news[i]/maxV*100)}px;background:var(--green);border-radius:3px 3px 0 0;"></div>
+      </div>
+      <div class="bar-label">${m}</div>
+    </div>`;
+  });
+}
+
+// ── DARK MODE ─────────────────────────────────────────────
+document.getElementById('themeToggle').addEventListener('click', () => {
+  document.documentElement.classList.toggle('dark');
+});
+
+// ── INIT ─────────────────────────────────────────────────
+buildBarChart();
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
