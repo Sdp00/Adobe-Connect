@@ -1,0 +1,44 @@
+/**
+ * Spectrum Design Tokens — Light theme, Medium scale
+ * Local copy so the dashboard works without any CDN dependency.
+ * These match the values set by sp-theme system="spectrum" color="light" scale="medium".
+ */
+
+:root,
+sp-theme {
+  /* ---- Grays ---- */
+  --spectrum-white:      #fff;
+  --spectrum-gray-50:    #fafafa;
+  --spectrum-gray-75:    #f5f5f5;
+  --spectrum-gray-100:   #f0f0f0;
+  --spectrum-gray-200:   #e0e0e0;
+  --spectrum-gray-300:   #cdcdcd;
+  --spectrum-gray-400:   #b3b3b3;
+  --spectrum-gray-500:   #8e8e8e;
+  --spectrum-gray-600:   #6e6e6e;
+  --spectrum-gray-700:   #4b4b4b;
+  --spectrum-gray-800:   #2c2c2c;
+  --spectrum-gray-900:   #1a1a1a;
+
+  /* ---- Accent (Spectrum Blue) ---- */
+  --spectrum-accent-background-color-default: #0265dc;
+
+  /* ---- Semantic greens ---- */
+  --spectrum-green-900:  #188038;
+  --spectrum-green-1000: #116329;
+
+  /* ---- Semantic reds ---- */
+  --spectrum-red-900:    #d7373f;
+  --spectrum-red-1000:   #b31412;
+
+  /* ---- Typography ---- */
+  --spectrum-font-family-base: 'adobe-clean', 'Source Sans 3', 'Source Sans Pro', ui-sans-serif, system-ui, sans-serif;
+  --spectrum-font-size-100:    14px;
+  --spectrum-font-size-200:    16px;
+  --spectrum-line-height-100:  1.4;
+
+  /* ---- Spacing ---- */
+  --spectrum-spacing-100: 8px;
+  --spectrum-spacing-200: 12px;
+  --spectrum-spacing-300: 16px;
+}
