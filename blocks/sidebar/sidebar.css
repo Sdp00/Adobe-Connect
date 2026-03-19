@@ -1,7 +1,7 @@
 /* ============================================================
    SIDEBAR — Adobe Connect EDS
    ============================================================ */
-
+ 
 :root {
   --ac-sidebar-w: 56px;
   --ac-sidebar-expanded-w: 220px;
@@ -9,7 +9,7 @@
   --ac-sidebar-speed: 0.25s;
   --ac-sidebar-ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
-
+ 
 /* ============================================================
    OVERLAY
    ============================================================ */
@@ -20,11 +20,11 @@
   background: rgb(0 0 0 / 42%);
   z-index: 89;
 }
-
+ 
 .ac-sidebar-overlay.is-visible {
   display: block;
 }
-
+ 
 /* ============================================================
    SHELL — light mode first, then dark override
    ============================================================ */
@@ -37,7 +37,7 @@
   --sb-active-bar: #e11d48;
   --sb-tip-bg: #2c2c2c;
   --sb-tip-text: #fff;
-
+ 
   position: fixed;
   top: var(--ac-sidebar-top);
   left: 0;
@@ -55,13 +55,13 @@
     width var(--ac-sidebar-speed) var(--ac-sidebar-ease),
     box-shadow var(--ac-sidebar-speed) var(--ac-sidebar-ease);
 }
-
+ 
 .ac-sidebar:hover {
   width: var(--ac-sidebar-expanded-w);
   box-shadow: 4px 0 20px rgb(0 0 0 / 10%);
   overflow: visible;
 }
-
+ 
 html[data-theme="dark"] .ac-sidebar {
   --sb-bg: #1e1e1e;
   --sb-border: #333;
@@ -72,7 +72,7 @@ html[data-theme="dark"] .ac-sidebar {
   --sb-tip-bg: #fff;
   --sb-tip-text: #111;
 }
-
+ 
 /* ============================================================
    NAV LIST
    ============================================================ */
@@ -82,13 +82,13 @@ html[data-theme="dark"] .ac-sidebar {
   padding: 0;
   flex: 1;
 }
-
+ 
 .ac-sidebar-item {
   position: relative;
 }
-
+ 
 /* ============================================================
-   LINK — light mode colour first, dark override after
+   LINK
    ============================================================ */
 .ac-sidebar-link {
   display: flex;
@@ -110,18 +110,18 @@ html[data-theme="dark"] .ac-sidebar {
   color: #2c2c2c;
   transition: background 0.15s, color 0.15s;
 }
-
+ 
 .ac-sidebar-link:hover {
   background: var(--sb-hover-bg);
   color: #2c2c2c;
 }
-
+ 
 .ac-sidebar-link.is-active {
   background: var(--sb-active-bg);
   color: var(--sb-active-text);
   font-weight: 600;
 }
-
+ 
 .ac-sidebar-link.is-active::before {
   content: "";
   position: absolute;
@@ -132,21 +132,13 @@ html[data-theme="dark"] .ac-sidebar {
   background: var(--sb-active-bar);
   border-radius: 0 3px 3px 0;
 }
-
+ 
 html[data-theme="dark"] .ac-sidebar-link {
   color: #fff;
 }
-
-html[data-theme="dark"] .ac-sidebar-link:hover {
-  color: #fff;
-}
-
-html[data-theme="dark"] .ac-sidebar-link.is-active {
-  color: #fca5a5;
-}
-
+ 
 /* ============================================================
-   ICON — light mode first, dark override after
+   ICON
    ============================================================ */
 .ac-sidebar-icon {
   display: flex;
@@ -156,28 +148,16 @@ html[data-theme="dark"] .ac-sidebar-link.is-active {
   min-width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: inherit;
 }
-
+ 
 .ac-sidebar-icon svg {
   width: 20px;
   height: 20px;
   display: block;
-  stroke: currentcolor;
-  fill: none;
-  color: inherit;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
-
-.ac-sidebar-icon svg * {
-  stroke: currentcolor;
-  fill: none;
-}
-
+ 
 /* ============================================================
-   LABEL — light mode first, dark override after
+   LABEL
    ============================================================ */
 .ac-sidebar-label {
   opacity: 0;
@@ -186,26 +166,23 @@ html[data-theme="dark"] .ac-sidebar-link.is-active {
   text-overflow: ellipsis;
   white-space: nowrap;
   pointer-events: none;
-  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
-  font-size: 14px;
-  font-weight: inherit;
   color: #2c2c2c;
   transition: opacity 0.15s 0.04s;
 }
-
+ 
 html[data-theme="dark"] .ac-sidebar-label {
   color: #fff;
 }
-
+ 
 .ac-sidebar:hover .ac-sidebar-label,
 .ac-sidebar.is-open .ac-sidebar-label {
   opacity: 1;
 }
-
+ 
 .ac-sidebar-link.is-active .ac-sidebar-label {
   color: var(--sb-active-text);
 }
-
+ 
 /* ============================================================
    TOOLTIP
    ============================================================ */
@@ -227,7 +204,7 @@ html[data-theme="dark"] .ac-sidebar-label {
   z-index: 9999;
   box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
 }
-
+ 
 .ac-sidebar-tooltip::before {
   content: "";
   position: absolute;
@@ -237,44 +214,11 @@ html[data-theme="dark"] .ac-sidebar-label {
   border: 5px solid transparent;
   border-right-color: var(--sb-tip-bg);
 }
-
+ 
 .ac-sidebar:not(:hover, .is-open) .ac-sidebar-item:hover .ac-sidebar-tooltip {
   display: block;
 }
-
-/* ============================================================
-   HAMBURGER — light mode first, dark override after
-   ============================================================ */
-.ac-sidebar-toggle {
-  display: none;
-  background: none;
-  border: none;
-  outline: none;
-  box-shadow: none;
-  appearance: none;
-  padding: 6px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.ac-sidebar-toggle svg {
-  width: 20px;
-  height: 20px;
-  stroke: #2c2c2c;
-  fill: none;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  display: block;
-  transition: stroke 0.15s;
-}
-
-html[data-theme="dark"] .ac-sidebar-toggle svg {
-  stroke: #fff;
-}
-
+ 
 /* ============================================================
    MOBILE ≤ 768px
    ============================================================ */
@@ -282,7 +226,7 @@ html[data-theme="dark"] .ac-sidebar-toggle svg {
   :root {
     --ac-sidebar-top: 56px;
   }
-
+ 
   .ac-sidebar {
     width: var(--ac-sidebar-expanded-w);
     transform: translateX(-100%);
@@ -290,49 +234,31 @@ html[data-theme="dark"] .ac-sidebar-toggle svg {
       transform var(--ac-sidebar-speed) var(--ac-sidebar-ease),
       box-shadow var(--ac-sidebar-speed) var(--ac-sidebar-ease);
   }
-
+ 
   .ac-sidebar:hover {
     width: var(--ac-sidebar-expanded-w);
     box-shadow: none;
     overflow: hidden;
   }
-
+ 
   .ac-sidebar.is-open {
     transform: translateX(0);
     box-shadow: 4px 0 24px rgb(0 0 0 / 20%);
     overflow: visible;
   }
-
+ 
   .ac-sidebar-label {
     opacity: 1;
     transition: none;
   }
-
-  .ac-sidebar-toggle {
-    display: flex;
-  }
-
-  .ac-sidebar-toggle svg {
-    width: 18px;
-    height: 18px;
-  }
-
+ 
   .ac-sidebar-icon svg {
     width: 18px;
     height: 18px;
   }
-
-  .ac-sidebar-tooltip {
-    display: none;
-  }
 }
-
+ 
 @media (width <= 375px) {
-  .ac-sidebar-toggle svg {
-    width: 17px;
-    height: 17px;
-  }
-
   .ac-sidebar-icon svg {
     width: 17px;
     height: 17px;
