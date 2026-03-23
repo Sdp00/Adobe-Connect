@@ -214,6 +214,13 @@ function FeedCard({ post }) {
               onInput=${(e) => setCommentInput(e.target.value)}
               onKeyDown=${(e) => e.key === 'Enter' && addComment()}
             />
+            <button
+              class="feed-comment-submit"
+              onClick=${addComment}
+              disabled=${!commentInput.trim()}
+            >
+              Post
+            </button>
           </div>
 
         </div>
