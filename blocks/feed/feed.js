@@ -2,99 +2,6 @@ import { html, render } from '../../vendor/htm-preact.js';
 import { useState, useEffect,useCallback,useRef } from '../../vendor/preact-hooks.js';
 
 
-const MOCK_POSTS = [
-  {
-    id: 1,
-    name: "Sarah Chen",
-    role: "Senior UX Designer",
-    time: "2 hours ago",
-    text: `Just finished the new design system for our enterprise platform 🎉 Spent 3 months getting every component just right. The key insight: <strong>consistency beats creativity</strong> when you're building for scale. Here's a sneak peek at the keyboard shortcuts overlay we designed...`,
-    likes: 24,
-    comments: 6,
-    images: [
-      "https://picsum.photos/seed/main/800/420",
-      "https://picsum.photos/seed/aa/400/300",
-      "https://picsum.photos/seed/bb/400/300",
-      "https://picsum.photos/seed/cc/400/300",
-      "https://picsum.photos/seed/dd/400/300",
-    ]
-  },
-  {
-    id: 2,
-    name: "Marcus Rivera",
-    role: "Engineering Manager",
-    time: "4 hours ago",
-    text: `Huge shoutout to the backend team for hitting <strong>99.98% uptime</strong> this quarter 🚀 We migrated 3 microservices to the new infra without a single customer-facing incident. That's what ownership looks like.`,
-    likes: 41,
-    comments: 3,
-    images: []
-  },
-  {
-    id: 3,
-    name: "Priya Nair",
-    role: "Product Manager",
-    time: "Yesterday",
-    text: `Wrapped up our Q1 roadmap review with leadership. Excited to share that <strong>three of our top-voted features</strong> are officially greenlit for Q2! Stay tuned for more details at the All-Hands next week 📋`,
-    likes: 18,
-    comments: 9,
-    images: [
-      "https://picsum.photos/seed/roadmap/800/400",
-    ]
-  },
-  {
-    id: 4,
-    name: "James Okafor",
-    role: "Senior Data Analyst",
-    time: "Yesterday",
-    text: `Built a new real-time dashboard for monitoring user retention across segments. First time we've had this level of visibility — the drop-off at day 7 is finally explainable 📊 Happy to walk anyone through it.`,
-    likes: 33,
-    comments: 12,
-    images: [
-      "https://picsum.photos/seed/dash/800/420",
-      "https://picsum.photos/seed/chart1/400/300",
-      "https://picsum.photos/seed/chart2/400/300",
-    ]
-  },
-  {
-    id: 5,
-    name: "Lena Fischer",
-    role: "HR Business Partner",
-    time: "2 days ago",
-    text: `Reminder: the <strong>Learning & Development budget</strong> resets at the end of this month 📚 Don't let it go to waste — courses, conferences, and books all qualify. Drop your requests in the L&D portal by Friday!`,
-    likes: 57,
-    comments: 4,
-    images: []
-  },
-  {
-    id: 6,
-    name: "Tom Yashida",
-    role: "DevOps Engineer",
-    time: "2 days ago",
-    text: `Just deployed our new CI/CD pipeline. Build times dropped from <strong>18 minutes → 4 minutes</strong> ⚡ The key was parallelising the test suites and caching dependencies more aggressively. Will write up a full post-mortem next week.`,
-    likes: 29,
-    comments: 7,
-    images: [
-      "https://picsum.photos/seed/devops/800/400",
-    ]
-  },
-  {
-    id: 7,
-    name: "Ananya Bhatt",
-    role: "Content Strategist",
-    time: "3 days ago",
-    text: `Our refreshed brand voice guide is now live on the internal wiki! 🎨 We've simplified the tone pillars from 7 down to 3: <strong>Clear, Human, Bold.</strong> Please use it for all external comms going forward.`,
-    likes: 15,
-    comments: 6,
-    commentsList: [
-      { id: 1, name: "Alex", text: "This is amazing 👏" },
-      { id: 2, name: "John", text: "Loved the consistency point!" }
-    ],
-    images: [
-      "https://picsum.photos/seed/brand1/400/300",
-      "https://picsum.photos/seed/brand2/400/300",
-    ]
-  },
-];
 
 /*  Lightbox  */
 
@@ -282,29 +189,35 @@ function FeedCard({ post }) {
 
       <!-- Comments placeholder -->
       ${showComments && html`
-  <div class="feed-comments">
+        <div class="feed-comments">
 
-    <!-- Existing comments -->
-    ${post.commentsList && post.commentsList.map(c => html`
-      <div class="feed-comment">
-        <div class="feed-comment-avatar">
-          ${c.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+          <!-- Existing comments -->
+          ${post.commentsList && post.commentsList.map(c => html`
+            <div class="feed-comment">
+              <div class="feed-comment-avatar">
+                ${c.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+              </div>
+              <div class="feed-comment-body">
+                <div class="feed-comment-name">${c.name}</div>
+                <div class="feed-comment-text">${c.text}</div>
+              </div>
+            </div>
+          `)}
+
+          <!-- Input -->
+          <div class="feed-comment-input-row">
+            <div class="feed-comment-avatar">JN</div>
+            <input
+              class="feed-comment-input"
+              placeholder="Write a comment…"
+              value=${commentInput}
+              onInput=${(e) => setCommentInput(e.target.value)}
+              onKeyDown=${(e) => e.key === 'Enter' && addComment()}
+            />
+          </div>
+
         </div>
-        <div class="feed-comment-body">
-          <div class="feed-comment-name">${c.name}</div>
-          <div class="feed-comment-text">${c.text}</div>
-        </div>
-      </div>
-    `)}
-
-    <!-- Input -->
-    <div class="feed-comment-input-row">
-      <div class="feed-comment-avatar">JN</div>
-      <input class="feed-comment-input" placeholder="Write a comment…" />
-    </div>
-
-  </div>
-`}
+      `}
 
       <!-- Lightbox -->
       ${lightbox !== null && html`
@@ -322,9 +235,15 @@ function FeedCard({ post }) {
 /* Feed  */
 
 function Feed() {
-  const [posts, setPosts] = useState(MOCK_POSTS);
+  // const [posts, setPosts] = useState(MOCK_POSTS);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
+    fetch('/data/post.json')
+    .then(res => res.json())
+    .then(data => setPosts(data))
+    .catch(err => console.error('Error loading posts:', err));
+    // Existing create-post event
     const handler = (e) => {
       const newPost = {
         id: Date.now(),
