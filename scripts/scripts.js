@@ -1,5 +1,7 @@
 import {
   buildBlock,
+  decorateBlock,
+  loadBlock,
   loadHeader,
   loadFooter,
   decorateIcons,
@@ -12,9 +14,12 @@ import {
   loadCSS,
 } from './aem.js';
 
-// ── SIDEBAR ──────────────────────────────────────────────────
-import { loadSidebar } from '../blocks/sidebar/sidebar.js';
-// ─────────────────────────────────────────────────────────────
+async function loadSidebar() {
+  const block = buildBlock('sidebar', '');
+  document.body.prepend(block);
+  decorateBlock(block);
+  return loadBlock(block);
+}
 
 /**
  * Builds hero block and prepends to main in a new section.
