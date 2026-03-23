@@ -235,15 +235,19 @@ function FeedCard({ post }) {
 /* Feed  */
 
 function Feed() {
-  // const [posts, setPosts] = useState(MOCK_POSTS);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts]           = useState([]);
+  const [visibleCount, setVisibleCount] = useState(3);
+  const [loading, setLoading]       = useState(false);
+  const loaderRef                   = useRef(null);
+  const POSTS_PER_PAGE              = 3;
 
+  // Load JSON once
   useEffect(() => {
     fetch('/data/post.json')
-    .then(res => res.json())
-    .then(data => setPosts(data))
-    .catch(err => console.error('Error loading posts:', err));
-    // Existing create-post event
+      .then(res => res.json())
+      .then(data => setPosts(data))
+      .catch(err => console.error('Error loading posts:', err));
+
     const handler = (e) => {
       const newPost = {
         id: Date.now(),
@@ -257,16 +261,60 @@ function Feed() {
       };
       setPosts(prev => [newPost, ...prev]);
     };
-
     window.addEventListener('create-post', handler);
     return () => window.removeEventListener('create-post', handler);
   }, []);
 
+  // IntersectionObserver — reads latest posts/visibleCount via refs
+  const postsRef       = useRef(posts);
+  const visibleRef     = useRef(visibleCount);
+  const loadingRef     = useRef(loading);
+
+  useEffect(() => { postsRef.current    = posts;        }, [posts]);
+  useEffect(() => { visibleRef.current  = visibleCount; }, [visibleCount]);
+  useEffect(() => { loadingRef.current  = loading;      }, [loading]);
+
+  useEffect(() => {
+    if (!loaderRef.current) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      if (loadingRef.current)         return;
+
+      const current = visibleRef.current;
+      const total   = postsRef.current.length;
+
+      if (current >= total) return; // nothing more to load
+
+      setLoading(true);
+      // Simulate network delay (remove setTimeout if data is already local)
+      setTimeout(() => {
+        setVisibleCount(n => Math.min(n + POSTS_PER_PAGE, total));
+        setLoading(false);
+      }, 400);
+    }, { threshold: 0.1 });
+
+    observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, []); // ← runs once; stale-closure problem solved by refs above
+
+  const visiblePosts = posts.slice(0, visibleCount);
+  const hasMore      = visibleCount < posts.length;
+
   return html`
     <div class="feed">
-      ${posts.map(post => html`
+      ${visiblePosts.map(post => html`
         <${FeedCard} key=${post.id} post=${post} />
       `)}
+
+      <div ref=${loaderRef} class="feed-loader">
+        ${loading
+          ? html`<div class="feed-loader-spinner"></div>`
+          : hasMore
+            ? html`<span>Scroll for more</span>`
+            : html`<span>You're all caught up ✓</span>`
+        }
+      </div>
     </div>
   `;
 }

@@ -10,6 +10,31 @@
   margin-top: 12px;
 }
 
+.feed-loader {
+  text-align: center;
+  padding: 20px;
+  color: var(--spectrum-global-color-gray-600);
+  font-size: 13px;
+  font-family: var(--spectrum-global-font-family-base);
+  min-height: 60px; /* keeps the sentinel always in the DOM */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feed-loader-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--spectrum-global-color-gray-300);
+  border-top-color: var(--spectrum-red-600);
+  border-radius: 50%;
+  animation: feed-spin 0.7s linear infinite;
+}
+
+@keyframes feed-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Card ─────────────────────────────────────────────────────────── */
 
 .feed-card {
