@@ -1,0 +1,183 @@
+/* stylelint-disable */
+/* =============================================================
+   Right Panel Layout — styles/rightpanel.css
+   ============================================================= */
+
+main {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 24px !important;
+  max-width: 1280px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+main > .section.post-bar-container {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+main > .section.calendar-container {
+  flex: 0 0 340px !important;
+  width: 340px !important;
+  min-width: 340px !important;
+  max-width: 340px !important;
+  position: sticky !important;
+  top: 72px !important;
+  align-self: flex-start !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+main > .section.calendar-container > .calendar-wrapper,
+main > .section.calendar-container > .upcoming-wrapper,
+main > .section.calendar-container > .trends-wrapper,
+main > .section.calendar-container > .newsletters-wrapper {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+@media (width <= 1024px) {
+  main {
+    flex-direction: column !important;
+  }
+
+  main > .section.calendar-container {
+    flex: unset !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: unset !important;
+    position: static !important;
+  }
+}
+
+/* ── Mobile: hide entire right panel section ── */
+@media (width <= 768px) {
+  .section.calendar-container {
+    display: none !important;
+  }
+
+  .upcoming-wrapper,
+  .trends-wrapper,
+  .newsletters-wrapper {
+    display: none !important;
+  }
+}
+
+/* ── Calendar popover trigger ── */
+.cal-popover-mount {
+  display: none;
+}
+
+.cal-popover__trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.cal-popover__trigger:hover {
+  background: #f3f3f3;
+}
+
+.cal-popover__icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  filter: brightness(0) saturate(100%);
+  opacity: 0.7;
+}
+
+.cal-popover__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgb(0 0 0 / 30%);
+}
+
+.cal-popover__panel {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100vw - 32px);
+  max-width: 380px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 40px rgb(0 0 0 / 18%);
+  z-index: 1000;
+  padding: 16px;
+  box-sizing: border-box;
+  animation: cal-slide-in 0.2s ease;
+}
+
+@keyframes cal-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.cal-popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cal-popover__label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.cal-popover__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.cal-popover__close:hover {
+  background: #f3f3f3;
+  color: #333;
+}
+
+@media (width <= 768px) {
+  .cal-popover-mount {
+    display: block;
+  }
+
+  .section.calendar-container .calendar-wrapper {
+    display: none;
+  }
+}
+
+@media (width >= 769px) {
+  .cal-popover__trigger,
+  .cal-popover__backdrop,
+  .cal-popover__panel {
+    display: none !important;
+  }
+}

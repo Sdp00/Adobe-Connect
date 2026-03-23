@@ -1,0 +1,121 @@
+/* stylelint-disable */
+/* =============================================================
+   Newsletters Block — newsletters.css
+   /blocks/newsletters/newsletters.css
+   ============================================================= */
+
+.newsletters-block {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%), 0 0 0 1px rgb(0 0 0 / 5%);
+  font-family: 'Adobe Clean', adobe-clean, 'Source Sans Pro', ui-sans-serif, system-ui, sans-serif;
+}
+
+.newsletters-block__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.newsletters-block__header-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  filter: brightness(0) saturate(100%) invert(25%) sepia(90%) saturate(500%) hue-rotate(195deg);
+  opacity: 0.85;
+}
+
+.newsletters-block__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.newsletters-block__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.newsletters-block__item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0 12px 10px;
+  border-left: 3px solid #bfdbfe;
+  border-top: 1px solid #f0f0f0;
+}
+
+.newsletters-block__item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.newsletters-block__thumb {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.newsletters-block__thumb-icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) saturate(100%) invert(25%) sepia(90%) saturate(500%) hue-rotate(195deg);
+  opacity: 0.8;
+}
+
+.newsletters-block__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.newsletters-block__category {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #0369a1;
+  margin-bottom: 3px;
+}
+
+.newsletters-block__item-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 4px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.newsletters-block__meta {
+  font-size: 11px;
+  color: #999;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.newsletters-block__sep {
+  color: #ddd;
+}
+
+.newsletters-block__read-time {
+  color: #bbb;
+}
