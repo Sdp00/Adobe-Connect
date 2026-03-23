@@ -42,6 +42,28 @@ function PostBar() {
     setIsModalOpen(false);
   };
 
+  const resetForm = () => {
+  setText('');
+  setFiles([]);
+  };
+
+  const handleClose = () => {
+  resetForm();
+  setIsModalOpen(false);
+  };
+
+  const handleDrop = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const droppedFiles = Array.from(e.dataTransfer.files);
+  setFiles(prev => [...prev, ...droppedFiles]);
+};
+
+const handleDragOver = (e) => {
+  e.preventDefault();
+};
+
   return html`
     <div class="postbar">
 
@@ -78,7 +100,7 @@ function PostBar() {
     
     <${Modal}
       isOpen=${isModalOpen}
-      onClose=${() => setIsModalOpen(false)}
+      onClose=${handleClose}
       modalHeader="Create Post"
       onSubmit=${submitPost}
       submitLabel="Send"
@@ -111,10 +133,17 @@ function PostBar() {
         onChange=${handleFileChange}
       />
 
-      <!-- CUSTOM BUTTON -->
-      <label for="file-upload" class="modal-upload-btn">
-        Upload
-      </label>
+     <div
+        class="modal-dropzone"
+        onDrop=${handleDrop}
+        onDragOver=${handleDragOver}
+      >
+        <p>Drag & drop files here</p>
+
+        <label for="file-upload" class="modal-upload-btn">
+          Or Upload
+        </label>
+      </div>
 
       <!-- PREVIEW -->
       ${files.length > 0 && html`
