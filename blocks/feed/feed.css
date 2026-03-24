@@ -132,6 +132,9 @@
   overflow: hidden;
   aspect-ratio: 1 / 1;
   cursor: pointer;
+  background-color: var(--spectrum-gray-100);
+  border: var(--spectrum-border-divider);
+  border-radius: 10px;
 }
 
 .feed-image-grid-item img {
