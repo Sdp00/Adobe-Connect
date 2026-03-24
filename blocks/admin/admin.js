@@ -11,6 +11,22 @@ const STATS = [
   { icon: 'newsletters', count: '3', label: 'Newsletters Sent' },
 ];
 
+/* ── Data layer ───────────────────────────────────────────────
+   Replace the mock return below with a real API/DB call.
+   Must resolve to { events, trainings, newsletters } counts.
+   ─────────────────────────────────────────────────────────── */
+async function fetchStats() {
+  // TODO: replace with real API call, e.g.:
+  // const res = await fetch('/api/admin/stats');
+  // return res.json();
+  return {
+    events: 4,
+    trainings: 6,
+    newsletters: 3,
+  };
+}
+
+/* ── Icon fetcher ─────────────────────────────────────────── */
 const iconCache = {};
 
 async function fetchIcon(name) {
