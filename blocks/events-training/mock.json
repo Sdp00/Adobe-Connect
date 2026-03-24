@@ -1,0 +1,220 @@
+{
+  "events": {
+    "upcoming": [
+      {
+        "id": "evt-001",
+        "title": "UX Research in the Age of AI: Separating Signal from Noise",
+        "description": "Explore how AI tools are reshaping user research workflows — best practices for AI-assisted synthesis and maintaining research integrity at scale.",
+        "date": "Mar 18, 2026",
+        "time": "2:00 PM – 3:30 PM PST",
+        "location": "Virtual – Adobe Connect Live",
+        "image": "/events-training/images/ux-research.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "evt-002",
+        "title": "Adobe Connect Community Mixer – Q1 2026",
+        "description": "Connect with fellow community members over virtual coffee. A great way to meet people across teams and build lasting professional relationships.",
+        "date": "Mar 25, 2026",
+        "time": "5:00 PM – 6:30 PM PST",
+        "location": "Virtual – Gather.town",
+        "image": "/events-training/images/community-mixer.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "evt-003",
+        "title": "AI in Product Design: Practical Applications for 2026",
+        "description": "Discover how leading product teams are integrating AI — from AI-assisted wireframing to automated accessibility audits and smart component suggestions.",
+        "date": "Mar 27, 2026",
+        "time": "11:00 AM – 12:30 PM PST",
+        "location": "Virtual – Adobe Connect Live",
+        "image": "/events-training/images/ai-product-design.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "evt-004",
+        "title": "Design Systems Hackathon 2026",
+        "description": "A 48-hour hackathon where teams compete to build the most innovative design system components. Open to all skill levels.",
+        "date": "Apr 4, 2026",
+        "time": "9:00 AM PST",
+        "location": "Virtual – Discord + Devpost",
+        "image": "/events-training/images/hackathon.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "evt-005",
+        "title": "Figma to Code: Bridging the Design-Dev Gap",
+        "description": "A deep dive into modern workflows for handing off Figma designs to engineers, including auto-layout, tokens, and code generation tools.",
+        "date": "Apr 10, 2026",
+        "time": "1:00 PM – 2:30 PM PST",
+        "location": "San Francisco, CA + Virtual",
+        "image": "/events-training/images/figma-to-code.jpg",
+        "type": "upcoming"
+      }
+    ],
+    "past": [
+      {
+        "id": "evt-006",
+        "title": "Content Strategy Fundamentals for Product Teams",
+        "description": "Practical workshop on voice, tone, microcopy, and content design principles for product teams.",
+        "date": "Mar 5, 2026",
+        "time": "10:00 AM PST",
+        "location": "Virtual – Zoom",
+        "image": "/events-training/images/content-strategy.jpg",
+        "type": "past"
+      },
+      {
+        "id": "evt-007",
+        "title": "Accessibility-First Design: WCAG 3.0 Deep Dive",
+        "description": "Covered WCAG 3.0 changes — new contrast requirements, cognitive accessibility guidelines, and testing workflows.",
+        "date": "Feb 28, 2026",
+        "time": "2:00 PM PST",
+        "location": "Virtual – Adobe Connect Live",
+        "image": "/events-training/images/accessibility.jpg",
+        "type": "past"
+      },
+      {
+        "id": "evt-008",
+        "title": "Building with Adobe APIs: Authentication & Webhooks",
+        "description": "A technical session covering OAuth 2.0, webhook configuration, and rate limit best practices across the Adobe API ecosystem.",
+        "date": "Feb 15, 2026",
+        "time": "11:00 AM PST",
+        "location": "Virtual – Zoom",
+        "image": "/events-training/images/adobe-apis.jpg",
+        "type": "past"
+      }
+    ]
+  },
+  "training": {
+    "upcoming": [
+      {
+        "id": "trn-001",
+        "title": "Advanced Figma Training: Variables, Prototyping & Dev Mode",
+        "description": "Structured session for intermediate-to-advanced Figma users. Covers Variables, auto-layout, high-fidelity prototyping, and Dev Mode handoff best practices.",
+        "date": "2026-03-17",
+        "displayDate": "Mar 17, 2026",
+        "time": "10:00 AM – 12:30 PM PST",
+        "location": "Virtual – Zoom",
+        "trainer": "Sarah Mitchell",
+        "seatsOccupied": 38,
+        "seatsTotal": 50,
+        "image": "/events-training/images/figma-training.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "trn-002",
+        "title": "Adobe Express for Teams: Content Creation at Scale",
+        "description": "Learn how to leverage Adobe Express templates, brand kits, and team libraries to create consistent, on-brand content efficiently across your organisation.",
+        "date": "2026-03-20",
+        "displayDate": "Mar 20, 2026",
+        "time": "1:00 PM – 3:00 PM PST",
+        "location": "Virtual – Adobe Connect Live",
+        "trainer": "David Park",
+        "seatsOccupied": 18,
+        "seatsTotal": 60,
+        "image": "/events-training/images/adobe-express.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "trn-003",
+        "title": "Presenting with Impact: Data Storytelling & Slide Design",
+        "description": "Master the art of turning complex data into compelling visual narratives. Topics include slide structure, chart selection, visual hierarchy, and presenting to executive audiences.",
+        "date": "2026-03-24",
+        "displayDate": "Mar 24, 2026",
+        "time": "11:00 AM – 1:00 PM PST",
+        "location": "Adobe HQ – Conf Room B2 + Zoom",
+        "trainer": "Neha Sharma",
+        "seatsOccupied": 22,
+        "seatsTotal": 40,
+        "image": "/events-training/images/data-storytelling.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "trn-004",
+        "title": "Introduction to Adobe Experience Manager",
+        "description": "A beginner-friendly walkthrough of AEM's core features — page authoring, asset management, workflows, and publishing pipelines.",
+        "date": "2026-04-02",
+        "displayDate": "Apr 2, 2026",
+        "time": "9:00 AM – 11:00 AM PST",
+        "location": "Virtual – Zoom",
+        "trainer": "Priya Anand",
+        "seatsOccupied": 10,
+        "seatsTotal": 45,
+        "image": "/events-training/images/aem-intro.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "trn-005",
+        "title": "Accessibility in Product Design: From Audit to Implementation",
+        "description": "Hands-on workshop covering WCAG 2.2 requirements, screen reader testing, colour contrast, and keyboard navigation.",
+        "date": "2026-04-10",
+        "displayDate": "Apr 10, 2026",
+        "time": "2:00 PM – 4:30 PM PST",
+        "location": "Virtual – Adobe Connect Live",
+        "trainer": "James Okafor",
+        "seatsOccupied": 5,
+        "seatsTotal": 35,
+        "image": "/events-training/images/accessibility-training.jpg",
+        "type": "upcoming"
+      },
+      {
+        "id": "trn-006",
+        "title": "Design Tokens & Theming with Style Dictionary",
+        "description": "Deep dive into design token architecture and how to sync tokens across Figma, web, iOS, and Android using a single source of truth.",
+        "date": "2026-04-18",
+        "displayDate": "Apr 18, 2026",
+        "time": "10:00 AM – 12:00 PM PST",
+        "location": "Virtual – Zoom",
+        "trainer": "Leila Hosseini",
+        "seatsOccupied": 28,
+        "seatsTotal": 50,
+        "image": "/events-training/images/design-tokens.jpg",
+        "type": "upcoming"
+      }
+    ],
+    "past": [
+      {
+        "id": "trn-007",
+        "title": "Content Strategy Fundamentals for Product Teams",
+        "description": "Practical workshop on voice, tone, microcopy, and content design principles for product teams building at scale.",
+        "date": "2026-03-05",
+        "displayDate": "Mar 5, 2026",
+        "time": "10:00 AM PST",
+        "location": "Virtual – Zoom",
+        "trainer": "Ananya Roy",
+        "seatsOccupied": 42,
+        "seatsTotal": 42,
+        "image": "/events-training/images/content-strategy-training.jpg",
+        "type": "past"
+      },
+      {
+        "id": "trn-008",
+        "title": "Motion Design for UI: Principles & After Effects",
+        "description": "Covers the 12 principles of animation applied to UI micro-interactions, transition design, and exporting motion specs for engineers.",
+        "date": "2026-02-20",
+        "displayDate": "Feb 20, 2026",
+        "time": "1:00 PM – 3:00 PM PST",
+        "location": "Virtual – Adobe Connect Live",
+        "trainer": "Tom Eriksson",
+        "seatsOccupied": 55,
+        "seatsTotal": 55,
+        "image": "/events-training/images/motion-design.jpg",
+        "type": "past"
+      },
+      {
+        "id": "trn-009",
+        "title": "Advanced CSS: Container Queries, Layers & Has Selector",
+        "description": "A technical deep dive into the latest CSS features and how to use them in production today.",
+        "date": "2026-02-10",
+        "displayDate": "Feb 10, 2026",
+        "time": "11:00 AM – 1:00 PM PST",
+        "location": "Virtual – Zoom",
+        "trainer": "Rachel Kim",
+        "seatsOccupied": 38,
+        "seatsTotal": 38,
+        "image": "/events-training/images/advanced-css.jpg",
+        "type": "past"
+      }
+    ]
+  }
+}

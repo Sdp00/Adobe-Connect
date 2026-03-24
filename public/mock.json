@@ -1,0 +1,50 @@
+{
+  "calendar": {
+    "title": "Team Calendar",
+    "month": "March 2026",
+    "year": 2026,
+    "month_index": 2,
+    "events": [
+      { "date": 4,  "type": "training", "title": "Design Sprint Kickoff" },
+      { "date": 4,  "type": "event",    "title": "Product Sync" },
+      { "date": 11, "type": "both",     "title": "All Hands Meeting" },
+      { "date": 14, "type": "training", "title": "Figma Advanced Workshop" },
+      { "date": 15, "type": "event",    "title": "Design Review" },
+      { "date": 17, "type": "training", "title": "Token-Based Theming" },
+      { "date": 26, "type": "both",     "title": "Q1 Retrospective" }
+    ],
+    "legend": [
+      { "type": "event",    "color": "#e63535", "label": "Event" },
+      { "type": "training", "color": "#3b82f6", "label": "Training" },
+      { "type": "both",     "color": "#8b5cf6", "label": "Both" }
+    ]
+  },
+  "upcoming": {
+    "title": "Upcoming Events/Trainings",
+    "items": [
+      { "id": 1, "tag": "UPCOMING TRAINING",    "title": "Design System Workshop",       "date": "Apr 10, 2026", "time": "02:00 PM", "location": "Workshop Room A",      "respond_within": "4 days",  "interested": false },
+      { "id": 2, "tag": "UPCOMING EVENT", "title": "Token-Based Theming Deep Dive","date": "Apr 17, 2026", "time": "10:00 AM", "location": "Online - Zoom",         "respond_within": "6 days",  "interested": false },
+      { "id": 3, "tag": "UPCOMING EVENT", "title": "Q1 All-Hands Retrospective",   "date": "Apr 26, 2026", "time": "03:00 PM", "location": "Main Auditorium",       "respond_within": "15 days", "interested": true  },
+      { "id": 4, "tag": "UPCOMING TRAINING", "title": "Figma Advanced Components",    "date": "Apr 2, 2026",  "time": "11:00 AM", "location": "Design Lab B",          "respond_within": "22 days", "interested": false },
+      { "id": 5, "tag": "UPCOMING EVENT",    "title": "Adobe MAX Community Preview",  "date": "Apr 17, 2026", "time": "09:00 AM", "location": "Online - Adobe Connect","respond_within": "30 days", "interested": false }
+    ]
+  },
+  "trends": {
+    "title": "Industry Updates",
+    "items": [
+      { "id": 1, "category": "Design",      "title": "CSS Anchoring Is Here: What It Means for UI Layouts",           "source": "CSS-Tricks",        "time_ago": "2h ago" },
+      { "id": 2, "category": "AI",          "title": "How Semantic Tokens Are Reshaping Design Systems at Scale",      "source": "Smashing Magazine", "time_ago": "5h ago" },
+      { "id": 3, "category": "Development", "title": "Edge Delivery Services: The Future of CMS Performance",          "source": "Web.dev",           "time_ago": "1d ago" },
+      { "id": 4, "category": "UX Research", "title": "2026 State of UX Report: Consistency Beats Creativity",          "source": "Nielsen Norman Group","time_ago": "2d ago" }
+    ]
+  },
+  "newsletters": {
+    "title": "Newsletters",
+    "items": [
+      { "id": 1, "category": "Weekly Digest",   "title": "Adobe Connect Weekly: March Edition — Collaboration Tools Roundup", "source": "Adobe Connect Team",    "time_ago": "Today", "read_time": "4 min read" },
+      { "id": 2, "category": "Design Systems",  "title": "Tokens, Themes & the Future of Component Libraries",               "source": "Design Systems Weekly", "time_ago": "3d ago","read_time": "6 min read" },
+      { "id": 3, "category": "Product Updates", "title": "What's New in Adobe EDS: Performance Wins & Block Authoring",      "source": "Adobe Experience Cloud","time_ago": "5d ago","read_time": "3 min read" },
+      { "id": 4, "category": "Community",       "title": "Meet the Contributors: Spotlight on Open Source UX Tooling",      "source": "Adobe Community Digest","time_ago": "1w ago","read_time": "5 min read" }
+    ]
+  }
+}

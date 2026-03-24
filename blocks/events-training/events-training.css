@@ -1,0 +1,646 @@
+/* ============================================================
+   EVENTS-TRAINING BLOCK — Adobe Connect EDS
+   Prefix: et-
+   Specificity order: element < class < class+pseudo <
+     class+class < class+class+element < html[...] variants
+   ============================================================ */
+
+/* ── Tab bar ─────────────────────────────────────────────── */
+.et-tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid var(--spectrum-border-divider, #eaeaea);
+  padding-bottom: 0;
+}
+
+.et-tab {
+  position: relative;
+  padding: 10px 24px;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+  bottom: -2px;
+  border-bottom: 2px solid transparent;
+}
+
+.et-tab:hover {
+  color: var(--spectrum-text-primary, #2c2c2c);
+}
+
+.et-tab.is-active {
+  color: #e11d48;
+  border-bottom-color: #e11d48;
+}
+
+/* ── Panel ───────────────────────────────────────────────── */
+.et-panel.is-hidden {
+  display: none;
+}
+
+/* ── Section ─────────────────────────────────────────────── */
+.et-section {
+  margin-bottom: 48px;
+}
+
+.et-section-label {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+  margin: 0 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--spectrum-border-divider, #eaeaea);
+}
+
+/* ── Grid ────────────────────────────────────────────────── */
+.et-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+.et-card {
+  background: var(--spectrum-gray-50, #fff);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.et-card:hover {
+  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+  transform: translateY(-2px);
+}
+
+.et-card-past {
+  opacity: 0.92;
+}
+
+/* ── Card image ──────────────────────────────────────────── */
+.et-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--spectrum-gray-200, #eaeaea);
+  flex-shrink: 0;
+}
+
+.et-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.et-card:hover .et-card-image img {
+  transform: scale(1.03);
+}
+
+/* ── Card body ───────────────────────────────────────────── */
+.et-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* ── Card title ──────────────────────────────────────────── */
+.et-card-title {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0 0 10px;
+}
+
+/* ── Card description ────────────────────────────────────── */
+.et-card-desc {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+  margin: 0 0 14px;
+  flex: 1;
+}
+
+/* ── Meta rows ───────────────────────────────────────────── */
+.et-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.et-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 13px;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+}
+
+.et-meta-row svg {
+  flex-shrink: 0;
+  stroke: var(--spectrum-text-secondary, #8e8e8e);
+}
+
+.et-meta-row strong {
+  font-weight: 600;
+  color: var(--spectrum-text-primary, #2c2c2c);
+}
+
+/* ── Card button ─────────────────────────────────────────── */
+.et-card-btn {
+  width: 100%;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 20px;
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.et-card-btn svg {
+  stroke: #fff;
+  flex-shrink: 0;
+}
+
+.et-card-btn.is-interested {
+  background: #be123c;
+}
+
+.et-card-btn.is-interested:hover {
+  background: #9f1239;
+}
+
+/* ── Seats bar ───────────────────────────────────────────── */
+.et-seats {
+  margin-bottom: 12px;
+}
+
+.et-seats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.et-seats-label {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 12px;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+}
+
+.et-seats-count {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--spectrum-text-primary, #2c2c2c);
+}
+
+.et-seats-track {
+  width: 100%;
+  height: 6px;
+  background: var(--spectrum-gray-200, #eaeaea);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.et-seats-fill {
+  height: 100%;
+  background: #e11d48;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ── Timer ───────────────────────────────────────────────── */
+.et-timer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef2f2;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e11d48;
+}
+
+.et-timer svg {
+  stroke: #e11d48;
+  flex-shrink: 0;
+}
+
+/* ── Accept / Decline row ────────────────────────────────── */
+.et-btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.et-accept-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.et-accept-btn svg {
+  stroke: #fff;
+  flex-shrink: 0;
+}
+
+.et-accept-btn.is-accepted {
+  background: #be123c;
+}
+
+.et-accept-btn.is-accepted:hover {
+  background: #9f1239;
+  transform: none;
+}
+
+/* ── Decline button ──────────────────────────────────────── */
+.et-decline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  color: #e11d48;
+  border: 1.5px solid #e11d48;
+}
+
+.et-decline-btn svg {
+  stroke: #e11d48;
+  flex-shrink: 0;
+  display: none;
+}
+
+.et-decline-btn:hover {
+  background: #fef2f2;
+  transform: translateY(-1px);
+}
+
+/* stylelint-disable no-descending-specificity */
+.et-decline-btn.is-declined {
+  background: #e11d48;
+  color: #fff;
+  border-color: #e11d48;
+}
+
+
+/* two-class selector: higher specificity — must come after single-class svg rules */
+.et-decline-btn.is-declined svg {
+  display: block;
+  stroke: #fff;
+}
+
+/* ── Disabled ────────────────────────────────────────────── */
+.et-accept-btn.is-disabled,
+.et-decline-btn.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+}
+
+/* ── Recording button ────────────────────────────────────── */
+
+/* placed AFTER .et-decline-btn.is-declined svg to avoid descending specificity */
+.et-recording-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.et-recording-btn svg {
+  stroke: #fff;
+  flex-shrink: 0;
+}
+
+/* ── Modal ───────────────────────────────────────────────── */
+.et-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 48%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.et-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 24px 48px rgb(0 0 0 / 24%);
+  box-sizing: border-box;
+}
+
+.et-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.et-modal-title {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0;
+}
+
+.et-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.et-modal-sub {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 13px;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+  margin: 0 0 16px;
+}
+
+.et-modal-label {
+  display: block;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin-bottom: 8px;
+}
+
+.et-modal-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid var(--spectrum-border-divider, #eaeaea);
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 14px;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  background: #fff;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 14px;
+  outline: none;
+}
+
+.et-modal-textarea:focus {
+  border-color: #e11d48;
+}
+
+.et-modal-confirm {
+  width: 100%;
+}
+
+.et-modal-confirm:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* placed AFTER .et-decline-btn.is-declined svg — same specificity tier */
+.et-modal-close svg {
+  stroke: var(--spectrum-text-secondary, #8e8e8e);
+}
+
+.et-modal-close:hover svg {
+  stroke: #e11d48;
+}
+
+/* stylelint-enable no-descending-specificity */
+
+/* ============================================================
+   DARK MODE — all after base rules
+   ============================================================ */
+html[data-theme="dark"] .et-tab-bar {
+  border-bottom-color: #333;
+}
+
+html[data-theme="dark"] .et-tab {
+  color: #b3b3b3;
+}
+
+html[data-theme="dark"] .et-tab:hover {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-tab.is-active {
+  color: #fca5a5;
+  border-bottom-color: #fca5a5;
+}
+
+html[data-theme="dark"] .et-section-label {
+  color: #b3b3b3;
+  border-bottom-color: #333;
+}
+
+html[data-theme="dark"] .et-card {
+  background: #1e1e1e;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+}
+
+html[data-theme="dark"] .et-card-title {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-card-desc {
+  color: #b3b3b3;
+}
+
+html[data-theme="dark"] .et-meta-row {
+  color: #b3b3b3;
+}
+
+html[data-theme="dark"] .et-meta-row svg {
+  stroke: #b3b3b3;
+}
+
+html[data-theme="dark"] .et-meta-row strong {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-card-btn {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-card-btn:hover {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-seats-label {
+  color: #b3b3b3;
+}
+
+html[data-theme="dark"] .et-seats-count {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-seats-track {
+  background: #333;
+}
+
+html[data-theme="dark"] .et-timer {
+  background: #3f1212;
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .et-timer svg {
+  stroke: #fca5a5;
+}
+
+html[data-theme="dark"] .et-accept-btn {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-accept-btn:hover {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-decline-btn {
+  background: #e11d48;
+  border-color: #e11d48;
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-decline-btn svg {
+  stroke: #fff;
+}
+
+html[data-theme="dark"] .et-decline-btn:hover {
+  background: #be123c;
+  border-color: #be123c;
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-decline-btn:hover svg {
+  stroke: #fff;
+}
+
+html[data-theme="dark"] .et-decline-btn.is-declined {
+  background: #e11d48;
+  border-color: #e11d48;
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-recording-btn {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-recording-btn:hover {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-modal {
+  background: #1e1e1e;
+}
+
+html[data-theme="dark"] .et-modal-title {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-modal-sub {
+  color: #b3b3b3;
+}
+
+html[data-theme="dark"] .et-modal-label {
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-modal-textarea {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #fff;
+}
+
+html[data-theme="dark"] .et-modal-confirm {
+  color: #fff;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (width <= 1024px) {
+  .et-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (width <= 768px) {
+  .et-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .et-tab {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
+  .et-card-body {
+    padding: 16px;
+  }
+
+  .et-card-title {
+    font-size: 15px;
+  }
+
+  .et-section-label {
+    font-size: 10px;
+  }
+
+  .et-modal {
+    padding: 18px;
+  }
+}
+
+@media (width <= 480px) {
+  .et-card-image {
+    aspect-ratio: 16 / 10;
+  }
+
+  .et-btn-row {
+    grid-template-columns: 1fr;
+  }
+
+  .et-tab-bar {
+    gap: 0;
+  }
+
+  .et-tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px 8px;
+  }
+}

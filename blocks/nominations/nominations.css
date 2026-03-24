@@ -1,0 +1,190 @@
+/* ============================================================
+   NOMINATIONS BLOCK — Adobe Connect EDS
+   ============================================================ */
+
+/* ── Page heading ────────────────────────────────────────── */
+.nom-heading {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0 0 32px;
+}
+
+html[data-theme="dark"] .nom-heading {
+  color: #fff;
+}
+
+/* ── Category section ────────────────────────────────────── */
+.nom-section {
+  margin-bottom: 52px;
+}
+
+.nom-section-label {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+  margin: 0 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--spectrum-border-divider, #eaeaea);
+}
+
+html[data-theme="dark"] .nom-section-label {
+  color: #b3b3b3;
+  border-bottom-color: #333;
+}
+
+/* ── Grid — 3 columns ────────────────────────────────────── */
+.nom-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+.nom-card {
+  background: var(--spectrum-gray-50, #fff);
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+  padding: 32px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-sizing: border-box;
+}
+
+.nom-card:hover {
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  transform: translateY(-3px);
+}
+
+html[data-theme="dark"] .nom-card {
+  background: #1e1e1e;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+}
+
+/* ── Avatar ──────────────────────────────────────────────── */
+.nom-avatar-wrap {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 20px;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--spectrum-gray-200, #eaeaea);
+}
+
+html[data-theme="dark"] .nom-avatar-wrap {
+  box-shadow: 0 0 0 3px #333;
+}
+
+.nom-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Initials fallback */
+.nom-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -1px;
+}
+
+/* ── Name ────────────────────────────────────────────────── */
+.nom-name {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+
+html[data-theme="dark"] .nom-name {
+  color: #fff;
+}
+
+/* ── Role ────────────────────────────────────────────────── */
+.nom-role {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+  margin: 0 0 16px;
+}
+
+html[data-theme="dark"] .nom-role {
+  color: #b3b3b3;
+}
+
+/* ── Category badge ──────────────────────────────────────── */
+.nom-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #fef2f2;
+  color: #e11d48;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+html[data-theme="dark"] .nom-badge {
+  background: #3f1212;
+  color: #fca5a5;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (width <= 1024px) {
+  .nom-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (width <= 768px) {
+  .nom-heading {
+    font-size: 22px;
+  }
+
+  .nom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nom-card {
+    padding: 24px 20px;
+  }
+
+  .nom-section-label {
+    font-size: 10px;
+  }
+}
+
+@media (width <= 480px) {
+  .nom-avatar-wrap {
+    width: 84px;
+    height: 84px;
+  }
+
+  .nom-avatar-fallback {
+    font-size: 26px;
+  }
+
+  .nom-name {
+    font-size: 16px;
+  }
+}
