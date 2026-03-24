@@ -1,0 +1,121 @@
+{
+  "categories": [
+    {
+      "id": "cat-001",
+      "name": "Innovation & Technology",
+      "nominees": [
+        {
+          "id": "nom-001",
+          "name": "Sarah Mitchell",
+          "role": "Principal UI Architect",
+          "department": "Design Systems",
+          "category": "Innovation & Technology",
+          "reason": "Led the migration of our entire component library to a token-based architecture, reducing design-dev handoff time by 60%.",
+          "image": "/nominations/images/sarah-mitchell.jpg",
+          "nominatedBy": "David Park",
+          "votes": 142
+        },
+        {
+          "id": "nom-002",
+          "name": "James Okafor",
+          "role": "Senior Technical Consultant",
+          "department": "Enterprise Solutions",
+          "category": "Innovation & Technology",
+          "reason": "Architected a real-time collaboration framework that now powers three flagship Adobe products.",
+          "image": "/nominations/images/james-okafor.jpg",
+          "nominatedBy": "Priya Anand",
+          "votes": 98
+        },
+        {
+          "id": "nom-003",
+          "name": "Leila Hosseini",
+          "role": "Staff Software Engineer",
+          "department": "Platform Engineering",
+          "category": "Innovation & Technology",
+          "reason": "Built the internal CLI tooling that automated CI/CD pipeline setup for 40+ teams across the organisation.",
+          "image": "/nominations/images/leila-hosseini.jpg",
+          "nominatedBy": "Tom Eriksson",
+          "votes": 115
+        }
+      ]
+    },
+    {
+      "id": "cat-002",
+      "name": "Community Leadership",
+      "nominees": [
+        {
+          "id": "nom-004",
+          "name": "Ananya Roy",
+          "role": "Senior UX Researcher",
+          "department": "User Research",
+          "category": "Community Leadership",
+          "reason": "Founded the internal UX Research Guild with 200+ members and runs monthly knowledge-sharing sessions.",
+          "image": "/nominations/images/ananya-roy.jpg",
+          "nominatedBy": "Rachel Kim",
+          "votes": 203
+        },
+        {
+          "id": "nom-005",
+          "name": "David Park",
+          "role": "Design Manager",
+          "department": "Product Design",
+          "category": "Community Leadership",
+          "reason": "Organised 12 cross-functional design sprints this year, mentoring over 30 junior designers across teams.",
+          "image": "/nominations/images/david-park.jpg",
+          "nominatedBy": "Neha Sharma",
+          "votes": 176
+        },
+        {
+          "id": "nom-006",
+          "name": "Rachel Kim",
+          "role": "Developer Advocate",
+          "department": "Developer Relations",
+          "category": "Community Leadership",
+          "reason": "Launched the Adobe Connect developer blog and grew it to 5,000 monthly readers within six months.",
+          "image": "/nominations/images/rachel-kim.jpg",
+          "nominatedBy": "Sarah Mitchell",
+          "votes": 134
+        }
+      ]
+    },
+    {
+      "id": "cat-003",
+      "name": "Customer Impact",
+      "nominees": [
+        {
+          "id": "nom-007",
+          "name": "Neha Sharma",
+          "role": "Principal Customer Success Manager",
+          "department": "Customer Success",
+          "category": "Customer Impact",
+          "reason": "Achieved a 98% renewal rate across her enterprise accounts and drove NPS from 42 to 71 in one year.",
+          "image": "/nominations/images/neha-sharma.jpg",
+          "nominatedBy": "James Okafor",
+          "votes": 189
+        },
+        {
+          "id": "nom-008",
+          "name": "Tom Eriksson",
+          "role": "Solutions Architect",
+          "department": "Pre-Sales Engineering",
+          "category": "Customer Impact",
+          "reason": "Designed a custom onboarding programme adopted by 15 enterprise clients, cutting time-to-value by 45%.",
+          "image": "/nominations/images/tom-eriksson.jpg",
+          "nominatedBy": "Leila Hosseini",
+          "votes": 157
+        },
+        {
+          "id": "nom-009",
+          "name": "Priya Anand",
+          "role": "Senior Account Executive",
+          "department": "Enterprise Sales",
+          "category": "Customer Impact",
+          "reason": "Closed the largest deal in APAC history and maintained a 100% customer satisfaction score for two consecutive quarters.",
+          "image": "/nominations/images/priya-anand.jpg",
+          "nominatedBy": "Ananya Roy",
+          "votes": 211
+        }
+      ]
+    }
+  ]
+}
