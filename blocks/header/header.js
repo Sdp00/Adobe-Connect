@@ -233,7 +233,7 @@ export default async function decorate(block) {
  
   const mobileSearchBar = document.createElement('div');
   mobileSearchBar.className = 'mobile-search-bar';
-  mobileSearchBar.innerHTML = `<input type="search" placeholder="${isAdminPage ? 'Search...' : searchText}" />`;
+  mobileSearchBar.innerHTML = `<div class="mobile-search-input-wrap"><input type="search" placeholder="${isAdminPage ? 'Search...' : searchText}" /></div>`;
   nav.appendChild(mobileSearchBar);
  
   function closeAll() {
