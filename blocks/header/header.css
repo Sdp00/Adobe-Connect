@@ -555,8 +555,12 @@ html[data-theme="dark"] .hamburger-btn svg {
   display: flex;
 }
  
-.mobile-search-bar input {
+.mobile-search-input-wrap {
   flex: 1;
+  position: relative;
+}
+
+.mobile-search-bar input {
   border: none;
   outline: none;
   background: var(--spectrum-gray-100);
@@ -817,6 +821,15 @@ html[data-theme="dark"] .search-result-badge.person {
     right: 0;
     width: 230px;
     top: 44px;
+  }
+
+  /* Search bar: fixed so it always anchors just below the sticky header on scroll */
+  .mobile-search-bar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    z-index: 4999;
   }
 }
  
