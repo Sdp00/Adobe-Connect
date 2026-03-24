@@ -1,9 +1,26 @@
-const STATS = [
-  { icon: 'events',      count: '4', label: 'Events' },
-  { icon: 'training',    count: '6', label: 'Trainings' },
-  { icon: 'newsletters', count: '3', label: 'Newsletters Sent' },
+/* ── Static config — icon names must match /icons/<name>.svg ── */
+const STAT_CONFIG = [
+  { key: 'events',      icon: 'events',      label: 'Events' },
+  { key: 'trainings',   icon: 'training',    label: 'Trainings' },
+  { key: 'newsletters', icon: 'newsletters', label: 'Newsletters Sent' },
 ];
 
+/* ── Data layer ───────────────────────────────────────────────
+   Replace the mock return below with a real API/DB call.
+   Must resolve to { events, trainings, newsletters } counts.
+   ─────────────────────────────────────────────────────────── */
+async function fetchStats() {
+  // TODO: replace with real API call, e.g.:
+  // const res = await fetch('/api/admin/stats');
+  // return res.json();
+  return {
+    events: 4,
+    trainings: 6,
+    newsletters: 3,
+  };
+}
+
+/* ── Icon fetcher ─────────────────────────────────────────── */
 const iconCache = {};
 
 async function fetchIcon(name) {
@@ -19,13 +36,17 @@ async function fetchIcon(name) {
   }
 }
 
+/* ── Block decorator ──────────────────────────────────────── */
 export default async function decorate(block) {
-  const svgs = await Promise.all(STATS.map((s) => fetchIcon(s.icon)));
+  const [stats, svgs] = await Promise.all([
+    fetchStats(),
+    Promise.all(STAT_CONFIG.map((s) => fetchIcon(s.icon))),
+  ]);
 
   const grid = document.createElement('div');
   grid.className = 'admin-stats-grid';
 
-  STATS.forEach((stat, i) => {
+  STAT_CONFIG.forEach((stat, i) => {
     const card = document.createElement('div');
     card.className = 'admin-stats-card';
 
@@ -35,7 +56,7 @@ export default async function decorate(block) {
 
     const count = document.createElement('p');
     count.className = 'admin-stats-count';
-    count.textContent = stat.count;
+    count.textContent = stats[stat.key] ?? '—';
 
     const label = document.createElement('p');
     label.className = 'admin-stats-label';

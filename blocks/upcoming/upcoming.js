@@ -1,43 +1,16 @@
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState, useCallback } from '../../vendor/preact-hooks.js';
-
-/* ── Decline Modal ── */
-function DeclineModal({ onConfirm, onCancel }) {
-  const [reason, setReason] = useState('');
-
-  return html`
-    <div class="upcoming-modal__overlay" onClick=${onCancel}>
-      <div class="upcoming-modal" onClick=${(e) => e.stopPropagation()}>
-        <h4 class="upcoming-modal__title">Reason for Declining</h4>
-        <textarea
-          class="upcoming-modal__textarea"
-          placeholder="Write your reason here..."
-          rows="4"
-          value=${reason}
-          onInput=${(e) => setReason(e.target.value)}>
-        </textarea>
-        <div class="upcoming-modal__actions">
-          <button class="upcoming-modal__cancel" onClick=${onCancel}>Cancel</button>
-          <button
-            class="upcoming-modal__confirm"
-            disabled=${!reason.trim()}
-            onClick=${() => reason.trim() && onConfirm(reason.trim())}>
-            Confirm
-          </button>
-        </div>
-      </div>
-    </div>`;
-}
+import Modal from '../../helper/modal.js';
 
 /* ── Single Item Card ── */
 function ItemCard({ item, interested, trainingStatus, onToggleInterested, onAccept, onDecline }) {
-  const isTraining = item.tag === 'TRAINING';
-  const status     = trainingStatus[item.id];
+  const isTraining = item.tag.includes('TRAINING');
+  const status = trainingStatus[item.id];
 
   return html`
     <div class="upcoming-block__card">
       <div class="upcoming-block__visual ${isTraining ? 'upcoming-block__visual--training' : ''}">
-        <span class="upcoming-block__tag upcoming-block__tag--${item.tag.toLowerCase()}">${item.tag}</span>
+        <span class="upcoming-block__tag upcoming-block__tag--${item.tag.toLowerCase().replace(/\s+/g, '-')}">${item.tag}</span>
       </div>
       <div class="upcoming-block__body">
         <h4 class="upcoming-block__event-title">${item.title}</h4>
@@ -60,7 +33,7 @@ function ItemCard({ item, interested, trainingStatus, onToggleInterested, onAcce
           <button
             class="upcoming-block__btn ${interested[item.id] ? 'upcoming-block__btn--active' : ''}"
             onClick=${() => onToggleInterested(item.id)}>
-            ${interested[item.id] ? "Interested!" : "I'm Interested"}
+            ${interested[item.id] ? 'Interested!' : "I'm Interested"}
           </button>`}
 
         ${isTraining && !status && html`
@@ -85,22 +58,25 @@ function ItemCard({ item, interested, trainingStatus, onToggleInterested, onAcce
 /* ── Main Upcoming Component ── */
 function Upcoming({ data }) {
   const { title, items } = data;
-  const [current, setCurrent]           = useState(0);
-  const [interested, setInterested]     = useState(() =>
+  const [current, setCurrent]               = useState(0);
+  const [interested, setInterested]         = useState(() =>
     items.reduce((acc, i) => ({ ...acc, [i.id]: i.interested }), {})
   );
   const [trainingStatus, setTrainingStatus] = useState({});
-  const [showDecline, setShowDecline]       = useState(null);
+  const [declineId, setDeclineId]           = useState(null);
+  const [reason, setReason]                 = useState('');
 
   const prev = useCallback(() => setCurrent(c => Math.max(0, c - 1)), []);
   const next = useCallback(() => setCurrent(c => Math.min(items.length - 1, c + 1)), [items.length]);
 
-  const toggleInterested = (id) => setInterested(s => ({ ...s, [id]: !s[id] }));
-  const handleAccept     = (id) => setTrainingStatus(s => ({ ...s, [id]: 'accepted' }));
-  const handleDecline    = (id) => setShowDecline(id);
-  const handleDeclineConfirm = (reason) => {
-    setTrainingStatus(s => ({ ...s, [showDecline]: 'declined' }));
-    setShowDecline(null);
+  const toggleInterested    = (id) => setInterested(s => ({ ...s, [id]: !s[id] }));
+  const handleAccept        = (id) => setTrainingStatus(s => ({ ...s, [id]: 'accepted' }));
+  const handleDeclineOpen   = (id) => { setDeclineId(id); setReason(''); };
+  const handleDeclineClose  = () => { setDeclineId(null); setReason(''); };
+  const handleDeclineSubmit = () => {
+    if (!reason.trim()) return;
+    setTrainingStatus(s => ({ ...s, [declineId]: 'declined' }));
+    handleDeclineClose();
   };
 
   const item = items[current];
@@ -118,7 +94,7 @@ function Upcoming({ data }) {
         trainingStatus=${trainingStatus}
         onToggleInterested=${toggleInterested}
         onAccept=${handleAccept}
-        onDecline=${handleDecline} />
+        onDecline=${handleDeclineOpen} />
 
       <div class="upcoming-block__nav">
         <button class="upcoming-block__arrow" onClick=${prev}
@@ -134,10 +110,21 @@ function Upcoming({ data }) {
           disabled=${current === items.length - 1}>${ArrowRight}</button>
       </div>
 
-      ${showDecline !== null && html`
-        <${DeclineModal}
-          onConfirm=${handleDeclineConfirm}
-          onCancel=${() => setShowDecline(null)} />`}
+      <${Modal}
+        isOpen=${declineId !== null}
+        onClose=${handleDeclineClose}
+        modalHeader="Reason for Declining"
+        onSubmit=${handleDeclineSubmit}
+        submitLabel="Confirm"
+        cancelLabel="Cancel">
+        <textarea
+          class="upcoming-block__decline-textarea"
+          placeholder="Write your reason here..."
+          rows="4"
+          value=${reason}
+          onInput=${(e) => setReason(e.target.value)}>
+        </textarea>
+      </${Modal}>
     </div>`;
 }
 
