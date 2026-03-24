@@ -23,14 +23,22 @@ main > .section.calendar-container {
   width: 340px !important;
   min-width: 340px !important;
   max-width: 340px !important;
-  position: sticky !important;
-  top: 72px !important;
-  align-self: flex-start !important;
   margin: 0 !important;
   padding: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 16px !important;
+  /* Scroll with feed — stop when panel bottom is reached */
+  position: sticky !important;
+  top: 0 !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  align-self: flex-start !important;
+  scrollbar-width: none !important;
+}
+
+main > .section.calendar-container::-webkit-scrollbar {
+  display: none !important;
 }
 
 main > .section.calendar-container > .calendar-wrapper,
@@ -180,4 +188,175 @@ main > .section.calendar-container > .newsletters-wrapper {
   .cal-popover__panel {
     display: none !important;
   }
+}
+
+/* =============================================================
+   Dark theme — all right panel blocks
+   ============================================================= */
+[data-theme="dark"] .calendar-block,
+[data-theme="dark"] .upcoming-block,
+[data-theme="dark"] .trends-block,
+[data-theme="dark"] .newsletters-block {
+  background: #1e1e1e;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 0 1px rgb(255 255 255 / 8%);
+}
+
+/* Calendar */
+[data-theme="dark"] .calendar-block__title,
+[data-theme="dark"] .calendar-block__month {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .calendar-block__dayname {
+  color: #666;
+}
+
+[data-theme="dark"] .calendar-block__num {
+  color: #ccc;
+}
+
+[data-theme="dark"] .calendar-block__cell--faded .calendar-block__num {
+  color: #444;
+}
+
+[data-theme="dark"] .calendar-block__legend {
+  color: #888;
+}
+
+/* Upcoming */
+[data-theme="dark"] .upcoming-block__title {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .upcoming-block__card {
+  border-color: #333;
+}
+
+[data-theme="dark"] .upcoming-block__event-title {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .upcoming-block__meta li {
+  color: #aaa;
+}
+
+[data-theme="dark"] .upcoming-block__icon {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="dark"] .upcoming-block__arrow {
+  border-color: #444;
+  color: #ccc;
+}
+
+[data-theme="dark"] .upcoming-block__arrow:not(:disabled):hover {
+  background: #2a2a2a;
+}
+
+[data-theme="dark"] .upcoming-block__dot {
+  background: #444;
+}
+
+[data-theme="dark"] .upcoming-block__btn-decline {
+  border-color: #e63535;
+  color: #e63535;
+}
+
+[data-theme="dark"] .upcoming-block__btn-decline:hover {
+  background: #2a1a1a;
+}
+
+[data-theme="dark"] .upcoming-block__status--accepted {
+  background: #052e1c;
+  color: #34d399;
+}
+
+[data-theme="dark"] .upcoming-block__status--declined {
+  background: #2a1a1a;
+  color: #f87171;
+}
+
+/* Trends */
+[data-theme="dark"] .trends-block__title {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .trends-block__item {
+  border-top-color: #2a2a2a;
+}
+
+[data-theme="dark"] .trends-block__thumb {
+  background: #2a1a1a;
+}
+
+[data-theme="dark"] .trends-block__item-title {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .trends-block__meta {
+  color: #666;
+}
+
+[data-theme="dark"] .trends-block__sep {
+  color: #444;
+}
+
+/* Newsletters */
+[data-theme="dark"] .newsletters-block__title {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .newsletters-block__item {
+  border-top-color: #2a2a2a;
+  border-left-color: #1d4ed8;
+}
+
+[data-theme="dark"] .newsletters-block__thumb {
+  background: #1a2035;
+}
+
+[data-theme="dark"] .newsletters-block__item-title {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .newsletters-block__meta {
+  color: #666;
+}
+
+[data-theme="dark"] .newsletters-block__sep {
+  color: #444;
+}
+
+[data-theme="dark"] .newsletters-block__read-time {
+  color: #555;
+}
+
+/* Calendar popover */
+[data-theme="dark"] .cal-popover__panel {
+  background: #1e1e1e;
+  box-shadow: 0 8px 40px rgb(0 0 0 / 50%);
+}
+
+[data-theme="dark"] .cal-popover__label {
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .cal-popover__close {
+  color: #888;
+}
+
+[data-theme="dark"] .cal-popover__close:hover {
+  background: #2a2a2a;
+  color: #f0f0f0;
+}
+
+/* Decline modal textarea */
+[data-theme="dark"] .upcoming-block__decline-textarea {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #f0f0f0;
+}
+
+[data-theme="dark"] .upcoming-block__decline-textarea:focus {
+  border-color: #e63535;
 }
