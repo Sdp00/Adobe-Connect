@@ -13,7 +13,6 @@ const PUBLIC_NAV = [
 const ADMIN_NAV = [
   { label: 'Dashboard',           icon: 'dashboard',        href: '/admin' },
   { label: 'Events and Training', icon: 'events-training',  href: '/admin#events-training' },
-  { label: 'Newsletter',          icon: 'newsletters',      href: '/admin#newsletter' },
   { label: 'Participation',       icon: 'participation',    href: '/admin#participation' },
 ];
 
