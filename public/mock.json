@@ -28,23 +28,5 @@
       { "id": 4, "tag": "UPCOMING TRAINING", "title": "Figma Advanced Components",    "date": "Apr 2, 2026",  "time": "11:00 AM", "location": "Design Lab B",          "respond_within": "22 days", "interested": false },
       { "id": 5, "tag": "UPCOMING EVENT",    "title": "Adobe MAX Community Preview",  "date": "Apr 17, 2026", "time": "09:00 AM", "location": "Online - Adobe Connect","respond_within": "30 days", "interested": false }
     ]
-  },
-  "trends": {
-    "title": "Industry Updates",
-    "items": [
-      { "id": 1, "category": "Design",      "title": "CSS Anchoring Is Here: What It Means for UI Layouts",           "source": "CSS-Tricks",        "time_ago": "2h ago" },
-      { "id": 2, "category": "AI",          "title": "How Semantic Tokens Are Reshaping Design Systems at Scale",      "source": "Smashing Magazine", "time_ago": "5h ago" },
-      { "id": 3, "category": "Development", "title": "Edge Delivery Services: The Future of CMS Performance",          "source": "Web.dev",           "time_ago": "1d ago" },
-      { "id": 4, "category": "UX Research", "title": "2026 State of UX Report: Consistency Beats Creativity",          "source": "Nielsen Norman Group","time_ago": "2d ago" }
-    ]
-  },
-  "newsletters": {
-    "title": "Newsletters",
-    "items": [
-      { "id": 1, "category": "Weekly Digest",   "title": "Adobe Connect Weekly: March Edition — Collaboration Tools Roundup", "source": "Adobe Connect Team",    "time_ago": "Today", "read_time": "4 min read" },
-      { "id": 2, "category": "Design Systems",  "title": "Tokens, Themes & the Future of Component Libraries",               "source": "Design Systems Weekly", "time_ago": "3d ago","read_time": "6 min read" },
-      { "id": 3, "category": "Product Updates", "title": "What's New in Adobe EDS: Performance Wins & Block Authoring",      "source": "Adobe Experience Cloud","time_ago": "5d ago","read_time": "3 min read" },
-      { "id": 4, "category": "Community",       "title": "Meet the Contributors: Spotlight on Open Source UX Tooling",      "source": "Adobe Community Digest","time_ago": "1w ago","read_time": "5 min read" }
-    ]
   }
 }
