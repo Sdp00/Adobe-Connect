@@ -5,7 +5,7 @@
 ───────────────────────────────────────────── */
 .admin-stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   padding: 24px 0;
 }
@@ -16,8 +16,9 @@
   border-radius: 12px;
   padding: 24px;
   display: flex;
-  flex-direction: column;
-  gap: var(--spectrum-spacing-100);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -36,7 +37,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: var(--spectrum-spacing-200);
+  margin-bottom: 0;
 }
  
 .admin-stats-icon svg {
@@ -63,6 +64,12 @@
 .admin-stats-icon-newsletters {
   background: #eff6ff;
   color: var(--spectrum-accent-background-color-default);
+}
+ 
+.admin-stats-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
  
 .admin-stats-count {
@@ -94,12 +101,6 @@ html[data-theme="dark"] .admin-stats-count {
  
 html[data-theme="dark"] .admin-stats-label {
   color: var(--spectrum-gray-500);
-}
- 
-@media (width <= 1024px) {
-  .admin-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
  
 @media (width <= 768px) {
