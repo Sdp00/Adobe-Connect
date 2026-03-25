@@ -5,7 +5,7 @@ import { useState, useEffect,useCallback,useRef } from '../../vendor/preact-hook
 
 /*  Lightbox  */
 
-function Lightbox({ images, startIndex, onClose }) {
+function Lightbox({ images, startIndex, onClose,commentsList,commentInput,addComment }) {
   const [current, setCurrent] = useState(startIndex);
   const total = images.length;
 
@@ -33,40 +33,82 @@ function Lightbox({ images, startIndex, onClose }) {
   return html`
     <div class="lightbox-backdrop" onClick=${onClose}>
 
-      <!-- Counter -->
-      <div class="lightbox-counter">${current + 1} / ${total}</div>
+    <div class="lightbox-container" onClick=${(e) => e.stopPropagation()}>
 
-      <!-- Close -->
-      <button class="lightbox-close" onClick=${onClose} aria-label="Close">✕</button>
+      <!-- LEFT: MEDIA -->
+      <div class="lightbox-media">
 
-      <!-- Image -->
-      <div class="lightbox-image-wrap" onClick=${(e) => e.stopPropagation()}>
+        <!-- Close -->
+        <button class="lightbox-close" onClick=${onClose}>✕</button>
+
+        <!-- Counter -->
+        <div class="lightbox-counter">${current + 1} / ${total}</div>
+
+        <!-- Image -->
         <img
           class="lightbox-img"
           src=${images[current]}
           alt=""
         />
 
-        <!-- Dot indicators -->
+        <!-- Prev / Next -->
         ${total > 1 && html`
-          <div class="lightbox-dots">
-            ${images.map((_, i) => html`
-              <span
-                class="lightbox-dot ${i === current ? 'lightbox-dot-active' : ''}"
-                onClick=${(e) => { e.stopPropagation(); setCurrent(i); }}
-              />
-            `)}
-          </div>
+          <button class="lightbox-nav lightbox-nav-prev" onClick=${prev}>‹</button>
+          <button class="lightbox-nav lightbox-nav-next" onClick=${next}>›</button>
         `}
       </div>
 
-      <!-- Prev / Next -->
-      ${total > 1 && html`
-        <button class="lightbox-nav lightbox-nav-prev" onClick=${prev} aria-label="Previous">‹</button>
-        <button class="lightbox-nav lightbox-nav-next" onClick=${next} aria-label="Next">›</button>
-      `}
+      <!-- RIGHT: COMMENTS -->
+      <div class="lightbox-side">
+
+        <div class="lightbox-side-header">
+          <div class="feed-avatar">JN</div>
+          <div>
+            <div class="feed-name">You</div>
+            <div class="feed-meta">Now</div>
+          </div>
+        </div>
+
+        <div class="lightbox-comments">
+
+          ${commentsList.map(c => html`
+            <div class="feed-comment">
+              <div class="feed-comment-avatar">
+                ${c.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+              </div>
+              <div class="feed-comment-body">
+                <div class="feed-comment-name">${c.name}</div>
+                <div class="feed-comment-text">${c.text}</div>
+              </div>
+            </div>
+          `)}
+
+        </div>
+
+        <div class="lightbox-comment-input-row">
+          <div class="feed-comment-avatar">JN</div>
+          <input
+            class="feed-comment-input"
+            placeholder="Write a comment…"
+            value=${commentInput}
+            onInput=${(e) => setCommentInput(e.target.value)}
+            onKeyDown=${(e) => e.key === 'Enter' && addComment()}
+          />
+
+          <button
+            class="feed-comment-submit"
+            onClick=${addComment}
+            disabled=${!commentInput.trim()}
+          >
+            Post
+          </button>
+        </div>
+
+      </div>
 
     </div>
+
+  </div>
   `;
 }
 
@@ -232,6 +274,10 @@ function FeedCard({ post }) {
           images=${allImages}
           startIndex=${lightbox}
           onClose=${() => setLightbox(null)}
+          commentsList=${commentsList}
+          commentInput=${commentInput}
+          setCommentInput=${setCommentInput}
+          addComment=${addComment}
         />
       `}
 
