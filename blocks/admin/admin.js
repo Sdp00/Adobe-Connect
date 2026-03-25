@@ -6,9 +6,9 @@ import Modal from '../../helper/modal.js';
    FRIEND'S STATS SECTION (unchanged)
 ───────────────────────────────────────────── */
 const STATS = [
-  { icon: 'events', count: '4', label: 'Events' },
-  { icon: 'training', count: '6', label: 'Trainings' },
-  { icon: 'newsletters', count: '3', label: 'Newsletters Sent' },
+  { icon: 'events',      count: '4', label: 'Events',           section: 'events-training' },
+  { icon: 'training',    count: '6', label: 'Trainings',        section: 'events-training' },
+  { icon: 'newsletters', count: '3', label: 'Newsletters Sent', section: 'newsletter' },
 ];
 
 /* ── Data layer ───────────────────────────────────────────────
@@ -62,6 +62,14 @@ function renderStats(container) {
       const label = document.createElement('p');
       label.className = 'admin-stats-label';
       label.textContent = stat.label;
+
+      card.addEventListener('click', () => {
+        const target = document.getElementById(stat.section);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+          history.replaceState(null, '', `/admin#${stat.section}`);
+        }
+      });
 
       card.append(iconWrap, count, label);
       grid.append(card);
@@ -535,7 +543,7 @@ function EventsTrainingsApp() {
   };
 
   return html`
-    <div class="ac-events-section">
+    <div class="ac-events-section" id="events-training">
       <div class="ac-section-header">
         <div class="ac-section-title">
           <h2>Events & Training</h2>
