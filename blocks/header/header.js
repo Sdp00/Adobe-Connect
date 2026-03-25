@@ -133,7 +133,7 @@ export default async function decorate(block) {
   nav.innerHTML = `
     <div class="nav-left">
       <button class="hamburger-btn icon-btn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="ac-sidebar"></button>
-      <a href="${isAdminPage ? '/admin/dashboard' : '/'}"><img class="nav-logo-img" src="/blocks/header/Adobe-logo.jpeg" alt="Adobe" /></a>
+      <a href="${isAdminPage ? '/admin' : '/'}"><img class="nav-logo-img" src="/blocks/header/Adobe-logo.jpeg" alt="Adobe" /></a>
       <span class="nav-title">${title}</span>
     </div>
  

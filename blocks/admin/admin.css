@@ -337,6 +337,7 @@ html[data-theme="dark"] .ac-card-badge--training {
   letter-spacing: -0.01em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: calc(1.45em * 2);
@@ -353,6 +354,7 @@ html[data-theme="dark"] .ac-card-title {
   line-height: 1.65;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: calc(1.65em * 3);
