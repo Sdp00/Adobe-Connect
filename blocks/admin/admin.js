@@ -1,32 +1,17 @@
 import { html, render } from '../../vendor/htm-preact.js';
-import { useState } from '../../vendor/preact-hooks.js';
+import { useState, useEffect } from '../../vendor/preact-hooks.js';
 import Modal from '../../helper/modal.js';
 import MediaUpload from '../../helper/media-upload.js';
 
 /* ─────────────────────────────────────────────
-    STATS SECTION (unchanged)
+   STATS
 ───────────────────────────────────────────── */
 const STATS = [
   { icon: 'events',   count: '4', label: 'Events',    section: 'events-training' },
   { icon: 'training', count: '6', label: 'Trainings', section: 'events-training' },
 ];
 
-/* ── Data Integration ───────────────────────────────────────────────
-   Replace the mock return below with a real API/DB call.
-   Must resolve to { events, trainings, newsletters } counts.
-   ─────────────────────────────────────────────────────────── */
-async function fetchStats() {
-  // TODO: replace with real API call, e.g.:
-  // const res = await fetch('/api/admin/stats');
-  // return res.json();
-  return {
-    events: 4,
-    trainings: 6,
-    newsletters: 3,
-  };
-}
-
-/* ── Icon fetcher ─────────────────────────────────────────── */
+/* ── Icon fetcher (with cache) ────────────────────────────────── */
 const iconCache = {};
 
 async function fetchIcon(name) {
@@ -42,6 +27,18 @@ async function fetchIcon(name) {
   }
 }
 
+/* ── Icon component ───────────────────────────────────────────── */
+function Icon({ name, width = 16, height = 16 }) {
+  const [svg, setSvg] = useState('');
+  useEffect(() => { fetchIcon(name).then(setSvg); }, [name]);
+  return html`<span
+    class="ac-icon"
+    style=${'width:' + width + 'px;height:' + height + 'px'}
+    dangerouslySetInnerHTML=${{ __html: svg }}
+  ></span>`;
+}
+
+/* ── Stats DOM render ─────────────────────────────────────────── */
 function renderStats(container) {
   Promise.all(STATS.map((s) => fetchIcon(s.icon))).then((svgs) => {
     const grid = document.createElement('div');
@@ -85,163 +82,52 @@ function renderStats(container) {
 }
 
 /* ─────────────────────────────────────────────
-   MOCK DATA
+   DATA FETCH
 ───────────────────────────────────────────── */
-const MOCK_DATA = [
-  {
-    id: 1,
-    type: 'event',
-    title: 'UX Research in the Age of AI',
-    description: 'Explore how AI tools are reshaping user research workflows — best practices for AI-assisted synthesis and maintaining research integrity at scale.',
-    date: '2026-03-15',
-    time: '10:00',
-    venue: 'Adobe HQ – Room A1',
-    status: 'live',
-    responses: { interested: 14 },
-  },
-  {
-    id: 2,
-    type: 'event',
-    title: 'AI in Product Design: Practical Applications for 2026',
-    description: 'Discover how leading product teams are integrating AI — from AI-assisted wireframing to automated accessibility audits and smart component suggestions.',
-    date: '2026-03-22',
-    time: '14:00',
-    venue: 'Virtual – Zoom',
-    status: 'live',
-    responses: { interested: 21 },
-  },
-  {
-    id: 3,
-    type: 'event',
-    title: 'Adobe Connect Community Mixer – Q1 2026',
-    description: 'Connect with fellow community members over virtual coffee. A great way to meet people across teams and build lasting professional relationships.',
-    date: '2026-04-05',
-    time: '17:00',
-    venue: 'Virtual – Teams',
-    status: 'draft',
-    responses: null,
-  },
-  {
-    id: 4,
-    type: 'event',
-    title: 'Connect BuildFest 2026 – 48-Hour Design Hackathon',
-    description: 'Form a team of 2–4 and build something using Adobe Connect APIs. Prizes for Best UX, Most Innovative Use Case, and Community Favourite.',
-    date: '',
-    time: '',
-    venue: 'TBD',
-    status: 'draft',
-    responses: null,
-  },
-  {
-    id: 5,
-    type: 'training',
-    title: 'Figma Deep Dive – Variables & Auto Layout',
-    description: 'Structured session for intermediate-to-advanced Figma users. Covers Variables, auto-layout, high-fidelity prototyping, and Dev Mode handoff best practices.',
-    date: '2026-03-18',
-    time: '09:00',
-    venue: 'Adobe HQ – Training Lab B',
-    trainerName: 'Ananya Krishnan',
-    totalSeats: 20,
-    status: 'live',
-    responses: { accepted: 7, declined: 3 },
-  },
-  {
-    id: 6,
-    type: 'training',
-    title: 'Plain Language & Global Content Writing',
-    description: 'Practical training on plain language principles, cultural sensitivity in copy, writing for accessibility, and creating content that resonates globally.',
-    date: '2026-03-10',
-    time: '11:00',
-    venue: 'Virtual – Zoom',
-    trainerName: 'Riya Mehta',
-    totalSeats: 25,
-    status: 'live',
-    responses: { accepted: 6, declined: 4 },
-  },
-  {
-    id: 7,
-    type: 'training',
-    title: 'API Security Fundamentals',
-    description: 'Deep dive into API authentication, authorization patterns, OAuth 2.0, JWT handling, and practical security auditing techniques for backend developers.',
-    date: '2026-02-28',
-    time: '10:30',
-    venue: 'Adobe HQ – Room C3',
-    trainerName: 'Karthik Suresh',
-    totalSeats: 30,
-    status: 'live',
-    responses: { accepted: 5, declined: 5 },
-  },
-  {
-    id: 8,
-    type: 'training',
-    title: 'Accessibility & Inclusive Design',
-    description: 'Covers WCAG 2.2, ARIA best practices, color contrast, keyboard navigation, screen-reader testing, and building accessible component libraries.',
-    date: '2026-02-20',
-    time: '13:00',
-    venue: 'Virtual – Teams',
-    trainerName: 'Priya Nair',
-    totalSeats: 35,
-    status: 'live',
-    responses: { accepted: 8, declined: 2 },
-  },
-  {
-    id: 9,
-    type: 'training',
-    title: 'React Performance Optimisation',
-    description: 'Profiling, memoization, lazy loading, concurrent rendering, and avoiding common React anti-patterns that slow down large applications.',
-    date: '2026-04-02',
-    time: '15:00',
-    venue: 'Adobe HQ – Training Lab A',
-    trainerName: 'Vikram Desai',
-    totalSeats: 20,
-    status: 'draft',
-    responses: { accepted: 5, declined: 3 },
-  },
-  {
-    id: 10,
-    type: 'training',
-    title: 'Data Visualisation with D3.js',
-    description: 'Building interactive charts and data-driven documents using the D3.js library. Covers scales, axes, transitions, and real-world dashboard patterns.',
-    date: '',
-    time: '',
-    venue: 'TBD',
-    trainerName: 'Sneha Iyer',
-    totalSeats: 25,
-    status: 'draft',
-    responses: null,
-  },
-];
-
-/* ─────────────────────────────────────────────
-   EMPTY FORM FACTORIES
-───────────────────────────────────────────── */
-function emptyEvent() {
-  return { type: 'event', title: '', description: '', date: '', time: '', venue: '', media: null };
-}
-
-function emptyTraining() {
-  return { type: 'training', title: '', date: '', time: '', venue: '', trainerName: '', totalSeats: '', description: '', media: null };
+async function fetchData() {
+  const res = await fetch('/db.json');
+  if (!res.ok) throw new Error(`Failed to load db.json (${res.status})`);
+  const json = await res.json();
+  return json.eventsAndTrainings;
 }
 
 /* ─────────────────────────────────────────────
-   PREVIEW CARD (read-only)
+   HELPERS
+───────────────────────────────────────────── */
+function emptyForm(type) {
+  const base = { type, title: '', description: '', date: '', time: '', venue: '', media: null };
+  return type === 'training'
+    ? { ...base, trainerName: '', totalSeats: '' }
+    : base;
+}
+
+function formatDate(d) {
+  if (!d) return 'Date TBD';
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  });
+}
+
+function formatTime(t) {
+  if (!t) return null;
+  const [h, m] = t.split(':');
+  const dt = new Date();
+  dt.setHours(+h, +m);
+  return dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+/* ─────────────────────────────────────────────
+   PREVIEW CARD  (inside edit modal)
 ───────────────────────────────────────────── */
 function PreviewCard({ form }) {
-  const hasImage = form.media && form.media.type && form.media.type.startsWith('image/');
-
+  const hasImage = form.media?.type?.startsWith('image/');
   return html`
     <div class="ac-preview-card">
       <div class="ac-preview-media">
-        ${hasImage ? html`
-          <img src=${URL.createObjectURL(form.media)} alt="media" />
-        ` : html`
-          <div class="ac-preview-media-placeholder">
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 8v4l3 3"/>
-            </svg>
-          </div>
-        `}
+        ${hasImage
+          ? html`<img src=${URL.createObjectURL(form.media)} alt="media" />`
+          : html`<div class="ac-preview-media-placeholder"><${Icon} name="clock" width=24 height=24 /></div>`
+        }
       </div>
       <div class="ac-preview-body">
         <h3 class="ac-preview-title">${form.title || 'Untitled'}</h3>
@@ -258,184 +144,175 @@ function PreviewCard({ form }) {
 }
 
 /* ─────────────────────────────────────────────
-   ADD/EDIT MODAL using helper's Modal wrapper
+   ADD / EDIT MODAL
 ───────────────────────────────────────────── */
 function ItemModal({ isOpen, onClose, itemType, editItem, onSaveDraft, onPublish }) {
-  const isEdit = !!editItem;
   const isTraining = itemType === 'training';
-
   const [tab, setTab] = useState('edit');
-  const [form, setForm] = useState(
-    editItem ? { ...editItem } : isTraining ? emptyTraining() : emptyEvent(),
-  );
+  const [form, setForm] = useState(editItem ? { ...editItem } : emptyForm(itemType));
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
 
-  const header = isEdit
-    ? ('Edit ' + (isTraining ? 'Training' : 'Event'))
-    : ('Add ' + (isTraining ? 'Training' : 'Event'));
+  const field = (label, inputEl) => html`
+    <div class="ac-form-group">
+      <label class="ac-form-label">${label}</label>
+      ${inputEl}
+    </div>
+  `;
 
-  const handleSaveDraft = () => {
-    onSaveDraft({ ...form, status: 'draft' });
-    onClose();
-  };
-
-  const handlePublish = () => {
-    onPublish({ ...form, status: 'live' });
-    onClose();
-  };
-
-  const footerActions = [
-    {
-      label: 'Save Draft',
-      variant: 'modal-btn--draft',
-      onClick: handleSaveDraft,
-    },
-  ];
+  const input = (type, key, placeholder, extra = {}) => html`
+    <input
+      class="ac-form-input${type === 'date' ? ' ac-form-input--date' : ''}"
+      type=${type}
+      placeholder=${placeholder}
+      value=${form[key] || ''}
+      onInput=${(e) => set(key, e.target.value)}
+      ...${extra}
+    />
+  `;
 
   const editForm = html`
-    <div class="ac-form-group">
-      <label class="ac-form-label">${isTraining ? 'SESSION TITLE' : 'TITLE'}</label>
-      <input
-        class="ac-form-input"
-        type="text"
-        placeholder="Enter title..."
-        value=${form.title}
-        onInput=${(e) => set('title', e.target.value)}
-      />
-    </div>
-
-    ${!isTraining ? html`
-      <div class="ac-form-group">
-        <label class="ac-form-label">DESCRIPTION</label>
-        <textarea
-          class="ac-form-textarea"
-          rows="4"
-          placeholder="Write a description..."
-          onInput=${(e) => set('description', e.target.value)}
-        >${form.description}</textarea>
-      </div>
-    ` : ''}
-
-    <div class="ac-form-group">
-      <label class="ac-form-label">DATE</label>
-      <input
-        class="ac-form-input ac-form-input--date"
-        type="date"
-        value=${form.date}
-        onInput=${(e) => set('date', e.target.value)}
-      />
-    </div>
-
-    ${!isTraining ? html`
-      <div class="ac-form-group">
-        <label class="ac-form-label">TIME</label>
-        <input
-          class="ac-form-input"
-          type="time"
-          value=${form.time || ''}
-          onInput=${(e) => set('time', e.target.value)}
-        />
-      </div>
-      <div class="ac-form-group">
-        <label class="ac-form-label">VENUE</label>
-        <input
-          class="ac-form-input"
-          type="text"
-          placeholder="Enter venue..."
-          value=${form.venue || ''}
-          onInput=${(e) => set('venue', e.target.value)}
-        />
-      </div>
-    ` : ''}
-
+    ${field(isTraining ? 'SESSION TITLE' : 'TITLE', input('text', 'title', 'Enter title...'))}
+    ${field('DATE', input('date', 'date', ''))}
+    ${field('TIME', input('time', 'time', ''))}
+    ${field('VENUE', input('text', 'venue', 'Enter venue...'))}
     ${isTraining ? html`
-      <div class="ac-form-group">
-        <label class="ac-form-label">TIME</label>
-        <input
-          class="ac-form-input"
-          type="time"
-          value=${form.time || ''}
-          onInput=${(e) => set('time', e.target.value)}
-        />
-      </div>
-      <div class="ac-form-group">
-        <label class="ac-form-label">VENUE</label>
-        <input
-          class="ac-form-input"
-          type="text"
-          placeholder="Enter venue..."
-          value=${form.venue || ''}
-          onInput=${(e) => set('venue', e.target.value)}
-        />
-      </div>
-      <div class="ac-form-group">
-        <label class="ac-form-label">TRAINER'S NAME</label>
-        <input
-          class="ac-form-input"
-          type="text"
-          placeholder="Enter trainer's name..."
-          value=${form.trainerName || ''}
-          onInput=${(e) => set('trainerName', e.target.value)}
-        />
-      </div>
-      <div class="ac-form-group">
-        <label class="ac-form-label">TOTAL SEATS AVAILABLE</label>
-        <input
-          class="ac-form-input"
-          type="number"
-          placeholder="e.g. 30"
-          min="1"
-          value=${form.totalSeats || ''}
-          onInput=${(e) => set('totalSeats', e.target.value)}
-        />
-      </div>
+      ${field("TRAINER'S NAME", input('text', 'trainerName', "Enter trainer's name..."))}
+      ${field('TOTAL SEATS AVAILABLE', input('number', 'totalSeats', 'e.g. 30', { min: 1 }))}
     ` : ''}
-
-    ${isTraining ? html`
-      <div class="ac-form-group">
-        <label class="ac-form-label">DESCRIPTION</label>
-        <textarea
-          class="ac-form-textarea"
-          rows="4"
-          placeholder="Write a description..."
-          onInput=${(e) => set('description', e.target.value)}
-        >${form.description}</textarea>
-      </div>
-    ` : ''}
-
     <div class="ac-form-group">
-      <label class="ac-form-label">
-        MEDIA <span class="ac-form-optional">(optional)</span>
-      </label>
+      <label class="ac-form-label">DESCRIPTION</label>
+      <textarea
+        class="ac-form-textarea"
+        rows="4"
+        placeholder="Write a description..."
+        onInput=${(e) => set('description', e.target.value)}
+      >${form.description}</textarea>
+    </div>
+    <div class="ac-form-group">
+      <label class="ac-form-label">MEDIA <span class="ac-form-optional">(optional)</span></label>
       <${MediaUpload} value=${form.media} onChange=${(f) => set('media', f)} />
     </div>
   `;
 
-  const bodyContent = html`
-    <div class="ac-modal-tabs">
-      <button
-        class=${'ac-modal-tab' + (tab === 'edit' ? ' active' : '')}
-        onClick=${() => setTab('edit')}
-      >Edit</button>
-      <button
-        class=${'ac-modal-tab' + (tab === 'preview' ? ' active' : '')}
-        onClick=${() => setTab('preview')}
-      >Preview</button>
-    </div>
-    ${tab === 'edit' ? editForm : html`<${PreviewCard} form=${form} />`}
-  `;
+  const header = `${editItem ? 'Edit' : 'Add'} ${isTraining ? 'Training' : 'Event'}`;
 
   return html`
     <${Modal}
       isOpen=${isOpen}
       onClose=${onClose}
       modalHeader=${header}
-      actions=${footerActions}
-      onSubmit=${handlePublish}
+      actions=${[{ label: 'Save Draft', variant: 'modal-btn--draft', onClick: () => { onSaveDraft({ ...form, status: 'draft' }); onClose(); } }]}
+      onSubmit=${() => { onPublish({ ...form, status: 'live' }); onClose(); }}
       submitLabel="Publish"
     >
-      ${bodyContent}
+      <div class="ac-modal-tabs">
+        <button class=${'ac-modal-tab' + (tab === 'edit' ? ' active' : '')} onClick=${() => setTab('edit')}>Edit</button>
+        <button class=${'ac-modal-tab' + (tab === 'preview' ? ' active' : '')} onClick=${() => setTab('preview')}>Preview</button>
+      </div>
+      ${tab === 'edit' ? editForm : html`<${PreviewCard} form=${form} />`}
+    </${Modal}>
+  `;
+}
+
+/* ─────────────────────────────────────────────
+   PREVIEW MODAL  (end-user view)
+───────────────────────────────────────────── */
+function PreviewModal({ isOpen, onClose, item }) {
+  if (!item) return null;
+  const isEvent = item.type === 'event';
+  const hasImage = item.media?.type?.startsWith('image/');
+
+  const metaRow = (iconName, content) => html`
+    <div class="ac-preview-eu-meta-row">
+      <${Icon} name=${iconName} width=16 height=16 />
+      <span>${content}</span>
+    </div>
+  `;
+
+  return html`
+    <${Modal}
+      isOpen=${isOpen}
+      onClose=${onClose}
+      modalHeader="Preview — how employees will see this"
+      actions=${[]}
+      onSubmit=${onClose}
+      submitLabel="Close"
+    >
+      <div class="ac-preview-enduser">
+        <div class="ac-preview-eu-banner">
+          ${hasImage
+            ? html`<img src=${URL.createObjectURL(item.media)} alt="cover" class="ac-preview-eu-img" />`
+            : html`<div class="ac-preview-eu-img-placeholder"><${Icon} name="image-placeholder" width=64 height=64 /></div>`
+          }
+        </div>
+
+        <div class="ac-preview-eu-body">
+          <span class="ac-card-badge ac-card-badge--${item.type}">${item.type.toUpperCase()}</span>
+          <h2 class="ac-preview-eu-title">${item.title || 'Untitled'}</h2>
+
+          <div class="ac-preview-eu-meta">
+            ${item.date
+              ? metaRow('calendar', `${formatDate(item.date)}${item.time ? ' · ' + formatTime(item.time) : ''}`)
+              : html`<div class="ac-preview-eu-meta-row ac-preview-eu-tbd">Date & time TBD</div>`
+            }
+            ${item.venue ? metaRow('location', item.venue) : ''}
+            ${isEvent && item.responses?.interested ? metaRow('users', `${item.responses.interested} people interested`) : ''}
+            ${!isEvent && item.trainerName ? metaRow('user', html`Trainer: <strong>${item.trainerName}</strong>`) : ''}
+            ${!isEvent && item.totalSeats ? metaRow('seats', `${item.totalSeats} seats available`) : ''}
+          </div>
+
+          ${item.description ? html`
+            <div class="ac-preview-eu-desc">
+              <h4>About this ${isEvent ? 'event' : 'session'}</h4>
+              <p>${item.description}</p>
+            </div>
+          ` : ''}
+
+          <button class="ac-preview-eu-cta">
+            ${isEvent ? 'Mark as Interested' : 'Register for this Training'}
+          </button>
+        </div>
+
+        <div class="ac-preview-notice">
+          This is exactly how employees will see this ${isEvent ? 'event' : 'training'} on the public site.
+        </div>
+      </div>
+    </${Modal}>
+  `;
+}
+
+/* ─────────────────────────────────────────────
+   INTERESTED USERS MODAL
+───────────────────────────────────────────── */
+function InterestedModal({ isOpen, onClose, item }) {
+  if (!item) return null;
+  const users = item.responses?.interestedUsers || [];
+  const getInitials = (name) => name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+
+  return html`
+    <${Modal}
+      isOpen=${isOpen}
+      onClose=${onClose}
+      modalHeader=${'Interested — ' + item.title}
+      actions=${[]}
+      onSubmit=${onClose}
+      submitLabel="Close"
+    >
+      <div class="ac-interested-meta">
+        <span class="ac-interested-count">${users.length} ${users.length === 1 ? 'person' : 'people'} interested</span>
+      </div>
+      <div class="ac-interested-list">
+        ${users.map((u) => html`
+          <div class="ac-interested-row">
+            <div class="ac-interested-avatar">${getInitials(u.name)}</div>
+            <div class="ac-interested-info">
+              <span class="ac-interested-name">${u.name}</span>
+              <a class="ac-interested-email" href=${'mailto:' + u.email}>${u.email}</a>
+            </div>
+          </div>
+        `)}
+      </div>
     </${Modal}>
   `;
 }
@@ -443,79 +320,54 @@ function ItemModal({ isOpen, onClose, itemType, editItem, onSaveDraft, onPublish
 /* ─────────────────────────────────────────────
    CARD
 ───────────────────────────────────────────── */
-function Card({ item, onEdit, onToggleStatus }) {
+function Card({ item, onEdit, onPreview, onInterested, onToggleStatus }) {
   const isEvent = item.type === 'event';
   const isLive = item.status === 'live';
-  const hasResponses =
-    item.responses &&
+  const hasResponses = item.responses &&
     (item.responses.interested != null || item.responses.accepted != null);
 
   return html`
     <div class="ac-card">
-      <div class="ac-card-badge ac-card-badge--${item.type}">
-        ${item.type.toUpperCase()}
-      </div>
+      <div class="ac-card-badge ac-card-badge--${item.type}">${item.type.toUpperCase()}</div>
 
       <h3 class="ac-card-title">${item.title}</h3>
       <p class="ac-card-desc">${item.description}</p>
 
       <div class="ac-card-meta">
         <span class="ac-card-date">
-          <svg viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/>
-            <line x1="8" y1="2" x2="8" y2="6"/>
-            <line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
+          <${Icon} name="calendar" width=16 height=16 />
           ${item.date}${item.duration ? html` · <strong>${item.duration}</strong>` : ''}
         </span>
       </div>
 
-      ${hasResponses ? html`
-        <div class="ac-card-responses">
-          ${isEvent ? html`
-            <span class="ac-chip ac-chip--interested">
-              <svg viewBox="0 0 24 24">
-                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-                <path d="M16 3.13a4 4 0 010 7.75"/>
-              </svg>
-              ${item.responses.interested} interested
-            </span>
-          ` : html`
-            <span class="ac-chip ac-chip--accepted">
-              <span class="ac-dot ac-dot--green"></span>
-              ${item.responses.accepted} accepted
-            </span>
-            <span class="ac-chip ac-chip--declined">
-              <span class="ac-dot ac-dot--red"></span>
-              ${item.responses.declined} declined
-            </span>
-            <a class="ac-view-link" href="#">View →</a>
-          `}
-        </div>
-      ` : html`
-        <div class="ac-card-responses">
-          <span class="ac-upcoming">
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            Upcoming — no responses yet
-          </span>
-        </div>
-      `}
+      <div class="ac-card-responses">
+        ${hasResponses
+          ? isEvent ? html`
+              <span class="ac-chip ac-chip--interested ac-chip-clickable" onClick=${() => onInterested(item)}>
+                <${Icon} name="users" width=16 height=16 />
+                ${item.responses.interested} interested
+              </span>
+            ` : html`
+              <span class="ac-chip ac-chip--accepted"><span class="ac-dot ac-dot--green"></span>${item.responses.accepted} accepted</span>
+              <span class="ac-chip ac-chip--declined"><span class="ac-dot ac-dot--red"></span>${item.responses.declined} declined</span>
+              <a class="ac-view-link" href="#">View →</a>
+            `
+          : html`
+              <span class="ac-upcoming">
+                <${Icon} name="info" width=16 height=16 />
+                Upcoming — no responses yet
+              </span>
+            `
+        }
+      </div>
 
       <div class="ac-card-actions">
         <button class="ac-action-btn" onClick=${() => onEdit(item)}>Edit</button>
-        <button class="ac-action-btn">Preview</button>
-        ${isLive ? html`
-          <button class="ac-action-btn ac-action-btn--live" onClick=${() => onToggleStatus(item)}>Live</button>
-        ` : html`
-          <button class="ac-action-btn ac-action-btn--publish" onClick=${() => onToggleStatus(item)}>Publish</button>
-        `}
+        <button class="ac-action-btn" onClick=${() => onPreview(item)}>Preview</button>
+        <button
+          class=${'ac-action-btn ' + (isLive ? 'ac-action-btn--live' : 'ac-action-btn--publish')}
+          onClick=${() => onToggleStatus(item)}
+        >${isLive ? 'Live' : 'Publish'}</button>
       </div>
     </div>
   `;
@@ -525,54 +377,51 @@ function Card({ item, onEdit, onToggleStatus }) {
    MAIN APP
 ───────────────────────────────────────────── */
 function EventsTrainingsApp() {
-  const [items, setItems] = useState(MOCK_DATA);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState('event');
   const [editItem, setEditItem] = useState(null);
+  const [previewItem, setPreviewItem] = useState(null);
+  const [interestedItem, setInterestedItem] = useState(null);
+
+  useEffect(() => {
+    fetchData()
+      .then((data) => { setItems(data); setLoading(false); })
+      .catch((err) => { setError(err.message); setLoading(false); });
+  }, []);
 
   const filtered = filter === 'all' ? items : items.filter((i) => i.type === filter);
 
-  const openAdd = (type) => {
-    setModalType(type);
-    setEditItem(null);
-    setModalOpen(true);
+  const saveItem = (form, status) => {
+    const updated = { ...form, status };
+    setItems((prev) =>
+      editItem
+        ? prev.map((i) => (i.id === editItem.id ? { ...i, ...updated } : i))
+        : [...prev, { ...updated, id: Date.now(), responses: null }],
+    );
   };
 
-  const openEdit = (item) => {
-    setModalType(item.type);
-    setEditItem(item);
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setEditItem(null);
-  };
-
-  const handleSaveDraft = (form) => {
-    if (editItem) {
-      setItems((prev) => prev.map((i) => (i.id === editItem.id ? { ...i, ...form } : i)));
-    } else {
-      setItems((prev) => [...prev, { ...form, id: Date.now(), responses: null }]);
-    }
-  };
-
-  const handlePublish = (form) => {
-    if (editItem) {
-      setItems((prev) => prev.map((i) => (i.id === editItem.id ? { ...i, ...form, status: 'live' } : i)));
-    } else {
-      setItems((prev) => [...prev, { ...form, id: Date.now(), responses: null, status: 'live' }]);
-    }
-  };
+  const openAdd = (type) => { setModalType(type); setEditItem(null); setModalOpen(true); };
+  const openEdit = (item) => { setModalType(item.type); setEditItem(item); setModalOpen(true); };
+  const closeModal = () => { setModalOpen(false); setEditItem(null); };
 
   const handleToggleStatus = (item) => {
     setItems((prev) =>
-      prev.map((i) =>
-        i.id === item.id ? { ...i, status: i.status === 'live' ? 'draft' : 'live' } : i,
-      ),
+      prev.map((i) => i.id === item.id ? { ...i, status: i.status === 'live' ? 'draft' : 'live' } : i),
     );
   };
+
+  const TABS = [
+    { key: 'all',      label: 'All' },
+    { key: 'event',    label: 'Events' },
+    { key: 'training', label: 'Trainings' },
+  ];
+
+  if (loading) return html`<div class="ac-state-loading"><span class="ac-spinner"></span>Loading...</div>`;
+  if (error)   return html`<div class="ac-state-error">Failed to load data: ${error}</div>`;
 
   return html`
     <div class="ac-events-section" id="events-training">
@@ -588,13 +437,11 @@ function EventsTrainingsApp() {
       </div>
 
       <div class="ac-tabs">
-        ${['all', 'event', 'training'].map((t) => html`
+        ${TABS.map(({ key, label }) => html`
           <button
-            class=${'ac-tab' + (filter === t ? ' active' : '')}
-            onClick=${() => setFilter(t)}
-          >
-            ${t === 'all' ? 'All' : t === 'event' ? 'Events' : 'Trainings'}
-          </button>
+            class=${'ac-tab' + (filter === key ? ' active' : '')}
+            onClick=${() => setFilter(key)}
+          >${label}</button>
         `)}
       </div>
 
@@ -604,18 +451,33 @@ function EventsTrainingsApp() {
             key=${item.id}
             item=${item}
             onEdit=${openEdit}
+            onPreview=${(i) => setPreviewItem(i)}
+            onInterested=${(i) => setInterestedItem(i)}
             onToggleStatus=${handleToggleStatus}
           />
         `)}
       </div>
 
       <${ItemModal}
+        key=${editItem ? editItem.id : 'new-' + modalType}
         isOpen=${modalOpen}
         onClose=${closeModal}
         itemType=${modalType}
         editItem=${editItem}
-        onSaveDraft=${handleSaveDraft}
-        onPublish=${handlePublish}
+        onSaveDraft=${(form) => saveItem(form, 'draft')}
+        onPublish=${(form) => saveItem(form, 'live')}
+      />
+
+      <${PreviewModal}
+        isOpen=${!!previewItem}
+        onClose=${() => setPreviewItem(null)}
+        item=${previewItem}
+      />
+
+      <${InterestedModal}
+        isOpen=${!!interestedItem}
+        onClose=${() => setInterestedItem(null)}
+        item=${interestedItem}
       />
     </div>
   `;
