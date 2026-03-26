@@ -1,6 +1,7 @@
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState,useEffect } from '../../vendor/preact-hooks.js';
-import  Modal  from '../../helper/modal.js';
+import Modal from '../../helper/modal.js';
+import MediaUpload from '../../helper/media-upload.js';
 
 function PostBar() {
 
@@ -23,10 +24,6 @@ function PostBar() {
   return () => window.removeEventListener('scroll', handleScroll);
 }, []);
 
-  const handleFileChange = (e) => {
-  const selected = Array.from(e.target.files);
-  setFiles(selected);
-};
   const submitPost = () => {
 
     if (!text.trim()) return;
@@ -52,17 +49,6 @@ function PostBar() {
   setIsModalOpen(false);
   };
 
-  const handleDrop = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-
-  const droppedFiles = Array.from(e.dataTransfer.files);
-  setFiles(prev => [...prev, ...droppedFiles]);
-};
-
-const handleDragOver = (e) => {
-  e.preventDefault();
-};
 
   return html`
     <div class="postbar">
@@ -123,52 +109,7 @@ const handleDragOver = (e) => {
         Upload Media
       </label>
 
-      <!-- HIDDEN INPUT -->
-      <input
-        id="file-upload"
-        type="file"
-        multiple
-        accept="image/*,video/*,application/pdf"
-        class="modal-file-hidden"
-        onChange=${handleFileChange}
-      />
-
-     <div
-        class="modal-dropzone"
-        onDrop=${handleDrop}
-        onDragOver=${handleDragOver}
-      >
-        <p>Drag & drop files here</p>
-
-        <label for="file-upload" class="modal-upload-btn">
-          Or Upload
-        </label>
-      </div>
-
-      <!-- PREVIEW -->
-      ${files.length > 0 && html`
-        <div class="modal-preview">
-          ${files.map(file => {
-            const url = URL.createObjectURL(file);
-
-            if (file.type.startsWith('image/')) {
-              return html`<img src=${url} class="modal-preview-img" />`;
-            }
-
-            if (file.type.startsWith('video/')) {
-              return html`
-                <video src=${url} class="modal-preview-video" controls />
-              `;
-            }
-
-            return html`
-              <div class="modal-preview-file">
-                📄 ${file.name}
-              </div>
-            `;
-          })}
-        </div>
-      `}
+      <${MediaUpload} multiple value=${files} onChange=${setFiles} />
     </${Modal}>
     
   `;
