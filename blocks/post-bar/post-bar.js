@@ -3,8 +3,39 @@ import { useState,useEffect } from '../../vendor/preact-hooks.js';
 import Modal from '../../helper/modal.js';
 import MediaUpload from '../../helper/media-upload.js';
 
-function PostBar() {
 
+function getConfig(block) {
+  const config = {};
+
+  [...block.children].forEach((row) => {
+    const key = row.children[0]?.textContent?.trim();
+    const value = row.children[1]?.textContent?.trim();
+
+    if (key) {
+      config[key] = value;
+    }
+  });
+
+  return config;
+  
+}
+
+function PostBar({config={}}) {
+
+  const {
+    postInputText="What's on your mind?",
+    postButtonLabel="POST",
+    modalHeader = 'Create Post',
+    titleLabel = 'Title',
+    descriptionLabel = 'Description',
+    submitLabel = 'Send',
+    cancelLabel = 'Discard',
+    showMediaUpload = 'true',
+  } = config;
+
+  const isMediaEnabled = showMediaUpload !== 'false';
+
+  const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [files, setFiles] = useState([]);
   const [showFab, setShowFab] = useState(false);
@@ -35,11 +66,13 @@ function PostBar() {
     );
 
     setText('');
+    setText('');
     setFiles([]);
     setIsModalOpen(false);
   };
 
   const resetForm = () => {
+  setText('');
   setText('');
   setFiles([]);
   };
@@ -59,7 +92,7 @@ function PostBar() {
 
       <input
         class="postbar-input"
-        placeholder="What's on your mind?"
+        placeholder=${postInputText}
         
         disabled
       />
@@ -69,7 +102,7 @@ function PostBar() {
         
         onClick=${() => setIsModalOpen(true)}
       >
-        + Post
+        ${postButtonLabel}
       </button>
 
     </div>
@@ -87,14 +120,26 @@ function PostBar() {
     <${Modal}
       isOpen=${isModalOpen}
       onClose=${handleClose}
-      modalHeader="Create Post"
+      modalHeader=${modalHeader}
       onSubmit=${submitPost}
-      submitLabel="Send"
-      cancelLabel="Discard"
+      submitLabel=${submitLabel}
+      cancelLabel=${cancelLabel}
     >
+
+        <!-- TITLE LABEL -->
+          <label class="modal-label">
+            ${titleLabel}
+          </label>
+
+          <input
+            class="modal-input"
+            placeholder="Enter title"
+            value=${title}
+            onInput=${(e) => setTitle(e.target.value)}
+          />
        <!-- TEXTAREA LABEL -->
       <label class="modal-label">
-        Description
+        ${descriptionLabel}
       </label>
 
       <textarea
@@ -104,18 +149,23 @@ function PostBar() {
         onInput=${(e) => setText(e.target.value)}
       />
 
+    ${isMediaEnabled && html`  
       <!-- UPLOAD LABEL -->
       <label class="modal-label">
         Upload Media
       </label>
 
       <${MediaUpload} multiple value=${files} onChange=${setFiles} />
+    `}
     </${Modal}>
     
   `;
 }
 
 export default function decorate(block) {
+
+  const config = getConfig(block);
+  block.innerHTML = '';
   
-  render(html`<${PostBar} />`, block);
+  render(html`<${PostBar} config=${config} />`, block);
 }

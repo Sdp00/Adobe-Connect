@@ -293,7 +293,7 @@ opacity: 0.65;
 
 /* ── Lightbox ─────────────────────────────────────────────────────── */
 
-.lightbox-backdrop {
+/* .lightbox-backdrop {
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -301,7 +301,7 @@ opacity: 0.65;
   display: flex;
   align-items: center;
   justify-content: center;
-}
+} */
 
 /* Counter top-centre */
 .lightbox-counter {
@@ -322,8 +322,13 @@ opacity: 0.65;
 /* Close button top-right */
 .lightbox-close {
   position: absolute;
-  top: 14px;
-  right: 16px;
+  
+  /* top: 14px;
+  right: 16px; */
+
+  top: 12px;
+  left: 12px;   /* ← move to left like FB */
+  right: auto;
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -415,6 +420,76 @@ opacity: 0.65;
 .lightbox-nav-prev { left: 16px; }
 .lightbox-nav-next { right: 16px; }
 
+
+/* /// */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+}
+
+/* MAIN WRAPPER */
+.lightbox-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* MEDIA */
+.lightbox-media {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+/* .lightbox-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+} */
+
+/* RIGHT PANEL */
+.lightbox-side {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  height: 40%;
+}
+
+/* HEADER */
+.lightbox-side-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* COMMENTS */
+.lightbox-comments {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* INPUT */
+.lightbox-comment-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+
+/* .lightbox-counter {
+  top: 12px;
+  right: 12px;
+  left: auto;
+  transform: none;
+} */
+
 .feed-comment {
   display: flex;
   gap: 8px;
@@ -472,6 +547,21 @@ opacity: 0.65;
   }
   .lightbox-nav-prev { left: 24px; }
   .lightbox-nav-next { right: 24px; }
+
+  .lightbox-container {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .lightbox-media {
+    flex: 2;
+  }
+
+  .lightbox-side {
+    flex: 1;
+    height: 100%;
+    border-left: 1px solid #ddd;
+  }
 }
 
 /* ── Desktop (≥ 1024 px) ─────────────────────────────────────────── */
@@ -481,7 +571,7 @@ opacity: 0.65;
     max-width: 960px;
 
     /* margin: 16px auto 0; */
-    
+
     margin-top: 6px;
     padding: 0;
     gap: 16px;
@@ -516,5 +606,25 @@ opacity: 0.65;
   .feed-action-icon { 
     width: 17px; 
     height: 17px; 
+  }
+
+  .lightbox-container {
+    flex-direction: row;
+  }
+
+  .lightbox-media {
+    flex: 2;
+  }
+
+  .lightbox-img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  }
+
+  .lightbox-side {
+    flex: 1;
+    height: 97%;
+    border-left: 1px solid #ddd;
   }
 }
