@@ -1,6 +1,7 @@
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState } from '../../vendor/preact-hooks.js';
 import Modal from '../../helper/modal.js';
+import MediaUpload from '../../helper/media-upload.js';
 
 /* ─────────────────────────────────────────────
     STATS SECTION (unchanged)
@@ -220,62 +221,6 @@ function emptyEvent() {
 
 function emptyTraining() {
   return { type: 'training', title: '', date: '', time: '', venue: '', trainerName: '', totalSeats: '', description: '', media: null };
-}
-
-/* ─────────────────────────────────────────────
-   MEDIA UPLOAD FIELD
-───────────────────────────────────────────── */
-function MediaUpload({ value, onChange }) {
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-    if (file) onChange(file);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleFile = (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) onChange(file);
-  };
-
-  const handleRemove = () => onChange(null);
-
-  if (value) {
-    return html`
-      <div class="ac-media-upload">
-        <div class="ac-media-preview">
-          ${value.type && value.type.startsWith('image/') ? html`
-            <img src=${URL.createObjectURL(value)} alt="preview" />
-          ` : html`
-            <span class="ac-media-filename">📎 ${value.name}</span>
-          `}
-          <button class="ac-media-remove" onClick=${handleRemove}>✕</button>
-        </div>
-      </div>
-    `;
-  }
-
-  return html`
-    <div class="ac-media-upload" onDragOver=${handleDragOver} onDrop=${handleDrop}>
-      <label class="ac-media-dropzone">
-        <input
-          type="file"
-          accept="image/*,video/*,.pdf"
-          onChange=${handleFile}
-          style="display:none"
-        />
-        <span>Click to upload or drag & drop</span>
-        <div class="ac-media-types">
-          <span>Image</span>
-          <span>Video</span>
-          <span>PDF</span>
-        </div>
-      </label>
-    </div>
-  `;
 }
 
 /* ─────────────────────────────────────────────
