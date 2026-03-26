@@ -1,6 +1,7 @@
 /* stylelint-disable */
 /* =============================================================
    Upcoming Block — Spectrum design tokens
+   Buttons powered by /styles/buttons.css (.btn system)
    ============================================================= */
 
 .upcoming-block {
@@ -137,73 +138,52 @@
   filter: brightness(0);
 }
 
-/* ── I'm Interested button — Spectrum accent ── */
+/* ── I'm Interested button
+     Base styles from .btn in buttons.css
+     Usage: <button class="btn upcoming-block__btn">I'm Interested</button>
+   ── */
 .upcoming-block__btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-  padding: 0 var(--spectrum-spacing-400, 16px);
   height: var(--spectrum-component-height-100, 32px);
-  background: var(--spectrum-accent-color-700, #e63535);
-  color: var(--spectrum-white, #fff);
-  border: none;
+  padding: 0 var(--spectrum-spacing-400, 16px);
   border-radius: var(--spectrum-corner-radius-full, 9999px);
   font-size: var(--spectrum-font-size-100, 14px);
-  font-weight: var(--spectrum-bold-font-weight, 700);
-  cursor: pointer;
-  transition: background 0.13s ease-in-out;
-  font-family: inherit;
   letter-spacing: 0.01em;
+  /* background, color, font-weight, cursor, transition inherited from .btn */
 }
 
-.upcoming-block__btn:hover {
-  background: var(--spectrum-accent-color-800, #cc2020);
-}
-
-.upcoming-block__btn:active {
-  background: var(--spectrum-accent-color-900, #b01b1b);
-}
-
-.upcoming-block__btn--active {
+/* Confirmed "interested" state — switch to green */
+.upcoming-block__btn--active,
+.upcoming-block__btn--active:hover {
   background: var(--spectrum-positive-color-700, #059669);
+  transform: none;
 }
 
 .upcoming-block__btn--active:hover {
   background: var(--spectrum-positive-color-800, #047857);
 }
 
-/* ── Accept / Decline — Spectrum button styles ── */
+/* ── Accept / Decline group
+     Usage:
+       <button class="btn upcoming-block__btn-accept">Accept</button>
+       <button class="btn upcoming-block__btn-decline">Decline</button>
+   ── */
 .upcoming-block__btn-group {
   display: flex;
   gap: var(--spectrum-spacing-200, 8px);
 }
 
-/* Accept = Spectrum accent filled */
+/* Accept — inherits .btn red fill; size overrides only */
 .upcoming-block__btn-accept {
   flex: 1;
   height: var(--spectrum-component-height-100, 32px);
   padding: 0 var(--spectrum-spacing-300, 12px);
-  background: var(--spectrum-accent-color-700, #e63535);
-  border: 2px solid transparent;
-  color: var(--spectrum-white, #fff);
   border-radius: var(--spectrum-corner-radius-full, 9999px);
   font-size: var(--spectrum-font-size-100, 14px);
-  font-weight: var(--spectrum-bold-font-weight, 700);
-  cursor: pointer;
-  transition: background 0.13s ease-in-out;
-  font-family: inherit;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spectrum-spacing-100, 6px);
+  /* background & color from .btn */
 }
 
-.upcoming-block__btn-accept:hover {
-  background: var(--spectrum-accent-color-800, #cc2020);
-}
-
-/* Decline = Spectrum secondary outlined */
+/* Decline — ghost/outlined; overrides .btn fill */
 .upcoming-block__btn-decline {
   flex: 1;
   height: var(--spectrum-component-height-100, 32px);
@@ -213,19 +193,14 @@
   color: var(--spectrum-gray-800, #333);
   border-radius: var(--spectrum-corner-radius-full, 9999px);
   font-size: var(--spectrum-font-size-100, 14px);
-  font-weight: var(--spectrum-bold-font-weight, 700);
-  cursor: pointer;
-  transition: border-color 0.13s, color 0.13s;
-  font-family: inherit;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spectrum-spacing-100, 6px);
+  transition: border-color 0.13s, color 0.13s, background 0.13s;
 }
 
 .upcoming-block__btn-decline:hover {
+  background: transparent;
   border-color: var(--spectrum-negative-color-700, #e63535);
   color: var(--spectrum-negative-color-700, #e63535);
+  transform: none;
 }
 
 /* ── Status badges ── */
