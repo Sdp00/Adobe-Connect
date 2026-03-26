@@ -1,17 +1,17 @@
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState } from '../../vendor/preact-hooks.js';
 import Modal from '../../helper/modal.js';
+import MediaUpload from '../../helper/media-upload.js';
 
 /* ─────────────────────────────────────────────
-   FRIEND'S STATS SECTION (unchanged)
+    STATS SECTION (unchanged)
 ───────────────────────────────────────────── */
 const STATS = [
-  { icon: 'events',      count: '4', label: 'Events',           section: 'events-training' },
-  { icon: 'training',    count: '6', label: 'Trainings',        section: 'events-training' },
-  { icon: 'newsletters', count: '3', label: 'Newsletters', section: 'newsletter' },
+  { icon: 'events',   count: '4', label: 'Events',    section: 'events-training' },
+  { icon: 'training', count: '6', label: 'Trainings', section: 'events-training' },
 ];
 
-/* ── Data layer ───────────────────────────────────────────────
+/* ── Data Integration ───────────────────────────────────────────────
    Replace the mock return below with a real API/DB call.
    Must resolve to { events, trainings, newsletters } counts.
    ─────────────────────────────────────────────────────────── */
@@ -51,17 +51,22 @@ function renderStats(container) {
       const card = document.createElement('div');
       card.className = 'admin-stats-card';
 
+      const left = document.createElement('div');
+      left.className = 'admin-stats-left';
+
       const iconWrap = document.createElement('div');
       iconWrap.className = `admin-stats-icon admin-stats-icon-${stat.icon}`;
       iconWrap.innerHTML = svgs[i];
 
-      const count = document.createElement('p');
-      count.className = 'admin-stats-count';
-      count.textContent = stat.count;
-
       const label = document.createElement('p');
       label.className = 'admin-stats-label';
       label.textContent = stat.label;
+
+      left.append(iconWrap, label);
+
+      const count = document.createElement('p');
+      count.className = 'admin-stats-count';
+      count.textContent = stat.count;
 
       card.addEventListener('click', () => {
         const target = document.getElementById(stat.section);
@@ -71,7 +76,7 @@ function renderStats(container) {
         }
       });
 
-      card.append(iconWrap, count, label);
+      card.append(left, count);
       grid.append(card);
     });
 
@@ -216,62 +221,6 @@ function emptyEvent() {
 
 function emptyTraining() {
   return { type: 'training', title: '', date: '', time: '', venue: '', trainerName: '', totalSeats: '', description: '', media: null };
-}
-
-/* ─────────────────────────────────────────────
-   MEDIA UPLOAD FIELD
-───────────────────────────────────────────── */
-function MediaUpload({ value, onChange }) {
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-    if (file) onChange(file);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleFile = (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) onChange(file);
-  };
-
-  const handleRemove = () => onChange(null);
-
-  if (value) {
-    return html`
-      <div class="ac-media-upload">
-        <div class="ac-media-preview">
-          ${value.type && value.type.startsWith('image/') ? html`
-            <img src=${URL.createObjectURL(value)} alt="preview" />
-          ` : html`
-            <span class="ac-media-filename">📎 ${value.name}</span>
-          `}
-          <button class="ac-media-remove" onClick=${handleRemove}>✕</button>
-        </div>
-      </div>
-    `;
-  }
-
-  return html`
-    <div class="ac-media-upload" onDragOver=${handleDragOver} onDrop=${handleDrop}>
-      <label class="ac-media-dropzone">
-        <input
-          type="file"
-          accept="image/*,video/*,.pdf"
-          onChange=${handleFile}
-          style="display:none"
-        />
-        <span>Click to upload or drag & drop</span>
-        <div class="ac-media-types">
-          <span>Image</span>
-          <span>Video</span>
-          <span>PDF</span>
-        </div>
-      </label>
-    </div>
-  `;
 }
 
 /* ─────────────────────────────────────────────
