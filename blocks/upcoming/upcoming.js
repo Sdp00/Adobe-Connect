@@ -31,17 +31,17 @@ function ItemCard({ item, interested, trainingStatus, onToggleInterested, onAcce
 
         ${!isTraining && html`
           <button
-            class="upcoming-block__btn ${interested[item.id] ? 'upcoming-block__btn--active' : ''}"
+            class="btn upcoming-block__btn ${interested[item.id] ? 'upcoming-block__btn--active' : ''}"
             onClick=${() => onToggleInterested(item.id)}>
             ${interested[item.id] ? 'Interested!' : "I'm Interested"}
           </button>`}
 
         ${isTraining && !status && html`
           <div class="upcoming-block__btn-group">
-            <button class="upcoming-block__btn-decline" onClick=${() => onDecline(item.id)}>
+            <button class="btn upcoming-block__btn-decline" onClick=${() => onDecline(item.id)}>
               Decline
             </button>
-            <button class="upcoming-block__btn-accept" onClick=${() => onAccept(item.id)}>
+            <button class="btn upcoming-block__btn-accept" onClick=${() => onAccept(item.id)}>
               Accept
             </button>
           </div>`}
@@ -129,6 +129,12 @@ function Upcoming({ data }) {
 }
 
 export default async function decorate(block) {
+  /* Load buttons.css — same pattern as events-training.js */
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = '/styles/buttons.css';
+  document.head.append(link);
+
   const resp = await fetch('public/mock.json');
   const json = await resp.json();
   const data = json.upcoming;
