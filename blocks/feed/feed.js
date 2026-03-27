@@ -413,7 +413,7 @@ export default function decorate(block) {
     config[key] = value;
   });
 
-  console.log("FEED CONFIG:", config);
+  // console.log("FEED CONFIG:", config);
 
   block.innerHTML=''
 

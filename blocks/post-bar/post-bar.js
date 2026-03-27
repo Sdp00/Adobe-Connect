@@ -40,6 +40,52 @@ function PostBar({config={}}) {
   const [files, setFiles] = useState([]);
   const [showFab, setShowFab] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [errors, setErrors] = useState({
+    title: '',
+    text: '',
+    files: [],
+  });
+
+  function validateMedia(files = []) {
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'video/mp4',
+    'application/pdf',
+  ];
+
+  const errors = [];
+
+  files.forEach((file) => {
+    if (!allowedTypes.includes(file.type)) {
+      errors.push(`${file.name} is not a supported format`);
+    }
+  });
+
+  return errors;
+}
+
+  function validatePost({ title, text, files }) {
+  const errors = {
+    title: '',
+    text: '',
+    files: [],
+  };
+
+  if (!title || !title.trim()) {
+    errors.title = 'Title is required';
+  }
+
+  if (!text || !text.trim()) {
+    errors.text = 'Description is required';
+  }
+
+  const mediaErrors = validateMedia(files);
+  errors.files = mediaErrors;
+
+  return errors;
+}
 
   useEffect(() => {
   const handleScroll = () => {
@@ -55,27 +101,42 @@ function PostBar({config={}}) {
   return () => window.removeEventListener('scroll', handleScroll);
 }, []);
 
-  const submitPost = () => {
-
-    if (!text.trim()) return;
-
-    window.dispatchEvent(
-      new CustomEvent('create-post', {
-        detail: { text ,files}
-      })
-    );
-
-    setText('');
-    setText('');
-    setFiles([]);
-    setIsModalOpen(false);
-  };
-
-  const resetForm = () => {
-  setText('');
+const resetForm = () => {
+  setTitle('');
   setText('');
   setFiles([]);
   };
+
+  const submitPost = () => {
+
+    // if (!text.trim()) return;
+
+     const validationErrors = validatePost({ title, text, files });
+
+    setErrors(validationErrors);
+
+    const hasError =
+      validationErrors.title ||
+      validationErrors.text ||
+      validationErrors.files.length > 0;
+
+    if (hasError) return;
+
+    window.dispatchEvent(
+      new CustomEvent('create-post', {
+        detail: { title,text ,files}
+      })
+    );
+
+    // setText('');
+    // setText('');
+    // setFiles([]);
+    resetForm();
+    setErrors({ title: '', text: '', files: [] });
+    setIsModalOpen(false);
+  };
+
+  
 
   const handleClose = () => {
   resetForm();
@@ -135,19 +196,32 @@ function PostBar({config={}}) {
             class="modal-input"
             placeholder="Enter title"
             value=${title}
-            onInput=${(e) => setTitle(e.target.value)}
+            onInput=${(e) => {
+              setTitle(e.target.value);
+              setErrors(prev => ({ ...prev, title: '' }));
+            }}
           />
+          ${errors.title && html`
+            <div class="field-error">${errors.title}</div>
+          `}
+
        <!-- TEXTAREA LABEL -->
-      <label class="modal-label">
-        ${descriptionLabel}
-      </label>
+        <label class="modal-label">
+          ${descriptionLabel}
+        </label>
 
       <textarea
         class="modal-textarea"
         placeholder="What's on your mind?"
         value=${text}
-        onInput=${(e) => setText(e.target.value)}
+        onInput=${(e) => {
+          setText(e.target.value);
+          setErrors(prev => ({ ...prev, text: '' }));
+        }}
       />
+      ${errors.text && html`
+        <div class="field-error">${errors.text}</div>
+      `}
 
     ${isMediaEnabled && html`  
       <!-- UPLOAD LABEL -->
@@ -155,7 +229,15 @@ function PostBar({config={}}) {
         Upload Media
       </label>
 
-      <${MediaUpload} multiple value=${files} onChange=${setFiles} />
+      <${MediaUpload} multiple value=${files} onChange=${(newFiles) => {
+    setFiles(newFiles);
+    setErrors(prev => ({ ...prev, files: [] }));
+  }} />
+      ${errors.files.length > 0 && html`
+        <div class="field-error">
+          ${errors.files.map(err => html`<div>${err}</div>`)}
+        </div>
+      `}
     `}
     </${Modal}>
     
