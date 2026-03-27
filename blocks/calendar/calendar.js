@@ -1,5 +1,22 @@
 import { html, render } from '../../vendor/htm-preact.js';
-import { useState } from '../../vendor/preact-hooks.js';
+import { useState, useEffect } from '../../vendor/preact-hooks.js';
+
+const svgCache = {};
+async function fetchSvg(name) {
+  if (svgCache[name]) return svgCache[name];
+  try {
+    const res = await fetch(`/icons/${name}.svg`);
+    if (!res.ok) return '';
+    const svg = (await res.text())
+      .replace(/<\?xml[^>]*\?>/g, '')
+      .trim()
+      .replace(/^<svg\b/, '<svg class="nav-icon"');
+    svgCache[name] = svg;
+    return svg;
+  } catch {
+    return '';
+  }
+}
 
 const DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 const DOT_COLOR = { event: '#e63535', training: '#3b82f6', both: '#8b5cf6' };
@@ -72,14 +89,17 @@ function Calendar({ data }) {
 
 function MobileCalendarPopover({ data }) {
   const [open, setOpen] = useState(false);
+  const [calSvg, setCalSvg] = useState('');
+
+  useEffect(() => { fetchSvg('calendar').then(setCalSvg); }, []);
 
   return html`
     <div class="cal-popover">
       <button
-        class="cal-popover__trigger"
+        class="cal-popover__trigger icon-btn"
         onClick=${() => setOpen(o => !o)}
         aria-label="Open calendar">
-        <img src="/icons/calendar.svg" class="cal-popover__icon" alt="Calendar" />
+        <span dangerouslySetInnerHTML=${{ __html: calSvg }} />
       </button>
 
       ${open && html`
