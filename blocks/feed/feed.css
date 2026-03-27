@@ -90,6 +90,13 @@
 }
 
 /* ── Body text ────────────────────────────────────────────────────── */
+ .feed-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111;
+  font-family: var(--spectrum-global-font-family-base);
+}
 
 .feed-text {
   font-size: 14px;
@@ -151,9 +158,9 @@
   filter: brightness(0.45);
 }
 
-.feed-image-grid-item:hover img {
+/* .feed-image-grid-item:hover img {
   opacity: 0.88;
-}
+} */
 
 
 .feed-image-overlay-count {
@@ -514,6 +521,314 @@ opacity: 0.65;
   font-size: 13px;
   line-height: 1.4;
   color: var(--spectrum-text-primary);
+}
+
+/* ── Video thumbnail in feed ──────────────────────────────────────── */
+.feed-media-videos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.feed-video-thumb {
+  position: relative;
+  width: 100%;
+  max-height: 340px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #000;
+}
+
+.feed-video-preview {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.feed-video-play-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 30%);
+  transition: background 0.15s ease;
+}
+
+.feed-video-thumb:hover .feed-video-play-btn {
+  background: rgb(0 0 0 / 50%);
+}
+
+.feed-video-play-btn svg {
+  width: 56px;
+  height: 56px;
+  color: #fff;
+  filter: drop-shadow(0 2px 8px rgb(0 0 0 / 50%));
+}
+
+/* ── PDF chip in feed ─────────────────────────────────────────────── */
+.feed-pdfs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.feed-pdf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--spectrum-gray-100);
+  border: 1px solid var(--spectrum-border-divider);
+  color: var(--spectrum-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--spectrum-global-font-family-base);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-pdf-chip:hover {
+  background: var(--spectrum-gray-200);
+}
+
+.feed-pdf-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--spectrum-red-600);
+}
+
+/* ── Lightbox media viewer ────────────────────────────────────────── */
+.lightbox-media-viewer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-pdf-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* ── Thumbnail strip ──────────────────────────────────────────────── */
+.lightbox-thumbstrip {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgb(0 0 0 / 50%);
+  border-radius: 999px;
+  max-width: 90vw;
+  overflow-x: auto;
+}
+
+.lightbox-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease;
+}
+
+.lightbox-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lightbox-thumb-active {
+  border-color: #fff;
+}
+
+.lightbox-thumb-icon {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.lightbox-thumb-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.lightbox-thumb-pdf {
+  color: #e0364a;
+}
+
+/* ── Hero media wrapper (shared for image / video / pdf) ─────────── */
+.feed-media-hero-wrap {
+  position: relative;
+  width: 100%;
+  max-height: 340px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feed-media-hero-wrap:hover .feed-image-hero {
+  opacity: 0.92;
+}
+
+/* Play overlay on hero video */
+.feed-video-play-btn-hero {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 25%);
+  transition: background 0.15s ease;
+}
+
+.feed-media-hero-wrap:hover .feed-video-play-btn-hero {
+  background: rgb(0 0 0 / 45%);
+}
+
+.feed-video-play-btn-hero svg {
+  width: 60px;
+  height: 60px;
+  color: #fff;
+  filter: drop-shadow(0 2px 8px rgb(0 0 0 / 50%));
+}
+
+/* PDF hero tile */
+.feed-pdf-hero {
+  width: 100%;
+  max-height: 340px;
+  min-height: 160px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.feed-pdf-hero:hover {
+  background: #ebebeb;
+}
+
+.feed-pdf-hero svg {
+  width: 48px;
+  height: 48px;
+  color: var(--spectrum-red-600, #e0364a);
+}
+
+.feed-pdf-hero span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--spectrum-text-primary);
+  font-family: var(--spectrum-global-font-family-base);
+  max-width: 80%;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Grid cell: video play icon ───────────────────────────────────── */
+
+/* .feed-image-grid-item { */
+
+  /* position: relative;  */
+
+  /* ensure overlay children are positioned correctly */
+
+/* } */
+
+.feed-grid-play-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 28%);
+  pointer-events: none;
+}
+
+.feed-grid-play-icon svg {
+  width: 32px;
+  height: 32px;
+  color: #fff;
+  filter: drop-shadow(0 1px 4px rgb(0 0 0 / 40%));
+}
+
+/* ── Grid cell: PDF icon ──────────────────────────────────────────── */
+.feed-grid-pdf-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #f5f5f5;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.feed-grid-pdf-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--spectrum-red-600, #e0364a);
+}
+
+.feed-grid-pdf-icon span {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--spectrum-text-primary);
+  font-family: var(--spectrum-global-font-family-base);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 90%;
+}
+
+/* ── Grid video element (no controls, covers cell) ────────────────── */
+.feed-image-grid-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
 }
 
 /* ── Tablet (≥ 600 px) ───────────────────────────────────────────── */

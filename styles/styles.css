@@ -368,7 +368,8 @@ main .section.highlight {
   border-radius: 14px;
   font-size: 16px;
   font-family: var(--spectrum-font-family);
-
+  color: var(--spectrum-text-primary);
+  
   /* margin-bottom: 20px; */
   background:var(--spectrum-gray-100);
 }
