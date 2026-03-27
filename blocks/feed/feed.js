@@ -1,3 +1,4 @@
+import  getBackendBaseUrl  from '../../utils/apiConfig.js';
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState, useEffect,useCallback,useRef } from '../../vendor/preact-hooks.js';
 
@@ -10,6 +11,7 @@ const DEFAULT_CONFIG = {
   showAvatars: true,
   maxCommentsVisible: 3,
   allowComments: true,
+  dataUrl: "/data/post.json"
 };
 
 function Lightbox({ mediaItems, startIndex, onClose, commentsList, commentInput, setCommentInput, addComment }) {
@@ -388,11 +390,20 @@ function Feed({ config }) {
   const loaderRef                   = useRef(null);
   const POSTS_PER_PAGE              = 3;
 
+  // const POSTS_API = `${getBackendBaseUrl()}/data/post.json`;
+
+  const POSTS_API = config.dataUrl
+  ? (config.dataUrl.startsWith('http')
+      ? config.dataUrl
+      : `${getBackendBaseUrl()}${config.dataUrl}`)
+  : `${getBackendBaseUrl()}/data/post.json`;
+
   // Load JSON once
   useEffect(() => {
-    fetch('/data/post.json')
+    // fetch('/data/post.json')
+    fetch(POSTS_API)
       .then(res => res.json())
-      .then(data => setPosts(data))
+      .then(data =>setPosts(data))
       .catch(err => console.error('Error loading posts:', err));
 
     const handler = (e) => {
