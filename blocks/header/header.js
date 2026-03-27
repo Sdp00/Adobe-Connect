@@ -1,5 +1,22 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+
+const iconCache = {};
+async function fetchIcon(name) {
+  if (iconCache[name]) return iconCache[name];
+  try {
+    const res = await fetch(`/icons/${name}.svg`);
+    if (!res.ok) return '';
+    const svg = (await res.text())
+      .replace(/<\?xml[^>]*\?>/g, '')
+      .trim()
+      .replace(/^<svg\b/, '<svg class="nav-icon"');
+    iconCache[name] = svg;
+    return svg;
+  } catch {
+    return '';
+  }
+}
  
 /* ─────────────────────────────────────────────
    HAMBURGER SVGs
@@ -166,10 +183,6 @@ export default async function decorate(block) {
       <!-- Notifications -->
       <div class="notify">
         <button class="icon-btn notify-trigger" aria-label="Notifications">
-          <svg class="nav-icon" viewBox="0 0 24 24">
-            <path d="M18 8a6 6 0 10-12 0v5l-2 2h16l-2-2z"/>
-            <path d="M13.73 21a2 2 0 01-3.46 0"/>
-          </svg>
           <span class="notify-dot"></span>
         </button>
       </div>
@@ -307,38 +320,30 @@ export default async function decorate(block) {
   if (mobileInput) attachSearch(mobileInput);
  
   /* DARK / LIGHT MODE TOGGLE */
-  const moonIcon = `
-    <svg class="nav-icon" viewBox="0 0 24 24">
-      <path d="M21 12.79A9 9 0 0111.21 3a7 7 0 109.79 9.79z"/>
-    </svg>`;
- 
-  const sunIcon = `
-    <svg class="nav-icon" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="5"/>
-      <line x1="12" y1="1" x2="12" y2="3"/>
-      <line x1="12" y1="21" x2="12" y2="23"/>
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-      <line x1="1" y1="12" x2="3" y2="12"/>
-      <line x1="21" y1="12" x2="23" y2="12"/>
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-    </svg>`;
- 
   const themeBtn = nav.querySelector('.theme-toggle-btn');
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
-  themeBtn.innerHTML = savedTheme === 'dark' ? sunIcon : moonIcon;
- 
+
+  const [moonSvg, sunSvg, bellSvg] = await Promise.all([
+    fetchIcon('moon'),
+    fetchIcon('sun'),
+    fetchIcon('bell'),
+  ]);
+
+  themeBtn.innerHTML = savedTheme === 'dark' ? sunSvg : moonSvg;
+
   themeBtn.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
-    themeBtn.innerHTML = next === 'dark' ? sunIcon : moonIcon;
+    themeBtn.innerHTML = next === 'dark' ? sunSvg : moonSvg;
   });
+
+  const notifyBtn = nav.querySelector('.notify-trigger');
+  notifyBtn.insertAdjacentHTML('afterbegin', bellSvg);
 }
- 
+
 /* PROFILE MODAL */
 function openProfileModal(nav) {
   if (document.querySelector('.profile-modal-overlay')) return;
