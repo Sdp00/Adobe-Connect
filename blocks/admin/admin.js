@@ -150,13 +150,30 @@ function ItemModal({ isOpen, onClose, itemType, editItem, onSaveDraft, onPublish
   const isTraining = itemType === 'training';
   const [tab, setTab] = useState('edit');
   const [form, setForm] = useState(editItem ? { ...editItem } : emptyForm(itemType));
+  const [errors, setErrors] = useState({});
 
-  const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
+  const set = (key, val) => {
+    setForm((f) => ({ ...f, [key]: val }));
+    if (errors[key]) setErrors((e) => ({ ...e, [key]: null }));
+  };
 
-  const field = (label, inputEl) => html`
+  const validate = () => {
+    const e = {};
+    if (!form.title?.trim()) e.title = 'Title is required';
+    if (!form.date) e.date = 'Date is required';
+    if (!form.description?.trim()) e.description = 'Description is required';
+    if (isTraining) {
+      if (!form.trainerName?.trim()) e.trainerName = "Trainer's name is required";
+      if (!form.totalSeats) e.totalSeats = 'Total seats is required';
+    }
+    return e;
+  };
+
+  const field = (label, inputEl, errorKey) => html`
     <div class="ac-form-group">
       <label class="ac-form-label">${label}</label>
       ${inputEl}
+      ${errors[errorKey] ? html`<span style="color:#b91c1c;font-size:0.75rem;margin-top:4px;display:block">${errors[errorKey]}</span>` : ''}
     </div>
   `;
 
@@ -172,13 +189,13 @@ function ItemModal({ isOpen, onClose, itemType, editItem, onSaveDraft, onPublish
   `;
 
   const editForm = html`
-    ${field(isTraining ? 'SESSION TITLE' : 'TITLE', input('text', 'title', 'Enter title...'))}
-    ${field('DATE', input('date', 'date', ''))}
-    ${field('TIME', input('time', 'time', ''))}
-    ${field('VENUE', input('text', 'venue', 'Enter venue...'))}
+    ${field(isTraining ? 'SESSION TITLE' : 'TITLE', input('text', 'title', 'Enter title...'), 'title')}
+    ${field('DATE', input('date', 'date', ''), 'date')}
+    ${field('TIME', input('time', 'time', ''), '')}
+    ${field('VENUE', input('text', 'venue', 'Enter venue...'), '')}
     ${isTraining ? html`
-      ${field("TRAINER'S NAME", input('text', 'trainerName', "Enter trainer's name..."))}
-      ${field('TOTAL SEATS AVAILABLE', input('number', 'totalSeats', 'e.g. 30', { min: 1 }))}
+      ${field("TRAINER'S NAME", input('text', 'trainerName', "Enter trainer's name..."), 'trainerName')}
+      ${field('TOTAL SEATS AVAILABLE', input('number', 'totalSeats', 'e.g. 30', { min: 1 }), 'totalSeats')}
     ` : ''}
     <div class="ac-form-group">
       <label class="ac-form-label">DESCRIPTION</label>
@@ -188,6 +205,7 @@ function ItemModal({ isOpen, onClose, itemType, editItem, onSaveDraft, onPublish
         placeholder="Write a description..."
         onInput=${(e) => set('description', e.target.value)}
       >${form.description}</textarea>
+      ${errors.description ? html`<span style="color:#b91c1c;font-size:0.75rem;margin-top:4px;display:block">${errors.description}</span>` : ''}
     </div>
     <div class="ac-form-group">
       <label class="ac-form-label">MEDIA <span class="ac-form-optional">(optional)</span></label>
@@ -203,7 +221,7 @@ function ItemModal({ isOpen, onClose, itemType, editItem, onSaveDraft, onPublish
       onClose=${onClose}
       modalHeader=${header}
       actions=${[{ label: 'Save Draft', variant: 'modal-btn--draft', onClick: () => { onSaveDraft({ ...form, status: 'draft' }); onClose(); } }]}
-      onSubmit=${() => { onPublish({ ...form, status: 'live' }); onClose(); }}
+      onSubmit=${() => { const e = validate(); if (Object.keys(e).length) { setErrors(e); setTab('edit'); return; } onPublish({ ...form, status: 'live' }); onClose(); }}
       submitLabel="Publish"
     >
       <div class="ac-modal-tabs">
