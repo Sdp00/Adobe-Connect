@@ -225,7 +225,7 @@ function EventsTrainingsApp() {
         item=${interestedItem}
       />
 
-      ${pastEvents.length > 0 && html`
+      ${pastEvents.length > 0 && filter !== 'training' && html`
         <div class="ac-past-section" id="past-events">
           <div class="ac-section-header">
             <div class="ac-section-title">
@@ -239,6 +239,7 @@ function EventsTrainingsApp() {
                 key=${item.id}
                 item=${item}
                 onAddMedia=${(i) => setMediaItem(i)}
+                onInterested=${(i) => setInterestedItem(i)}
               />
             `)}
           </div>

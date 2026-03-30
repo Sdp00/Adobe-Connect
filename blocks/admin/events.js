@@ -123,8 +123,9 @@ export function EventCard({ item, onEdit, onPreview, onInterested, onToggleStatu
 /* ─────────────────────────────────────────────
    PAST EVENT CARD
 ───────────────────────────────────────────── */
-export function PastEventCard({ item, onAddMedia }) {
+export function PastEventCard({ item, onAddMedia, onInterested }) {
   const hasImage = item.media?.type?.startsWith('image/');
+  const interestedCount = item.responses?.interested;
 
   return html`
     <div class="ac-card ac-card--past">
@@ -143,6 +144,14 @@ export function PastEventCard({ item, onAddMedia }) {
         </span>
         ${item.venue ? html`<span class="ac-card-date"><${Icon} name="location" width=16 height=16 />${item.venue}</span>` : ''}
       </div>
+      ${interestedCount != null && html`
+        <div class="ac-card-responses">
+          <span class="ac-chip ac-chip--interested ac-chip-clickable" onClick=${() => onInterested(item)}>
+            <${Icon} name="users" width=16 height=16 />
+            ${interestedCount} interested
+          </span>
+        </div>
+      `}
       <div class="ac-card-actions">
         <button class="ac-action-btn ac-action-btn--media" onClick=${() => onAddMedia(item)}>
           ${hasImage ? 'Update Media' : 'Add Media'}
