@@ -90,8 +90,12 @@ function Calendar({ data }) {
 function MobileCalendarPopover({ data }) {
   const [open, setOpen] = useState(false);
   const [calSvg, setCalSvg] = useState('');
+  const [closeSvg, setCloseSvg] = useState('');
 
-  useEffect(() => { fetchSvg('calendar').then(setCalSvg); }, []);
+  useEffect(() => {
+    fetchSvg('calendar').then(setCalSvg);
+    fetchSvg('close').then(setCloseSvg);
+  }, []);
 
   return html`
     <div class="cal-popover">
@@ -108,12 +112,7 @@ function MobileCalendarPopover({ data }) {
           <div class="cal-popover__header">
             <span class="cal-popover__label">${data.title}</span>
             <button class="cal-popover__close" onClick=${() => setOpen(false)}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6"  y1="6" x2="18" y2="18"/>
-              </svg>
+              <span dangerouslySetInnerHTML=${{ __html: closeSvg }} />
             </button>
           </div>
           <${CalendarGrid} data=${data} />
@@ -121,20 +120,17 @@ function MobileCalendarPopover({ data }) {
     </div>`;
 }
 
-export default async function decorate(block) {
-  const resp = await fetch('public/mock.json');
+export async function injectMobileCalendarIcon() {
+  // Guard: don't inject twice
+  if (document.querySelector('.cal-popover-mount')) return;
+
+  const resp = await fetch('/public/mock.json');
   const json = await resp.json();
   const data = json.calendar;
 
-  // Desktop block
-  block.innerHTML = '';
-  render(html`<${Calendar} data=${data} />`, block);
+  const doInject = () => {
+    if (document.querySelector('.cal-popover-mount')) return;
 
-  // Mobile icon — inject BEFORE the dark/light mode toggle button in header
-  // Adobe Connect header has a theme-toggle button with class nav-hamburger or similar
-  // We insert between search button and dark mode toggle
-  const injectCalendarIcon = () => {
-    // Try to find the dark/light mode button — it usually has a moon/sun icon
     const darkToggle = document.querySelector(
       'header button[aria-label*="dark"], header button[aria-label*="theme"], header button[aria-label*="color"], header .nav-hamburger, header .theme-toggle, header [class*="dark"], header [class*="theme"]'
     );
@@ -143,10 +139,8 @@ export default async function decorate(block) {
     mount.className = 'cal-popover-mount';
 
     if (darkToggle) {
-      // Insert right before the dark/light toggle
       darkToggle.parentElement.insertBefore(mount, darkToggle);
     } else {
-      // Fallback — append to header
       const header = document.querySelector('header');
       if (header) header.appendChild(mount);
     }
@@ -154,19 +148,27 @@ export default async function decorate(block) {
     render(html`<${MobileCalendarPopover} data=${data} />`, mount);
   };
 
-  // Wait for header to be decorated by EDS
   if (document.querySelector('header button')) {
-    injectCalendarIcon();
+    doInject();
   } else {
-    // Header not ready yet — observe DOM
     const observer = new MutationObserver(() => {
       if (document.querySelector('header button')) {
         observer.disconnect();
-        injectCalendarIcon();
+        doInject();
       }
     });
     observer.observe(document.querySelector('header') || document.body, {
       childList: true, subtree: true,
     });
   }
+}
+
+export default async function decorate(block) {
+  const resp = await fetch('/public/mock.json');
+  const json = await resp.json();
+  const data = json.calendar;
+
+  // Desktop block
+  block.innerHTML = '';
+  render(html`<${Calendar} data=${data} />`, block);
 }

@@ -3,7 +3,7 @@ import {
   decorateBlock,
   loadBlock,
   loadHeader,
-  loadFooter,
+  // loadFooter,
   decorateIcons,
   decorateSections,
   decorateBlocks,
@@ -164,6 +164,14 @@ async function loadLazy(doc) {
   loadSidebar();
   // ──────────────────────────────────────────────────────────
 
+  // ── MOBILE CALENDAR ICON (all pages except admin) ─────────
+  if (!window.location.pathname.startsWith('/admin')) {
+    import('../blocks/calendar/calendar.js').then(({ injectMobileCalendarIcon }) => {
+      injectMobileCalendarIcon();
+    });
+  }
+  // ──────────────────────────────────────────────────────────
+
   const main = doc.querySelector('main');
   await loadSections(main);
 
@@ -171,7 +179,7 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadFooter(doc.querySelector('footer'));
+  // loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   if (!window.location.pathname.startsWith('/admin')) {
