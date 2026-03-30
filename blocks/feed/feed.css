@@ -133,7 +133,11 @@
 }
 
 .feed-image-grid-1 { grid-template-columns: 1fr; }
-.feed-image-grid-2 { grid-template-columns: 1fr 1fr; }
+
+/* .feed-image-grid-2 { grid-template-columns: 1fr 1fr; } */
+.feed-image-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
 .feed-image-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
 
 .feed-image-grid-item {

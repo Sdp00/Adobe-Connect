@@ -166,9 +166,23 @@ const pdfItems   = post.pdfs   || [];
 const allMedia   = [...imageItems, ...videoItems, ...pdfItems];
 
 // ALL media goes into the same grid
-const [heroItem, ...restItems] = allMedia;
-const gridItems  = restItems.slice(0, 3);
-const extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
+// const [heroItem, ...restItems] = allMedia;
+// const gridItems  = restItems.slice(0, 3);
+// const extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
+let heroItem = null;
+let gridItems = [];
+let extraCount = 0;
+
+if (allMedia.length === 1) {
+  heroItem = allMedia[0];
+} else if (allMedia.length === 2) {
+  gridItems = allMedia; //  both side by side
+} else {
+  heroItem = allMedia[0];
+  const restItems = allMedia.slice(1);
+  gridItems = restItems.slice(0, 3);
+  extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
+}
 // Image layout (hero + grid) — unchanged
 // const allImages = post.images || [];
 // const [hero, ...rest] = allImages;
