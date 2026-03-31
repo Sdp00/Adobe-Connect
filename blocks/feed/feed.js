@@ -15,7 +15,9 @@ const DEFAULT_CONFIG = {
 };
 
 function Lightbox({ mediaItems, startIndex, onClose, commentsList, commentInput, setCommentInput, addComment }) {
-  const [current, setCurrent] = useState(startIndex);
+  // const [current, setCurrent] = useState(startIndex);
+  const safeIndex = Math.min(startIndex, mediaItems.length - 1);
+const [current, setCurrent] = useState(safeIndex);
   const total = mediaItems.length;
 
   const prev = useCallback((e) => {
@@ -41,6 +43,9 @@ function Lightbox({ mediaItems, startIndex, onClose, commentsList, commentInput,
   const item = mediaItems[current];
 
   const renderMedia = () => {
+    if (!item) {
+    return html`<div>No media</div>`;
+  }
     if (item.type?.startsWith('video/')) {
       return html`<video class="lightbox-img" src=${item.url} controls autoplay key=${item.url} />`;
     }
@@ -212,7 +217,11 @@ if (allMedia.length === 1) {
 };
 
   // Grid image click → open lightbox at hero(0) + grid offset
-  const openLightbox = (imgIndex) => setLightbox(imgIndex);
+  // const openLightbox = (imgIndex) => setLightbox(imgIndex);
+  const openLightbox = (imgIndex) => {
+  if (imgIndex >= allMedia.length) return;
+  setLightbox(imgIndex);
+};
 
   return html`
     <div class="feed-card">
@@ -271,7 +280,7 @@ if (allMedia.length === 1) {
           ${gridItems.map((item, i) => html`
             <div
               class="feed-image-grid-item ${i === gridItems.length - 1 && extraCount > 0 ? 'feed-image-grid-item--overlay' : ''}"
-              onClick=${() => !config.disableLightbox && openLightbox(i + 1)}
+              onClick=${() => !config.disableLightbox &&  openLightbox(heroItem ? i + 1 : i)}
             >
               ${item.type?.startsWith('video/') ? html`
                 <video src=${item.url} preload="metadata" />
