@@ -1,115 +1,81 @@
-/* stylelint-disable selector-class-pattern */
-.trends-block {
-  background: var(--spectrum-gray-50);
-  border-radius: var(--spectrum-corner-radius-200, 8px);
-  padding: var(--spectrum-spacing-400, 16px);
-  border: 1px solid var(--spectrum-gray-300, #e0e0e0);
-  font-family: var(--spectrum-sans-font-family-stack, 'Adobe Clean', adobe-clean, ui-sans-serif, system-ui, sans-serif);
+.insights.industry-updates.block {
+  background: var(--spectrum-global-color-gray-50);
+  border-radius: var(--spectrum-alias-border-radius-regular);
+  padding: var(--spectrum-global-dimension-size-200);
 }
 
-.trends-block__header {
-  display: flex;
-  align-items: center;
-  gap: var(--spectrum-spacing-200, 8px);
-  margin-bottom: var(--spectrum-spacing-300, 12px);
+.insights.industry-updates.block h3 {
+  font-size: var(--spectrum-global-dimension-font-size-200);
+  font-weight: var(--spectrum-alias-font-weight-bold);
+  margin-bottom: var(--spectrum-global-dimension-size-150);
+  color: var(--spectrum-global-color-gray-900);
 }
 
-.trends-block__header-icon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  filter: brightness(0);
-  opacity: 0.6;
-}
-
-.trends-block__title {
-  font-size: var(--spectrum-font-size-300, 18px);
-  font-weight: var(--spectrum-bold-font-weight, 700);
-  color: var(--spectrum-gray-900, #1a1a1a);
-  margin: 0;
-}
-
-.trends-block__list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* list */
+.insights.industry-updates.block .rpf-list {
   display: flex;
   flex-direction: column;
+  gap: var(--spectrum-global-dimension-size-200);
+  position: relative;
+  padding-left: var(--spectrum-global-dimension-size-200);
 }
 
-.trends-block__item {
+/* vertical line */
+.insights.industry-updates.block .rpf-list::before {
+  content: '';
+  position: absolute;
+  left: var(--spectrum-global-dimension-size-100);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--spectrum-global-color-gray-300);
+}
+
+/* item */
+.insights.industry-updates.block .rpf-item {
   display: flex;
-  gap: var(--spectrum-spacing-300, 12px);
+  gap: var(--spectrum-global-dimension-size-150);
   align-items: flex-start;
-  padding: var(--spectrum-spacing-300, 12px) 0;
-  border-top: 1px solid var(--spectrum-gray-200, #f0f0f0);
 }
 
-.trends-block__item:first-child {
-  border-top: none;
-  padding-top: 0;
-}
-
-.trends-block__thumb {
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
-  border-radius: var(--spectrum-corner-radius-100, 4px);
-  background: var(--spectrum-negative-color-100, #fef2f2);
+/* icon */
+.insights.industry-updates.block .rpf-icon {
+  width: var(--spectrum-global-dimension-size-400);
+  height: var(--spectrum-global-dimension-size-400);
+  border-radius: var(--spectrum-alias-border-radius-small);
+  background: var(--spectrum-global-color-gray-200);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--spectrum-global-color-gray-800);
+  flex-shrink: 0;
 }
 
-.trends-block__thumb-icon {
-  width: 18px;
-  height: 18px;
-  filter: brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(600%) hue-rotate(340deg);
-  opacity: 0.8;
-}
-
-.trends-block__content {
+/* content */
+.insights.industry-updates.block .rpf-content {
   flex: 1;
-  min-width: 0;
 }
 
-.trends-block__item-title {
-  font-size: var(--spectrum-font-size-100, 14px);
-  font-weight: var(--spectrum-bold-font-weight, 700);
-  color: var(--spectrum-gray-900, #111);
-  margin: 0 0 4px;
-  line-height: var(--spectrum-line-height-100, 1.4);
+/* tag */
+.insights.industry-updates.block .rpf-tag {
+  font-size: var(--spectrum-global-dimension-font-size-75);
+  font-weight: var(--spectrum-alias-font-weight-bold);
+  color: var(--spectrum-global-color-gray-700);
+  margin-bottom: 2px;
+  text-transform: uppercase;
 }
 
-.trends-block__description {
-  font-size: var(--spectrum-font-size-75, 12px);
-  color: var(--spectrum-gray-600, #909090);
-  margin: 0;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* title */
+.insights.industry-updates.block .rpf-title {
+  font-size: var(--spectrum-global-dimension-font-size-200);
+  font-weight: var(--spectrum-alias-font-weight-bold);
+  color: var(--spectrum-global-color-gray-900);
+  line-height: 1.3;
 }
 
-/* Dark */
-[data-theme="dark"] .trends-block {
-  background: #1e1e1e;
-  border-color: #3a3a3a;
-}
-
-[data-theme="dark"] .trends-block__title,
-[data-theme="dark"] .trends-block__item-title {
-  color: #f0f0f0;
-}
-
-[data-theme="dark"] .trends-block__item {
-  border-top-color: #2a2a2a;
-}
-
-[data-theme="dark"] .trends-block__description {
-  color: #777;
-}
-
-[data-theme="dark"] .trends-block__thumb {
-  background: #2a1a1a;
+/* meta */
+.insights.industry-updates.block .rpf-meta {
+  font-size: var(--spectrum-global-dimension-font-size-100);
+  color: var(--spectrum-global-color-gray-600);
+  margin-top: 2px;
 }

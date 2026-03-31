@@ -49,10 +49,20 @@ main > .section.calendar-container::-webkit-scrollbar {
 main > .section.calendar-container > .calendar-wrapper,
 main > .section.calendar-container > .upcoming-wrapper,
 main > .section.calendar-container > .trends-wrapper,
-main > .section.calendar-container > .newsletters-wrapper {
+main > .section.calendar-container > .newsletters-wrapper,
+main > .section.calendar-container > .attributes-wrapper,
+main > .section.calendar-container > .fragment-wrapper,
+.fragment .newsletters-wrapper,
+.fragment .trends-wrapper,
+.fragment .insights-wrapper,
+.fragment .section {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
+}
+
+.fragment .insights-wrapper + .insights-wrapper {
+  margin-top: 16px !important;
 }
 
 @media (width <= 1024px) {
@@ -79,7 +89,8 @@ main > .section.calendar-container > .newsletters-wrapper {
 
   .upcoming-wrapper,
   .trends-wrapper,
-  .newsletters-wrapper {
+  .newsletters-wrapper,
+  .attributes-wrapper {
     display: none !important;
   }
 }
