@@ -1,0 +1,190 @@
+{
+  "eventsAndTrainings": [
+    {
+      "id": 1,
+      "type": "event",
+      "title": "UX Research in the Age of AI",
+      "description": "Explore how AI tools are reshaping user research workflows — best practices for AI-assisted synthesis and maintaining research integrity at scale.",
+      "date": "2026-03-15",
+      "time": "10:00",
+      "venue": "Adobe HQ – Room A1",
+      "status": "live",
+      "responses": {
+        "interested": 14,
+        "interestedUsers": [
+          { "name": "Ananya Krishnan",  "email": "ananya.k@adobe.com" },
+          { "name": "Riya Mehta",       "email": "riya.mehta@adobe.com" },
+          { "name": "Karthik Suresh",   "email": "karthik.s@adobe.com" },
+          { "name": "Priya Nair",       "email": "priya.nair@adobe.com" },
+          { "name": "Vikram Desai",     "email": "vikram.d@adobe.com" },
+          { "name": "Sneha Iyer",       "email": "sneha.iyer@adobe.com" },
+          { "name": "Arjun Patel",      "email": "arjun.p@adobe.com" },
+          { "name": "Divya Sharma",     "email": "divya.s@adobe.com" },
+          { "name": "Rahul Verma",      "email": "rahul.v@adobe.com" },
+          { "name": "Meera Nambiar",    "email": "meera.n@adobe.com" },
+          { "name": "Siddharth Rao",    "email": "siddharth.r@adobe.com" },
+          { "name": "Kavya Reddy",      "email": "kavya.red@adobe.com" },
+          { "name": "Aditya Bhatt",     "email": "aditya.b@adobe.com" },
+          { "name": "Tanvi Joshi",      "email": "tanvi.j@adobe.com" }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "type": "event",
+      "title": "AI in Product Design: Practical Applications for 2026",
+      "description": "Discover how leading product teams are integrating AI — from AI-assisted wireframing to automated accessibility audits and smart component suggestions.",
+      "date": "2026-03-22",
+      "time": "14:00",
+      "venue": "Virtual – Zoom",
+      "status": "live",
+      "responses": {
+        "interested": 21,
+        "interestedUsers": [
+          { "name": "Neha Gupta",       "email": "neha.g@adobe.com" },
+          { "name": "Rohan Kulkarni",   "email": "rohan.k@adobe.com" },
+          { "name": "Ishaan Malhotra",  "email": "ishaan.m@adobe.com" },
+          { "name": "Pooja Srinivasan", "email": "pooja.sr@adobe.com" },
+          { "name": "Aman Tiwari",      "email": "aman.t@adobe.com" },
+          { "name": "Simran Batra",     "email": "simran.b@adobe.com" },
+          { "name": "Yash Chopra",      "email": "yash.c@adobe.com" },
+          { "name": "Nidhi Agarwal",    "email": "nidhi.a@adobe.com" },
+          { "name": "Kunal Saxena",     "email": "kunal.s@adobe.com" },
+          { "name": "Ritika Singh",     "email": "ritika.si@adobe.com" },
+          { "name": "Abhishek Das",     "email": "abhishek.d@adobe.com" },
+          { "name": "Shreya Pillai",    "email": "shreya.p@adobe.com" },
+          { "name": "Varun Menon",      "email": "varun.m@adobe.com" },
+          { "name": "Lakshmi Iyer",     "email": "lakshmi.i@adobe.com" },
+          { "name": "Deepak Jain",      "email": "deepak.j@adobe.com" },
+          { "name": "Chitra Bose",      "email": "chitra.b@adobe.com" },
+          { "name": "Harish Kumar",     "email": "harish.k@adobe.com" },
+          { "name": "Anjali Mishra",    "email": "anjali.m@adobe.com" },
+          { "name": "Suresh Pandey",    "email": "suresh.p@adobe.com" },
+          { "name": "Geeta Rao",        "email": "geeta.r@adobe.com" },
+          { "name": "Manish Thakur",    "email": "manish.t@adobe.com" }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "type": "event",
+      "title": "Adobe Connect Community Mixer – Q1 2026",
+      "description": "Connect with fellow community members over virtual coffee. A great way to meet people across teams and build lasting professional relationships.",
+      "date": "2026-04-05",
+      "time": "17:00",
+      "venue": "Virtual – Teams",
+      "status": "draft",
+      "responses": {
+        "interested": 8,
+        "interestedUsers": [
+          { "name": "Ananya Krishnan",  "email": "ananya.k@adobe.com" },
+          { "name": "Riya Mehta",       "email": "riya.mehta@adobe.com" },
+          { "name": "Karthik Suresh",   "email": "karthik.s@adobe.com" },
+          { "name": "Priya Nair",       "email": "priya.nair@adobe.com" },
+          { "name": "Vikram Desai",     "email": "vikram.d@adobe.com" },
+          { "name": "Sneha Iyer",       "email": "sneha.iyer@adobe.com" },
+          { "name": "Arjun Patel",      "email": "arjun.p@adobe.com" },
+          { "name": "Divya Sharma",     "email": "divya.s@adobe.com" }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "type": "event",
+      "title": "Connect BuildFest 2026 – 48-Hour Design Hackathon",
+      "description": "Form a team of 2–4 and build something using Adobe Connect APIs. Prizes for Best UX, Most Innovative Use Case, and Community Favourite.",
+      "date": "",
+      "time": "",
+      "venue": "TBD",
+      "status": "draft",
+      "responses": {
+        "interested": 5,
+        "interestedUsers": [
+          { "name": "Rahul Verma",      "email": "rahul.v@adobe.com" },
+          { "name": "Meera Nambiar",    "email": "meera.n@adobe.com" },
+          { "name": "Siddharth Rao",    "email": "siddharth.r@adobe.com" },
+          { "name": "Kavya Reddy",      "email": "kavya.red@adobe.com" },
+          { "name": "Aditya Bhatt",     "email": "aditya.b@adobe.com" }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "type": "training",
+      "title": "Figma Deep Dive – Variables & Auto Layout",
+      "description": "Structured session for intermediate-to-advanced Figma users. Covers Variables, auto-layout, high-fidelity prototyping, and Dev Mode handoff best practices.",
+      "date": "2026-03-18",
+      "time": "09:00",
+      "venue": "Adobe HQ – Training Lab B",
+      "trainerName": "Ananya Krishnan",
+      "totalSeats": 20,
+      "status": "live",
+      "responses": { "accepted": 7, "declined": 3 }
+    },
+    {
+      "id": 6,
+      "type": "training",
+      "title": "Plain Language & Global Content Writing",
+      "description": "Practical training on plain language principles, cultural sensitivity in copy, writing for accessibility, and creating content that resonates globally.",
+      "date": "2026-03-10",
+      "time": "11:00",
+      "venue": "Virtual – Zoom",
+      "trainerName": "Riya Mehta",
+      "totalSeats": 25,
+      "status": "live",
+      "responses": { "accepted": 6, "declined": 4 }
+    },
+    {
+      "id": 7,
+      "type": "training",
+      "title": "API Security Fundamentals",
+      "description": "Deep dive into API authentication, authorization patterns, OAuth 2.0, JWT handling, and practical security auditing techniques for backend developers.",
+      "date": "2026-02-28",
+      "time": "10:30",
+      "venue": "Adobe HQ – Room C3",
+      "trainerName": "Karthik Suresh",
+      "totalSeats": 30,
+      "status": "live",
+      "responses": { "accepted": 5, "declined": 5 }
+    },
+    {
+      "id": 8,
+      "type": "training",
+      "title": "Accessibility & Inclusive Design",
+      "description": "Covers WCAG 2.2, ARIA best practices, color contrast, keyboard navigation, screen-reader testing, and building accessible component libraries.",
+      "date": "2026-02-20",
+      "time": "13:00",
+      "venue": "Virtual – Teams",
+      "trainerName": "Priya Nair",
+      "totalSeats": 35,
+      "status": "live",
+      "responses": { "accepted": 8, "declined": 2 }
+    },
+    {
+      "id": 9,
+      "type": "training",
+      "title": "React Performance Optimisation",
+      "description": "Profiling, memoization, lazy loading, concurrent rendering, and avoiding common React anti-patterns that slow down large applications.",
+      "date": "2026-04-02",
+      "time": "15:00",
+      "venue": "Adobe HQ – Training Lab A",
+      "trainerName": "Vikram Desai",
+      "totalSeats": 20,
+      "status": "draft",
+      "responses": { "accepted": 5, "declined": 3 }
+    },
+    {
+      "id": 10,
+      "type": "training",
+      "title": "Data Visualisation with D3.js",
+      "description": "Building interactive charts and data-driven documents using the D3.js library. Covers scales, axes, transitions, and real-world dashboard patterns.",
+      "date": "",
+      "time": "",
+      "venue": "TBD",
+      "trainerName": "Sneha Iyer",
+      "totalSeats": 25,
+      "status": "draft",
+      "responses": null
+    }
+  ]
+}

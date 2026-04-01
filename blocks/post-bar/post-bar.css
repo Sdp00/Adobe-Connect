@@ -137,6 +137,17 @@
   }
 }
 
+.field-error {
+  color: #e53935;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.modal-input.error,
+.modal-textarea.error {
+  border: 1px solid #e53935;
+}
+
 
 
 /* ── Tablet (≥ 600 px) ───────────────────────────────────────────── */

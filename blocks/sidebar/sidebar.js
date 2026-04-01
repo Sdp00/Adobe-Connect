@@ -11,10 +11,9 @@ const PUBLIC_NAV = [
 ];
 
 const ADMIN_NAV = [
-  { label: 'Dashboard',           icon: 'dashboard',        href: '/admin/dashboard' },
-  { label: 'Events and Training', icon: 'events-training',  href: '/admin/events-training' },
-  { label: 'Newsletter',          icon: 'newsletters',      href: '/admin/newsletter' },
-  { label: 'Participation',       icon: 'participation',    href: '/admin/participation' },
+  { label: 'Dashboard',           icon: 'dashboard',        href: '/admin' },
+  { label: 'Events and Training', icon: 'events-training',  href: '/admin#events-training' },
+  { label: 'Participation',       icon: 'participation',    href: '/admin#participation' },
 ];
 
 /* ── Icon fetcher ─────────────────────────────────────────── */
@@ -44,10 +43,16 @@ async function fetchIcon(name) {
 
 function isActive(href) {
   const cur = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
-  const tgt = href.replace(/\.html$/, '').replace(/\/$/, '');
-  if (cur === '/admin' && tgt === '/admin/dashboard') return true;
-  if (!tgt) return cur === '';
-  return cur === tgt || cur.startsWith(`${tgt}/`);
+  const curHash = window.location.hash; // e.g. '#newsletter'
+  const [hrefPath, hrefHash] = href.split('#');
+  const tgt = hrefPath.replace(/\.html$/, '').replace(/\/$/, '');
+
+  // Home ('/') → tgt is '' — only active on exact root
+  if (tgt === '') return cur === '';
+
+  if (cur !== tgt && !cur.startsWith(`${tgt}/`)) return false;
+  if (hrefHash) return curHash === `#${hrefHash}`;
+  return !curHash; // Dashboard active only when no hash
 }
 
 function isAdminPage() {
