@@ -1,6 +1,7 @@
 import  getBackendBaseUrl  from '../../utils/apiConfig.js';
 import { html, render } from '../../vendor/htm-preact.js';
-import { useState, useEffect,useCallback,useRef } from '../../vendor/preact-hooks.js';
+import { useState, useEffect, useCallback, useRef } from '../../vendor/preact-hooks.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 
 
 const DEFAULT_CONFIG = {
