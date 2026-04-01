@@ -15,7 +15,9 @@ const DEFAULT_CONFIG = {
 };
 
 function Lightbox({ mediaItems, startIndex, onClose, commentsList, commentInput, setCommentInput, addComment }) {
-  const [current, setCurrent] = useState(startIndex);
+  // const [current, setCurrent] = useState(startIndex);
+  const safeIndex = Math.min(startIndex, mediaItems.length - 1);
+const [current, setCurrent] = useState(safeIndex);
   const total = mediaItems.length;
 
   const prev = useCallback((e) => {
@@ -41,6 +43,9 @@ function Lightbox({ mediaItems, startIndex, onClose, commentsList, commentInput,
   const item = mediaItems[current];
 
   const renderMedia = () => {
+    if (!item) {
+    return html`<div>No media</div>`;
+  }
     if (item.type?.startsWith('video/')) {
       return html`<video class="lightbox-img" src=${item.url} controls autoplay key=${item.url} />`;
     }
@@ -166,9 +171,23 @@ const pdfItems   = post.pdfs   || [];
 const allMedia   = [...imageItems, ...videoItems, ...pdfItems];
 
 // ALL media goes into the same grid
-const [heroItem, ...restItems] = allMedia;
-const gridItems  = restItems.slice(0, 3);
-const extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
+// const [heroItem, ...restItems] = allMedia;
+// const gridItems  = restItems.slice(0, 3);
+// const extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
+let heroItem = null;
+let gridItems = [];
+let extraCount = 0;
+
+if (allMedia.length === 1) {
+  heroItem = allMedia[0];
+} else if (allMedia.length === 2) {
+  gridItems = allMedia; //  both side by side
+} else {
+  heroItem = allMedia[0];
+  const restItems = allMedia.slice(1);
+  gridItems = restItems.slice(0, 3);
+  extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
+}
 // Image layout (hero + grid) — unchanged
 // const allImages = post.images || [];
 // const [hero, ...rest] = allImages;
@@ -198,7 +217,11 @@ const extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
 };
 
   // Grid image click → open lightbox at hero(0) + grid offset
-  const openLightbox = (imgIndex) => setLightbox(imgIndex);
+  // const openLightbox = (imgIndex) => setLightbox(imgIndex);
+  const openLightbox = (imgIndex) => {
+  if (imgIndex >= allMedia.length) return;
+  setLightbox(imgIndex);
+};
 
   return html`
     <div class="feed-card">
@@ -257,7 +280,7 @@ const extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
           ${gridItems.map((item, i) => html`
             <div
               class="feed-image-grid-item ${i === gridItems.length - 1 && extraCount > 0 ? 'feed-image-grid-item--overlay' : ''}"
-              onClick=${() => !config.disableLightbox && openLightbox(i + 1)}
+              onClick=${() => !config.disableLightbox &&  openLightbox(heroItem ? i + 1 : i)}
             >
               ${item.type?.startsWith('video/') ? html`
                 <video src=${item.url} preload="metadata" />
