@@ -5,7 +5,7 @@ import {
   InterestedModal, PastEventCard, AddMediaModal, isPastEvent,
 } from './events.js';
 import {
-  TrainingCard, TrainingItemModal, TrainingPreviewModal,
+  TrainingCard, TrainingItemModal, TrainingPreviewModal, TrainingResponsesModal,
 } from './trainings.js';
 
 /* ─────────────────────────────────────────────
@@ -97,6 +97,7 @@ function EventsTrainingsApp() {
   const [previewItem, setPreviewItem] = useState(null);
   const [interestedItem, setInterestedItem] = useState(null);
   const [mediaItem, setMediaItem] = useState(null);
+  const [respItem, setRespItem] = useState(null);
 
   useEffect(() => {
     fetchData()
@@ -183,6 +184,7 @@ function EventsTrainingsApp() {
               onEdit=${openEdit}
               onPreview=${(i) => setPreviewItem(i)}
               onToggleStatus=${handleToggleStatus}
+              onViewResponses=${(i) => setRespItem(i)}
             />`
         )}
       </div>
@@ -223,6 +225,12 @@ function EventsTrainingsApp() {
         isOpen=${!!interestedItem}
         onClose=${() => setInterestedItem(null)}
         item=${interestedItem}
+      />
+
+      <${TrainingResponsesModal}
+        isOpen=${!!respItem}
+        onClose=${() => setRespItem(null)}
+        item=${respItem}
       />
 
       ${pastEvents.length > 0 && filter !== 'training' && html`
