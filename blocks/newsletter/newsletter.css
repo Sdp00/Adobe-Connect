@@ -1,0 +1,180 @@
+/* ============================================================
+   NEWSLETTER BLOCK — Adobe Connect EDS
+   Prefix: nl-
+   All base rules first, dark mode at the end
+   ============================================================ */
+
+/* ── Page heading ────────────────────────────────────────── */
+.nl-heading {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0 0 28px;
+}
+
+/* ── Grid — 2 columns ────────────────────────────────────── */
+.nl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+.nl-card {
+  background: var(--spectrum-gray-50, #fff);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-sizing: border-box;
+}
+
+.nl-card:hover {
+  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+  transform: translateY(-2px);
+}
+
+/* ── Category badge ──────────────────────────────────────── */
+.nl-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Card title ──────────────────────────────────────────── */
+.nl-card-title {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0;
+  flex: 1;
+}
+
+/* ── Source ──────────────────────────────────────────────── */
+.nl-source-row {
+  display: flex;
+  align-items: center;
+}
+
+.nl-source {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+}
+
+/* ── Meta row ────────────────────────────────────────────── */
+.nl-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nl-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 12px;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+}
+
+.nl-meta-item svg {
+  stroke: var(--spectrum-text-secondary, #8e8e8e);
+  flex-shrink: 0;
+}
+
+/* ── Read button ─────────────────────────────────────────── */
+.nl-read-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  margin-top: 4px;
+}
+
+.nl-read-btn svg {
+  stroke: #fff;
+  flex-shrink: 0;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.nl-empty {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 14px;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+}
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+html[data-theme="dark"] .nl-heading {
+  color: #fff;
+}
+
+html[data-theme="dark"] .nl-card {
+  background: #1e1e1e;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+}
+
+html[data-theme="dark"] .nl-card-title {
+  color: #fff;
+}
+
+html[data-theme="dark"] .nl-source {
+  color: #b3b3b3;
+}
+
+html[data-theme="dark"] .nl-meta-item {
+  color: #b3b3b3;
+}
+
+html[data-theme="dark"] .nl-meta-item svg {
+  stroke: #b3b3b3;
+}
+
+html[data-theme="dark"] .nl-read-btn {
+  color: #fff;
+}
+
+html[data-theme="dark"] .nl-empty {
+  color: #b3b3b3;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (width <= 1024px) {
+  .nl-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (width <= 768px) {
+  .nl-heading {
+    font-size: 22px;
+  }
+
+  .nl-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nl-card {
+    padding: 16px;
+  }
+}

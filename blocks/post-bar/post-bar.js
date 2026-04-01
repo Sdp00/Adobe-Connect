@@ -1,13 +1,91 @@
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState,useEffect } from '../../vendor/preact-hooks.js';
-import  Modal  from '../../helper/modal.js';
+import Modal from '../../helper/modal.js';
+import MediaUpload from '../../helper/media-upload.js';
 
-function PostBar() {
 
+function getConfig(block) {
+  const config = {};
+
+  [...block.children].forEach((row) => {
+    const key = row.children[0]?.textContent?.trim();
+    const value = row.children[1]?.textContent?.trim();
+
+    if (key) {
+      config[key] = value;
+    }
+  });
+
+  return config;
+  
+}
+
+function PostBar({config={}}) {
+
+  const {
+    postInputText="What's on your mind?",
+    postButtonLabel="POST",
+    modalHeader = 'Create Post',
+    titleLabel = 'Title',
+    descriptionLabel = 'Description',
+    submitLabel = 'Send',
+    cancelLabel = 'Discard',
+    showMediaUpload = 'true',
+  } = config;
+
+  const isMediaEnabled = showMediaUpload !== 'false';
+
+  const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [files, setFiles] = useState([]);
   const [showFab, setShowFab] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [errors, setErrors] = useState({
+    title: '',
+    text: '',
+    files: [],
+  });
+
+  function validateMedia(files = []) {
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'video/mp4',
+    'application/pdf',
+  ];
+
+  const errors = [];
+
+  files.forEach((file) => {
+    if (!allowedTypes.includes(file.type)) {
+      errors.push(`${file.name} is not a supported format`);
+    }
+  });
+
+  return errors;
+}
+
+  function validatePost({ title, text, files }) {
+  const errors = {
+    title: '',
+    text: '',
+    files: [],
+  };
+
+  if (!title || !title.trim()) {
+    errors.title = 'Title is required';
+  }
+
+  if (!text || !text.trim()) {
+    errors.text = 'Description is required';
+  }
+
+  const mediaErrors = validateMedia(files);
+  errors.files = mediaErrors;
+
+  return errors;
+}
 
   useEffect(() => {
   const handleScroll = () => {
@@ -23,46 +101,48 @@ function PostBar() {
   return () => window.removeEventListener('scroll', handleScroll);
 }, []);
 
-  const handleFileChange = (e) => {
-  const selected = Array.from(e.target.files);
-  setFiles(selected);
-};
-  const submitPost = () => {
-
-    if (!text.trim()) return;
-
-    window.dispatchEvent(
-      new CustomEvent('create-post', {
-        detail: { text ,files}
-      })
-    );
-
-    setText('');
-    setFiles([]);
-    setIsModalOpen(false);
-  };
-
-  const resetForm = () => {
+const resetForm = () => {
+  setTitle('');
   setText('');
   setFiles([]);
   };
+
+  const submitPost = () => {
+
+    // if (!text.trim()) return;
+
+     const validationErrors = validatePost({ title, text, files });
+
+    setErrors(validationErrors);
+
+    const hasError =
+      validationErrors.title ||
+      validationErrors.text ||
+      validationErrors.files.length > 0;
+
+    if (hasError) return;
+
+    window.dispatchEvent(
+      new CustomEvent('create-post', {
+        detail: { title,text ,files}
+      })
+    );
+
+    // setText('');
+    // setText('');
+    // setFiles([]);
+    resetForm();
+    setErrors({ title: '', text: '', files: [] });
+    setIsModalOpen(false);
+  };
+
+  
 
   const handleClose = () => {
   resetForm();
   setIsModalOpen(false);
   };
 
-  const handleDrop = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-
-  const droppedFiles = Array.from(e.dataTransfer.files);
-  setFiles(prev => [...prev, ...droppedFiles]);
-};
-
-const handleDragOver = (e) => {
-  e.preventDefault();
-};
 
   return html`
     <div class="postbar">
@@ -73,7 +153,7 @@ const handleDragOver = (e) => {
 
       <input
         class="postbar-input"
-        placeholder="What's on your mind?"
+        placeholder=${postInputText}
         
         disabled
       />
@@ -83,7 +163,7 @@ const handleDragOver = (e) => {
         
         onClick=${() => setIsModalOpen(true)}
       >
-        + Post
+        ${postButtonLabel}
       </button>
 
     </div>
@@ -101,80 +181,73 @@ const handleDragOver = (e) => {
     <${Modal}
       isOpen=${isModalOpen}
       onClose=${handleClose}
-      modalHeader="Create Post"
+      modalHeader=${modalHeader}
       onSubmit=${submitPost}
-      submitLabel="Send"
-      cancelLabel="Discard"
+      submitLabel=${submitLabel}
+      cancelLabel=${cancelLabel}
     >
+
+        <!-- TITLE LABEL -->
+          <label class="modal-label">
+            ${titleLabel}
+          </label>
+
+          <input
+            class="modal-input"
+            placeholder="Enter title"
+            value=${title}
+            onInput=${(e) => {
+              setTitle(e.target.value);
+              setErrors(prev => ({ ...prev, title: '' }));
+            }}
+          />
+          ${errors.title && html`
+            <div class="field-error">${errors.title}</div>
+          `}
+
        <!-- TEXTAREA LABEL -->
-      <label class="modal-label">
-        Description
-      </label>
+        <label class="modal-label">
+          ${descriptionLabel}
+        </label>
 
       <textarea
         class="modal-textarea"
         placeholder="What's on your mind?"
         value=${text}
-        onInput=${(e) => setText(e.target.value)}
+        onInput=${(e) => {
+          setText(e.target.value);
+          setErrors(prev => ({ ...prev, text: '' }));
+        }}
       />
+      ${errors.text && html`
+        <div class="field-error">${errors.text}</div>
+      `}
 
+    ${isMediaEnabled && html`  
       <!-- UPLOAD LABEL -->
       <label class="modal-label">
         Upload Media
       </label>
 
-      <!-- HIDDEN INPUT -->
-      <input
-        id="file-upload"
-        type="file"
-        multiple
-        accept="image/*,video/*,application/pdf"
-        class="modal-file-hidden"
-        onChange=${handleFileChange}
-      />
-
-     <div
-        class="modal-dropzone"
-        onDrop=${handleDrop}
-        onDragOver=${handleDragOver}
-      >
-        <p>Drag & drop files here</p>
-
-        <label for="file-upload" class="modal-upload-btn">
-          Or Upload
-        </label>
-      </div>
-
-      <!-- PREVIEW -->
-      ${files.length > 0 && html`
-        <div class="modal-preview">
-          ${files.map(file => {
-            const url = URL.createObjectURL(file);
-
-            if (file.type.startsWith('image/')) {
-              return html`<img src=${url} class="modal-preview-img" />`;
-            }
-
-            if (file.type.startsWith('video/')) {
-              return html`
-                <video src=${url} class="modal-preview-video" controls />
-              `;
-            }
-
-            return html`
-              <div class="modal-preview-file">
-                📄 ${file.name}
-              </div>
-            `;
-          })}
+      <${MediaUpload} multiple value=${files} onChange=${(newFiles) => {
+    setFiles(newFiles);
+    setErrors(prev => ({ ...prev, files: [] }));
+  }} />
+      ${errors.files.length > 0 && html`
+        <div class="field-error">
+          ${errors.files.map(err => html`<div>${err}</div>`)}
         </div>
       `}
+    `}
     </${Modal}>
     
   `;
 }
 
 export default function decorate(block) {
+
+  const config = getConfig(block);
+  block.innerHTML = '';
   
-  render(html`<${PostBar} />`, block);
+  render(html`<${PostBar} config=${config} />`, block);
 }

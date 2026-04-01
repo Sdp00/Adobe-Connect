@@ -124,6 +124,13 @@ function Calendar({ data }) {
 
 function MobileCalendarPopover({ data }) {
   const [open, setOpen] = useState(false);
+  const [calSvg, setCalSvg] = useState('');
+  const [closeSvg, setCloseSvg] = useState('');
+
+  useEffect(() => {
+    fetchSvg('calendar').then(setCalSvg);
+    fetchSvg('close').then(setCloseSvg);
+  }, []);
 
   return html`
     <div class="cal-popover">
@@ -131,7 +138,7 @@ function MobileCalendarPopover({ data }) {
         class="cal-popover__trigger"
         onClick=${() => setOpen((o) => !o)}
         aria-label="Open calendar">
-        <img src="/icons/calendar.svg" class="cal-popover__icon" alt="Calendar" />
+        <span dangerouslySetInnerHTML=${{ __html: calSvg }} />
       </button>
 
       ${open && html`
@@ -183,12 +190,12 @@ export default async function decorate(block) {
   };
 
   if (document.querySelector('header button')) {
-    injectCalendarIcon();
+    doInject();
   } else {
     const observer = new MutationObserver(() => {
       if (document.querySelector('header button')) {
         observer.disconnect();
-        injectCalendarIcon();
+        doInject();
       }
     });
     observer.observe(document.querySelector('header') || document.body, {
