@@ -422,126 +422,101 @@ function Feed({ config }) {
   : `${getBackendBaseUrl()}/data/post.json`;
 
   // Load JSON once
-  // useEffect(() => {
-  //   // fetch('/data/post.json')
-  //   fetch(POSTS_API)
-  //     .then(res => res.json())
-  //     .then(data =>setPosts(data))
-  //     .catch(err => console.error('Error loading posts:', err));
-
-  //   const handler = (e) => {
-  //     const { title, text, files = [] } = e.detail;
-  //     const mediaItems = files.map(file => ({
-  //       url: URL.createObjectURL(file),
-  //       type: file.type,
-  //       name: file.name,
-  //     }));
-  //     const newPost = {
-  //       id: Date.now(),
-  //       name: "You",
-  //       role: "Employee",
-  //       time: "now",
-  //       title: e.detail.title,
-  //       text: e.detail.text,
-  //       likes: 0,
-  //       comments: 0,
-  //       // images: []
-  //       images: mediaItems.filter(m => m.type.startsWith('image/')).map(m => m.url),
-  //       videos: mediaItems.filter(m => m.type.startsWith('video/')),
-  //       pdfs:   mediaItems.filter(m => m.type === 'application/pdf'),
-  //     };
-  //     setPosts(prev => [newPost, ...prev]);
-  //   };
-  //   window.addEventListener('create-post', handler);
-  //   return () => window.removeEventListener('create-post', handler);
-  // }, []);
-
-  function transformPost(apiPost) {
-  const media = apiPost.content?.media || [];
-
-  const images = [];
-  const videos = [];
-  const pdfs = [];
-  let commentsList = [];
-  let totalLikes = 0;
-
-  media.forEach((m) => {
-    // normalize URL (important if backend is relative)
-    const fullUrl = m.url.startsWith('http')
-      ? m.url
-      : `${getBackendBaseUrl()}${m.url}`;
-
-    if (m.type === 'image') {
-      images.push(fullUrl);
-    } else if (m.type === 'video') {
-      videos.push({
-        url: fullUrl,
-        type: 'video/mp4'
-      });
-    } else if (m.type === 'pdf') {
-      pdfs.push({
-        url: fullUrl,
-        type: 'application/pdf',
-        name: m.name
-      });
-    }
-
-    // comments
-    if (m.comments) {
-      commentsList = [
-        ...commentsList,
-        ...m.comments.map(c => ({
-          id: c._id,
-          name: c.author?.name || 'User',
-          text: c.text
-        }))
-      ];
-    }
-
-    // likes
-    totalLikes += m.stats?.likes || 0;
-  });
-
-  return {
-    id: apiPost._id,
-    name: apiPost.author?.name || 'User',
-    role: apiPost.author?.role || '',
-    time: new Date(apiPost.createdAt).toLocaleString(),
-    title: apiPost.content?.title,
-    text: apiPost.content?.text,
-    likes: totalLikes,
-    commentsList,
-    images,
-    videos,
-    pdfs
-  };
-}
-
-   const BASEURL=`https://293924-adobeconnectmw-dev.adobeio-static.net/api/v1/web/adobe-connect/`
-  
   useEffect(() => {
-  // fetch(`${getBackendBaseUrl()}/user-blog`)
-  fetch(`${BASEURL}/user-blog`)
-    .then(res => res.json())
-    .then(data => {
-      // assuming API returns array
-      const transformed = data.map(transformPost);
-      setPosts(transformed);
-      // console.log(data);
-      
-    })
-    .catch(err => console.error('Error loading posts:', err));
-}, []);
+    // fetch('/data/post.json')
+    fetch(POSTS_API)
+      .then(res => res.json())
+      .then(data =>setPosts(data))
+      .catch(err => console.error('Error loading posts:', err));
 
-useEffect(() => {
-  const handler = (e) => {
-    const transformed = transformPost(e.detail);
-    setPosts(prev => [transformed, ...prev]);
-  };
+    const handler = (e) => {
+      const { title, text, files = [] } = e.detail;
+      const mediaItems = files.map(file => ({
+        url: URL.createObjectURL(file),
+        type: file.type,
+        name: file.name,
+      }));
+      const newPost = {
+        id: Date.now(),
+        name: "You",
+        role: "Employee",
+        time: "now",
+        title: e.detail.title,
+        text: e.detail.text,
+        likes: 0,
+        comments: 0,
+        // images: []
+        images: mediaItems.filter(m => m.type.startsWith('image/')).map(m => m.url),
+        videos: mediaItems.filter(m => m.type.startsWith('video/')),
+        pdfs:   mediaItems.filter(m => m.type === 'application/pdf'),
+      };
+      setPosts(prev => [newPost, ...prev]);
+    };
+    window.addEventListener('create-post', handler);
+    return () => window.removeEventListener('create-post', handler);
+  }, []);
 
-  window.addEventListener('post-created', handler);
-  return () => window.removeEventListener('post-created', handler);
-}, []);
+//   function transformPost(apiPost) {
+//   const media = apiPost.content?.media || [];
+
+//   const images = [];
+//   const videos = [];
+//   const pdfs = [];
+//   let commentsList = [];
+//   let totalLikes = 0;
+
+//   media.forEach((m) => {
+//     // normalize URL (important if backend is relative)
+//     const fullUrl = m.url.startsWith('http')
+//       ? m.url
+//       : `${getBackendBaseUrl()}${m.url}`;
+
+//     if (m.type === 'image') {
+//       images.push(fullUrl);
+//     } else if (m.type === 'video') {
+//       videos.push({
+//         url: fullUrl,
+//         type: 'video/mp4'
+//       });
+//     } else if (m.type === 'pdf') {
+//       pdfs.push({
+//         url: fullUrl,
+//         type: 'application/pdf',
+//         name: m.name
+//       });
+//     }
+
+//     // comments
+//     if (m.comments) {
+//       commentsList = [
+//         ...commentsList,
+//         ...m.comments.map(c => ({
+//           id: c._id,
+//           name: c.author?.name || 'User',
+//           text: c.text
+//         }))
+//       ];
+//     }
+
+//     // likes
+//     totalLikes += m.stats?.likes || 0;
+//   });
+
+//   return {
+//     id: apiPost._id,
+//     name: apiPost.author?.name || 'User',
+//     role: apiPost.author?.role || '',
+//     time: new Date(apiPost.createdAt).toLocaleString(),
+//     title: apiPost.content?.title,
+//     text: apiPost.content?.text,
+//     likes: totalLikes,
+//     commentsList,
+//     images,
+//     videos,
+//     pdfs
+//   };
+// }
+
 
   // IntersectionObserver — reads latest posts/visibleCount via refs
   const postsRef       = useRef(posts);
@@ -626,4 +601,3 @@ export default function decorate(block) {
 
   render(html`<${Feed} config=${config} />`, block);
 }
-

@@ -107,133 +107,36 @@ const resetForm = () => {
   setFiles([]);
   };
 
-  // const submitPost = () => {
+  const submitPost = () => {
 
-  //   // if (!text.trim()) return;
+    // if (!text.trim()) return;
 
-  //    const validationErrors = validatePost({ title, text, files });
+     const validationErrors = validatePost({ title, text, files });
 
-  //   setErrors(validationErrors);
+    setErrors(validationErrors);
 
-  //   const hasError =
-  //     validationErrors.title ||
-  //     validationErrors.text ||
-  //     validationErrors.files.length > 0;
+    const hasError =
+      validationErrors.title ||
+      validationErrors.text ||
+      validationErrors.files.length > 0;
 
-  //   if (hasError) return;
+    if (hasError) return;
 
-  //   window.dispatchEvent(
-  //     new CustomEvent('create-post', {
-  //       detail: { title,text ,files}
-  //     })
-  //   );
-
-  //   // setText('');
-  //   // setText('');
-  //   // setFiles([]);
-  //   resetForm();
-  //   setErrors({ title: '', text: '', files: [] });
-  //   setIsModalOpen(false);
-  // };
-
-  const BASEURL=`https://293924-adobeconnectmw-dev.adobeio-static.net/api/v1/web/adobe-connect/`
-  
-//   const submitPost = async () => {
-//   const validationErrors = validatePost({ title, text, files });
-//   setErrors(validationErrors);
-
-//   if (validationErrors.title || validationErrors.text || validationErrors.files.length > 0) return;
-
-//   const formData = new FormData();
-//   formData.append('title', title);
-//   formData.append('text', text);
-
-//   files.forEach(file => {
-//     formData.append('files', file);
-//   });
-
-//   try {
-//     const res = await fetch(`${BASEURL}/user-blog`, {
-//       method: 'POST',
-//       body: formData
-//     });
-
-//     const newPost = await res.json();
-
-//     // update UI
-//     window.dispatchEvent(
-//       new CustomEvent('post-created', { detail: newPost })
-//     );
-
-//     resetForm();
-//     setIsModalOpen(false);
-//   } catch (err) {
-//     console.error('Post failed:', err);
-//   }
-// };
-
-const submitPost = async () => {
-  const validationErrors = validatePost({ title, text, files });
-  setErrors(validationErrors);
-
-  if (validationErrors.title || validationErrors.text || validationErrors.files.length > 0) return;
-
-  try {
-    //  STEP 1: upload all files
-    const uploadedMedia = [];
-
-    for (const file of files) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch(`${BASEURL}/file`, {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await res.json();
-
-      // expected response example:
-      // { url: "/uploads/xyz.jpg", type: "image" }
-
-      uploadedMedia.push({
-        url: data.url,
-        type: file.type.startsWith('image')
-          ? 'image'
-          : file.type.startsWith('video')
-          ? 'video'
-          : 'pdf',
-        name: file.name
-      });
-    }
-
-    //  STEP 2: create post
-    const postPayload = {
-      title,
-      text,
-      media: uploadedMedia
-    };
-
-    const res = await fetch(`${BASEURL}/user-blog`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(postPayload)
-    });
-
-    const newPost = await res.json();
-
-    //  update UI
     window.dispatchEvent(
-      new CustomEvent('post-created', { detail: newPost })
+      new CustomEvent('create-post', {
+        detail: { title,text ,files}
+      })
     );
 
+    // setText('');
+    // setText('');
+    // setFiles([]);
     resetForm();
+    setErrors({ title: '', text: '', files: [] });
     setIsModalOpen(false);
+  };
 
-  } catch (err) {
-    console.error('Post failed:', err);
-  }
-};
+
 
   
 
