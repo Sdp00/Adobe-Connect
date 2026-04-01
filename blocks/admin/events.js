@@ -247,25 +247,36 @@ export function InterestedModal({ isOpen, onClose, item }) {
   const users = generateInterestedUsers(item);
 
   return html`
-    <${Modal}
-      isOpen=${isOpen}
-      onClose=${onClose}
-      modalHeader=${'Interested — ' + item.title}
-      actions=${[]}
-      onSubmit=${onClose}
-      submitLabel="Close"
-      showCancel=${false}
-    >
-      <div class="ac-interested-meta">
-        <span class="ac-interested-count">${users.length} ${users.length === 1 ? 'person' : 'people'} interested</span>
-      </div>
-      <div class="ac-interested-list">
-        ${users.map((u) => html`
-          <div class="ac-interested-row">
-            <div class="ac-interested-avatar">${getInitials(u.name)}</div>
-            <div class="ac-interested-info">
-              <span class="ac-interested-name">${u.name}</span>
-              <a class="ac-interested-email" href=${'mailto:' + u.email}>${u.email}</a>
+    ${isOpen ? html`
+      <div class="ac-resp-backdrop" onClick=${(e) => { if (e.target === e.currentTarget) onClose(); }}>
+        <div class="ac-resp-modal">
+
+          <!-- Header -->
+          <div class="ac-resp-header">
+            <div class="ac-resp-header-left">
+              <div class="ac-resp-header-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                  <path d="M13 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                  <path d="M2 17c0-3.314 3.582-6 8-6s8 2.686 8 6"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="ac-resp-title">Interested</h2>
+                <p class="ac-resp-subtitle">${item.title}</p>
+              </div>
+            </div>
+            <button class="ac-resp-close" onClick=${onClose} aria-label="Close">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
+                <path d="M3 3l10 10M13 3L3 13"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Summary -->
+          <div class="ac-resp-summary">
+            <div class="ac-resp-pill ac-resp-pill--interested-ev">
+              <span class="ac-resp-pill-dot" style="background:#f59e0b"></span>
+              <strong>${users.length}</strong> Interested
             </div>
             <div class="ac-resp-total">${users.length} total</div>
           </div>

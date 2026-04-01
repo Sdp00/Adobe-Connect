@@ -5,7 +5,7 @@ import {
   InterestedModal, PastEventCard, AddMediaModal, isPastEvent,
 } from './events.js';
 import {
-  TrainingCard, TrainingItemModal, TrainingPreviewModal,
+  TrainingCard, TrainingItemModal, TrainingPreviewModal, TrainingResponsesModal,
 } from './trainings.js';
 
 /* ─────────────────────────────────────────────
@@ -97,6 +97,7 @@ function EventsTrainingsApp() {
   const [previewItem, setPreviewItem] = useState(null);
   const [interestedItem, setInterestedItem] = useState(null);
   const [mediaItem, setMediaItem] = useState(null);
+  const [respItem, setRespItem] = useState(null);
 
   useEffect(() => {
     fetchData()
@@ -183,6 +184,7 @@ function EventsTrainingsApp() {
               onEdit=${openEdit}
               onPreview=${(i) => setPreviewItem(i)}
               onToggleStatus=${handleToggleStatus}
+              onViewResponses=${(i) => setRespItem(i)}
             />`
         )}
       </div>
@@ -225,7 +227,13 @@ function EventsTrainingsApp() {
         item=${interestedItem}
       />
 
-      ${pastEvents.length > 0 && html`
+      <${TrainingResponsesModal}
+        isOpen=${!!respItem}
+        onClose=${() => setRespItem(null)}
+        item=${respItem}
+      />
+
+      ${pastEvents.length > 0 && filter !== 'training' && html`
         <div class="ac-past-section" id="past-events">
           <div class="ac-section-header">
             <div class="ac-section-title">
@@ -239,6 +247,7 @@ function EventsTrainingsApp() {
                 key=${item.id}
                 item=${item}
                 onAddMedia=${(i) => setMediaItem(i)}
+                onInterested=${(i) => setInterestedItem(i)}
               />
             `)}
           </div>
