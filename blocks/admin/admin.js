@@ -5,70 +5,82 @@ import {
   InterestedModal, PastEventCard, AddMediaModal, isPastEvent,
 } from './events.js';
 import {
-  TrainingCard, TrainingItemModal, TrainingPreviewModal,
+  TrainingCard, TrainingItemModal, TrainingPreviewModal, TrainingResponsesModal,
 } from './trainings.js';
 
-/* ─── Read config from authored block HTML ─── */
-function parseConfig(block) {
-  const getRow = (key) => [...block.children]
-    .find((r) => r.children[0]?.textContent.trim().toLowerCase() === key)
-    ?.children[1];
-
-  return {
-    title:    getRow('title')?.querySelector('strong, h2')?.textContent.trim() || '',
-    subtitle: getRow('sub-title')?.querySelector('p')?.textContent.trim() || '',
-    icons:    [...(getRow('stat-card-svg')?.querySelectorAll('span.icon') || [])].map((s) => s.cloneNode(true)),
-    buttons:  [...(getRow('buttons')?.querySelectorAll('p') || [])].map((p) => p.textContent.trim().replace(/^\+\s*/, '')),
-    tabs:     [...(getRow('categories')?.querySelectorAll('p') || [])].map((p) => p.textContent.trim()),
-  };
+/* ─────────────────────────────────────────────
+   ICON FETCHER  (used by stats only)
+───────────────────────────────────────────── */
+const iconCache = {};
+async function fetchIcon(name) {
+  if (iconCache[name]) return iconCache[name];
+  try {
+    const res = await fetch(`/icons/${name}.svg`);
+    if (!res.ok) throw res.status;
+    const svg = (await res.text()).replace(/<\?xml[^>]*\?>/g, '').trim();
+    iconCache[name] = svg;
+    return svg;
+  } catch {
+    return '';
+  }
 }
 
-/* ─── Stat cards ─── */
-function buildStats(container, { icons, buttons }) {
-  const TYPE = { events: 'event', trainings: 'training' };
-  const grid = document.createElement('div');
-  grid.className = 'admin-stats-grid';
+/* ─────────────────────────────────────────────
+   STATS
+───────────────────────────────────────────── */
+const STATS = [
+  { icon: 'events',   count: '4', label: 'Events',    filter: 'event' },
+  { icon: 'training', count: '6', label: 'Trainings', filter: 'training' },
+];
 
-  buttons.forEach((label, i) => {
-    const filter = TYPE[label.toLowerCase()] || label.toLowerCase().replace(/s$/, '');
+function renderStats(container) {
+  Promise.all(STATS.map((s) => fetchIcon(s.icon))).then((svgs) => {
+    const grid = document.createElement('div');
+    grid.className = 'admin-stats-grid';
 
-    const card = document.createElement('div');
-    card.className = 'admin-stats-card';
+    STATS.forEach((stat, i) => {
+      const card = document.createElement('div');
+      card.className = 'admin-stats-card';
 
-    const left = document.createElement('div');
-    left.className = 'admin-stats-left';
+      const left = document.createElement('div');
+      left.className = 'admin-stats-left';
 
-    const iconWrap = document.createElement('div');
-    iconWrap.className = 'admin-stats-icon';
-    if (icons[i]) iconWrap.appendChild(icons[i]);
+      const iconWrap = document.createElement('div');
+      iconWrap.className = `admin-stats-icon admin-stats-icon-${stat.icon}`;
+      iconWrap.innerHTML = svgs[i];
 
-    const labelEl = document.createElement('p');
-    labelEl.className = 'admin-stats-label';
-    labelEl.textContent = label;
+      const label = document.createElement('p');
+      label.className = 'admin-stats-label';
+      label.textContent = stat.label;
 
-    const countEl = document.createElement('p');
-    countEl.className = 'admin-stats-count';
-    countEl.dataset.filter = filter;
+      left.append(iconWrap, label);
 
-    left.append(iconWrap, labelEl);
-    card.append(left, countEl);
+      const count = document.createElement('p');
+      count.className = 'admin-stats-count';
+      count.textContent = stat.count;
 
-    card.addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('ac:filter-change', { detail: filter }));
-      document.getElementById('events-training')?.scrollIntoView({ behavior: 'smooth' });
+      card.addEventListener('click', () => {
+        document.dispatchEvent(new CustomEvent('ac:filter-change', { detail: stat.filter }));
+        const target = document.getElementById('events-training');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      card.append(left, count);
+      grid.append(card);
     });
 
-    grid.appendChild(card);
+    container.appendChild(grid);
   });
-
-  container.appendChild(grid);
 }
 
-/* ─── Fetch data ─── */
+/* ─────────────────────────────────────────────
+   DATA FETCH
+───────────────────────────────────────────── */
 async function fetchData() {
   const res = await fetch('/db.json');
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
-  return (await res.json()).eventsAndTrainings;
+  if (!res.ok) throw new Error(`Failed to load db.json (${res.status})`);
+  const json = await res.json();
+  return json.eventsAndTrainings;
 }
 
 /* ─────────────────────────────────────────────
@@ -85,77 +97,76 @@ function EventsTrainingsApp() {
   const [previewItem, setPreviewItem] = useState(null);
   const [interestedItem, setInterestedItem] = useState(null);
   const [mediaItem, setMediaItem] = useState(null);
+  const [respItem, setRespItem] = useState(null);
 
   useEffect(() => {
     fetchData()
-      .then((data) => {
-        setItems(data);
-        setLoading(false);
-        const counts = {};
-        data.filter((i) => !isPastEvent(i)).forEach((i) => { counts[i.type] = (counts[i.type] || 0) + 1; });
-        document.querySelectorAll('.admin-stats-count').forEach((el) => {
-          el.textContent = counts[el.dataset.filter] ?? 0;
-        });
-      })
+      .then((data) => { setItems(data); setLoading(false); })
       .catch((err) => { setError(err.message); setLoading(false); });
   }, []);
 
-  /* listen for stat-card filter clicks */
   useEffect(() => {
-    const h = (e) => setFilter(e.detail);
-    document.addEventListener('ac:filter-change', h);
-    return () => document.removeEventListener('ac:filter-change', h);
+    const handler = (e) => setFilter(e.detail);
+    document.addEventListener('ac:filter-change', handler);
+    return () => document.removeEventListener('ac:filter-change', handler);
   }, []);
 
-  const upcoming = items.filter((i) => !isPastEvent(i));
-  const past     = items.filter(isPastEvent);
-  const shown    = filter === 'all' ? upcoming : upcoming.filter((i) => i.type === filter);
+  const upcomingItems = items.filter((i) => !isPastEvent(i));
+  const pastEvents = items.filter(isPastEvent);
+  const filtered = filter === 'all' ? upcomingItems : upcomingItems.filter((i) => i.type === filter);
 
-  /* helpers */
-  const save = (form, status) => setItems((prev) =>
-    modal.item
-      ? prev.map((i) => (i.id === modal.item.id ? { ...i, ...form, status } : i))
-      : [...prev, { ...form, status, id: Date.now(), responses: null }],
-  );
+  const saveItem = (form, status) => {
+    const updated = { ...form, status };
+    setItems((prev) =>
+      editItem
+        ? prev.map((i) => (i.id === editItem.id ? { ...i, ...updated } : i))
+        : [...prev, { ...updated, id: Date.now(), responses: null }],
+    );
+  };
 
-  const toggleStatus = (item) => setItems((prev) =>
-    prev.map((i) => (i.id === item.id ? { ...i, status: i.status === 'live' ? 'draft' : 'live' } : i)),
-  );
+  const handleSaveMedia = (media) => {
+    setItems((prev) => prev.map((i) => (i.id === mediaItem.id ? { ...i, media } : i)));
+  };
 
-  const openAdd  = (type) => setModal({ open: true, type, item: null });
-  const openEdit = (item) => setModal({ open: true, type: item.type, item });
-  const closeModal = () => setModal((m) => ({ ...m, open: false, item: null }));
+  const handleToggleStatus = (item) => {
+    setItems((prev) =>
+      prev.map((i) => (i.id === item.id ? { ...i, status: i.status === 'live' ? 'draft' : 'live' } : i)),
+    );
+  };
 
-  /* derive types from authored button labels */
-  const TYPE    = { events: 'event', trainings: 'training' };
-  const TAB_KEY = { all: 'all', events: 'event', trainings: 'training' };
+  const openAdd = (type) => { setModalType(type); setEditItem(null); setModalOpen(true); };
+  const openEdit = (item) => { setModalType(item.type); setEditItem(item); setModalOpen(true); };
+  const closeModal = () => { setModalOpen(false); setEditItem(null); };
 
-  const addBtns = buttons.map((label) => {
-    const type = TYPE[label.toLowerCase()] || label.toLowerCase().replace(/s$/, '');
-    return html`<button class="ac-btn ac-btn--outline" onClick=${() => openAdd(type)}>+ ${label}</button>`;
-  });
-
-  const tabItems = tabs.map((label) => ({ key: TAB_KEY[label.toLowerCase()] || label.toLowerCase(), label }));
+  const TABS = [
+    { key: 'all',      label: 'All' },
+    { key: 'event',    label: 'Events' },
+    { key: 'training', label: 'Trainings' },
+  ];
 
   if (loading) return html`<div class="ac-state-loading"><span class="ac-spinner"></span>Loading...</div>`;
-  if (error)   return html`<div class="ac-state-error">Error: ${error}</div>`;
+  if (error)   return html`<div class="ac-state-error">Failed to load data: ${error}</div>`;
 
   return html`
     <div class="ac-events-section" id="events-training">
 
       <div class="ac-section-header">
         <div class="ac-section-title">
-          <h2>${title}</h2>
-          <p>${subtitle}</p>
+          <h2>Events & Training</h2>
+          <p>Manage all events and training sessions in one place</p>
         </div>
-        <div class="ac-section-actions">${addBtns}</div>
+        <div class="ac-section-actions">
+          <button class="ac-btn ac-btn--outline" onClick=${() => openAdd('event')}>+ Event</button>
+          <button class="ac-btn ac-btn--outline" onClick=${() => openAdd('training')}>+ Training</button>
+        </div>
       </div>
 
       <div class="ac-tabs">
-        ${tabItems.map(({ key, label }) => html`
-          <button class=${'ac-tab' + (filter === key ? ' active' : '')} onClick=${() => setFilter(key)}>
-            ${label}
-          </button>
+        ${TABS.map(({ key, label }) => html`
+          <button
+            class=${'ac-tab' + (filter === key ? ' active' : '')}
+            onClick=${() => setFilter(key)}
+          >${label}</button>
         `)}
       </div>
 
@@ -173,29 +184,42 @@ function EventsTrainingsApp() {
               onEdit=${openEdit}
               onPreview=${(i) => setPreviewItem(i)}
               onToggleStatus=${handleToggleStatus}
+              onViewResponses=${(i) => setRespItem(i)}
             />`
         )}
       </div>
 
-      ${modal.open && modal.type === 'event' && html`
-        <${EventItemModal} key=${modal.item?.id || 'new'} isOpen=${true} editItem=${modal.item}
+      ${modalOpen && modalType === 'event' && html`
+        <${EventItemModal}
+          key=${editItem ? editItem.id : 'new-event'}
+          isOpen=${modalOpen}
           onClose=${closeModal}
-          onSaveDraft=${(f) => save(f, 'draft')}
-          onPublish=${(f) => save(f, 'live')} />`}
+          editItem=${editItem}
+          onSaveDraft=${(form) => saveItem(form, 'draft')}
+          onPublish=${(form) => saveItem(form, 'live')}
+        />`}
 
-      ${modal.open && modal.type === 'training' && html`
-        <${TrainingItemModal} key=${modal.item?.id || 'new'} isOpen=${true} editItem=${modal.item}
+      ${modalOpen && modalType === 'training' && html`
+        <${TrainingItemModal}
+          key=${editItem ? editItem.id : 'new-training'}
+          isOpen=${modalOpen}
           onClose=${closeModal}
-          onSaveDraft=${(f) => save(f, 'draft')}
-          onPublish=${(f) => save(f, 'live')} />`}
+          editItem=${editItem}
+          onSaveDraft=${(form) => saveItem(form, 'draft')}
+          onPublish=${(form) => saveItem(form, 'live')}
+        />`}
 
       <${EventPreviewModal}
-        isOpen=${!!preview && preview.type === 'event'}
-        onClose=${() => setPreview(null)} item=${preview} />
+        isOpen=${!!previewItem && previewItem?.type === 'event'}
+        onClose=${() => setPreviewItem(null)}
+        item=${previewItem}
+      />
 
       <${TrainingPreviewModal}
-        isOpen=${!!preview && preview.type === 'training'}
-        onClose=${() => setPreview(null)} item=${preview} />
+        isOpen=${!!previewItem && previewItem?.type === 'training'}
+        onClose=${() => setPreviewItem(null)}
+        item=${previewItem}
+      />
 
       <${InterestedModal}
         isOpen=${!!interestedItem}
@@ -203,7 +227,13 @@ function EventsTrainingsApp() {
         item=${interestedItem}
       />
 
-      ${past.length > 0 && filter !== 'training' && html`
+      <${TrainingResponsesModal}
+        isOpen=${!!respItem}
+        onClose=${() => setRespItem(null)}
+        item=${respItem}
+      />
+
+      ${pastEvents.length > 0 && filter !== 'training' && html`
         <div class="ac-past-section" id="past-events">
           <div class="ac-section-header">
             <div class="ac-section-title">
@@ -212,38 +242,45 @@ function EventsTrainingsApp() {
             </div>
           </div>
           <div class="ac-grid">
-            ${past.map((item) => html`
-              <${PastEventCard} key=${item.id} item=${item}
-                onAddMedia=${setMediaItem} onInterested=${setInterested} />`)}
+            ${pastEvents.map((item) => html`
+              <${PastEventCard}
+                key=${item.id}
+                item=${item}
+                onAddMedia=${(i) => setMediaItem(i)}
+                onInterested=${(i) => setInterestedItem(i)}
+              />
+            `)}
           </div>
-        </div>`}
+        </div>
+      `}
 
       <${AddMediaModal}
-        key=${mediaItem?.id} isOpen=${!!mediaItem} item=${mediaItem}
+        key=${mediaItem?.id}
+        isOpen=${!!mediaItem}
         onClose=${() => setMediaItem(null)}
-        onSave=${(media) => {
-          setItems((prev) => prev.map((i) => (i.id === mediaItem.id ? { ...i, media } : i)));
-          setMediaItem(null);
-        }} />
+        item=${mediaItem}
+        onSave=${handleSaveMedia}
+      />
 
     </div>
   `;
 }
 
-/* ─── Block entry ─── */
+/* ─────────────────────────────────────────────
+   BLOCK ENTRY
+───────────────────────────────────────────── */
 export function openCreateModal() {
   document.dispatchEvent(new CustomEvent('ac:open-create'));
 }
 
 export default async function decorate(block) {
-  const config = parseConfig(block);
   block.textContent = '';
 
-  const statsEl = document.createElement('div');
-  block.appendChild(statsEl);
-  buildStats(statsEl, config);
+  const statsContainer = document.createElement('div');
+  block.appendChild(statsContainer);
+  renderStats(statsContainer);
 
-  const appEl = document.createElement('div');
-  block.appendChild(appEl);
-  render(html`<${App} title=${config.title} subtitle=${config.subtitle} tabs=${config.tabs} buttons=${config.buttons} />`, appEl);
+  const appRoot = document.createElement('div');
+  block.appendChild(appRoot);
+  render(html`<${EventsTrainingsApp} />`, appRoot);
 }
