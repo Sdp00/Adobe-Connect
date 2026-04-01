@@ -186,12 +186,74 @@ export function AddMediaModal({ isOpen, onClose, item, onSave }) {
 }
 
 /* ─────────────────────────────────────────────
-   INTERESTED USERS MODAL
+   INTERESTED USERS MODAL  (redesigned)
 ───────────────────────────────────────────── */
+
+const AVATAR_COLORS_EV = [
+  { bg: '#fff4ec', color: '#c2410c', border: '#fddcca' },
+  { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' },
+  { bg: '#f0fdf4', color: '#15803d', border: '#bbf7d0' },
+  { bg: '#fdf4ff', color: '#7e22ce', border: '#e9d5ff' },
+  { bg: '#fff7ed', color: '#c2410c', border: '#fed7aa' },
+  { bg: '#fef2f2', color: '#b91c1c', border: '#fecaca' },
+];
+
+function getEvUserColor(name) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS_EV[Math.abs(hash) % AVATAR_COLORS_EV.length];
+}
+
+function getEvInitials(name) {
+  if (!name) return '?';
+  return name.trim().split(/\s+/).map((n) => n[0].toUpperCase()).slice(0, 2).join('');
+}
+
+function toEvAdobeEmail(name) {
+  if (!name) return '';
+  return name.trim().toLowerCase().replace(/\s+/g, '.') + '@adobe.com';
+}
+
+const MOCK_INTERESTED_NAMES = [
+  'Rahul Verma', 'Meera Nambiar', 'Siddharth Rao', 'Kavya Reddy',
+  'Aditya Bhatt', 'Nisha Pillai', 'Kiran Menon', 'Ravi Shankar',
+  'Anita Desai', 'Suresh Kumar', 'Lakshmi Iyer', 'Vijay Nair',
+];
+
+function generateInterestedUsers(item) {
+  const count = item.responses?.interested ?? 0;
+  const existing = item.responses?.interestedUsers || [];
+  if (existing.length > 0) {
+    return existing.map((u) => ({ ...u, color: getEvUserColor(u.name) }));
+  }
+  return MOCK_INTERESTED_NAMES.slice(0, count).map((name) => ({
+    name,
+    email: toEvAdobeEmail(name),
+    color: getEvUserColor(name),
+  }));
+}
+
+function exportInterestedToExcel(item, users) {
+  const rows = [
+    ['Event', item.title || 'Untitled'],
+    ['Date', item.date || 'TBD'],
+    [''],
+    ['NAME', 'EMAIL'],
+    ...users.map((u) => [u.name, u.email]),
+  ];
+  const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(item.title || 'event').replace(/\s+/g, '_')}_interested.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function InterestedModal({ isOpen, onClose, item }) {
   if (!item) return null;
-  const users = item.responses?.interestedUsers || [];
-  const getInitials = (name) => name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+  const users = generateInterestedUsers(item);
 
   return html`
     <${Modal}
@@ -214,10 +276,47 @@ export function InterestedModal({ isOpen, onClose, item }) {
               <span class="ac-interested-name">${u.name}</span>
               <a class="ac-interested-email" href=${'mailto:' + u.email}>${u.email}</a>
             </div>
+            <div class="ac-resp-total">${users.length} total</div>
           </div>
-        `)}
+
+          <!-- User List -->
+          <div class="ac-resp-list">
+            ${users.length === 0 ? html`
+              <div class="ac-resp-empty">
+                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="opacity:0.3">
+                  <circle cx="24" cy="18" r="9"/>
+                  <path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18"/>
+                </svg>
+                <p>No interested users yet</p>
+              </div>
+            ` : users.map((u) => html`
+              <div class="ac-resp-row">
+                <div class="ac-resp-avatar" style=${'background:' + u.color.bg + ';color:' + u.color.color + ';border-color:' + u.color.border}>
+                  ${getEvInitials(u.name)}
+                </div>
+                <div class="ac-resp-info">
+                  <span class="ac-resp-name">${u.name}</span>
+                  <a class="ac-resp-email" href=${'mailto:' + u.email}>${u.email}</a>
+                </div>
+              </div>
+            `)}
+          </div>
+
+          <!-- Footer -->
+          <div class="ac-resp-footer">
+            <button class="ac-resp-export-btn" onClick=${() => exportInterestedToExcel(item, users)}>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                <path d="M8 2v8M5 7l3 3 3-3"/>
+                <path d="M2 12v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1"/>
+              </svg>
+              Export as Excel
+            </button>
+            <button class="ac-resp-close-btn" onClick=${onClose}>Close</button>
+          </div>
+
+        </div>
       </div>
-    </${Modal}>
+    ` : ''}
   `;
 }
 
