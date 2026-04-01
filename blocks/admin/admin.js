@@ -4,7 +4,9 @@ import {
   EventCard, EventItemModal, EventPreviewModal,
   InterestedModal, PastEventCard, AddMediaModal, isPastEvent,
 } from './events.js';
-import { TrainingCard, TrainingItemModal, TrainingPreviewModal } from './trainings.js';
+import {
+  TrainingCard, TrainingItemModal, TrainingPreviewModal,
+} from './trainings.js';
 
 /* ─── Read config from authored block HTML ─── */
 function parseConfig(block) {
@@ -69,18 +71,21 @@ async function fetchData() {
   return (await res.json()).eventsAndTrainings;
 }
 
-/* ─── Main app ─── */
-function App({ title, subtitle, tabs, buttons }) {
-  const [items, setItems]       = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
-  const [filter, setFilter]     = useState('all');
-  const [modal, setModal]       = useState({ open: false, type: 'event', item: null });
-  const [preview, setPreview]   = useState(null);
-  const [interested, setInterested] = useState(null);
-  const [mediaItem, setMediaItem]   = useState(null);
+/* ─────────────────────────────────────────────
+   MAIN APP
+───────────────────────────────────────────── */
+function EventsTrainingsApp() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('event');
+  const [editItem, setEditItem] = useState(null);
+  const [previewItem, setPreviewItem] = useState(null);
+  const [interestedItem, setInterestedItem] = useState(null);
+  const [mediaItem, setMediaItem] = useState(null);
 
-  /* load data + update stat counts */
   useEffect(() => {
     fetchData()
       .then((data) => {
@@ -155,13 +160,20 @@ function App({ title, subtitle, tabs, buttons }) {
       </div>
 
       <div class="ac-grid">
-        ${shown.map((item) => item.type === 'event'
-          ? html`<${EventCard} key=${item.id} item=${item}
-              onEdit=${openEdit} onPreview=${setPreview}
-              onInterested=${setInterested} onToggleStatus=${toggleStatus} />`
-          : html`<${TrainingCard} key=${item.id} item=${item}
-              onEdit=${openEdit} onPreview=${setPreview}
-              onToggleStatus=${toggleStatus} />`,
+        ${filtered.map((item) => item.type === 'event'
+          ? html`<${EventCard}
+              key=${item.id} item=${item}
+              onEdit=${openEdit}
+              onPreview=${(i) => setPreviewItem(i)}
+              onInterested=${(i) => setInterestedItem(i)}
+              onToggleStatus=${handleToggleStatus}
+            />`
+          : html`<${TrainingCard}
+              key=${item.id} item=${item}
+              onEdit=${openEdit}
+              onPreview=${(i) => setPreviewItem(i)}
+              onToggleStatus=${handleToggleStatus}
+            />`
         )}
       </div>
 
@@ -186,7 +198,10 @@ function App({ title, subtitle, tabs, buttons }) {
         onClose=${() => setPreview(null)} item=${preview} />
 
       <${InterestedModal}
-        isOpen=${!!interested} onClose=${() => setInterested(null)} item=${interested} />
+        isOpen=${!!interestedItem}
+        onClose=${() => setInterestedItem(null)}
+        item=${interestedItem}
+      />
 
       ${past.length > 0 && filter !== 'training' && html`
         <div class="ac-past-section" id="past-events">

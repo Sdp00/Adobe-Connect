@@ -21,78 +21,6 @@ async function loadSidebar() {
   return loadBlock(block);
 }
 
-/* ─────────────────────────────────────────────
-   SCROLL SPY  (admin pages only)
-   Watches sections on the page and highlights
-   the matching sidebar link as you scroll.
-
-   Sections are identified by the hash in the
-   sidebar link href:
-     /admin           → top of page (Dashboard)
-     /admin#events-training → #events-training
-     /admin#participation   → #participation
-───────────────────────────────────────────── */
-function initScrollSpy() {
-  // Only run on admin pages
-  if (!window.location.pathname.startsWith('/admin')) return;
-
-  // Wait for sidebar to appear in the DOM, then wire up
-  const waitForSidebar = setInterval(() => {
-    const links = document.querySelectorAll('a.ac-sidebar-link');
-    if (!links.length) return;
-    clearInterval(waitForSidebar);
-
-    // Build a map of { sectionEl → linkEl }
-    // For /admin (no hash) we treat the very top as "Dashboard"
-    const sectionMap = [];
-
-    links.forEach((link) => {
-      const url = new URL(link.href, window.location.origin);
-      if (url.pathname !== window.location.pathname) return;
-
-      if (url.hash) {
-        const target = document.querySelector(url.hash);
-        if (target) sectionMap.push({ section: target, link });
-      } else {
-        // Dashboard — sentinel element at top of main
-        const sentinel = document.querySelector('main') || document.body;
-        sectionMap.push({ section: sentinel, link });
-      }
-    });
-
-    if (!sectionMap.length) return;
-
-    function setActive(activeLink) {
-      links.forEach((l) => {
-        l.classList.remove('is-active');
-        l.setAttribute('aria-current', 'false');
-      });
-      activeLink.classList.add('is-active');
-      activeLink.setAttribute('aria-current', 'page');
-    }
-
-    function onScroll() {
-      const { scrollY } = window;
-      const offset = 120; // px from top before switching — tweak as needed
-
-      // Walk sections from bottom to top; first one whose top ≤ scrollY+offset wins
-      let active = sectionMap[0];
-      for (let i = sectionMap.length - 1; i >= 0; i -= 1) {
-        const top = sectionMap[i].section.getBoundingClientRect().top + scrollY;
-        if (scrollY + offset >= top) {
-          active = sectionMap[i];
-          break;
-        }
-      }
-      setActive(active.link);
-    }
-
-    // Kick off immediately + on scroll
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }, 100);
-}
-
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
@@ -234,10 +162,6 @@ async function loadLazy(doc) {
 
   // ── SIDEBAR ────────────────────────────────────────────────
   loadSidebar();
-  // ──────────────────────────────────────────────────────────
-
-  // ── SCROLL SPY ────────────────────────────────────────────
-  initScrollSpy();
   // ──────────────────────────────────────────────────────────
 
   // ── MOBILE CALENDAR ICON (all pages except admin) ─────────
