@@ -8,6 +8,7 @@ export default function Modal({
   onSubmit,
   submitLabel = 'Submit', //  default
   cancelLabel = 'Cancel', //  default
+  showCancel = true,
   actions = [], //  NEW
   children,
 }) {
@@ -46,7 +47,7 @@ export default function Modal({
             <div class="modal-footer">
 
                 <!-- Cancel -->
-                ${onClose && html`
+                ${showCancel && onClose && html`
                 <button class="modal-cancel" onClick=${onClose}>
                     ${cancelLabel}
                 </button>
