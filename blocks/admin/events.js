@@ -201,6 +201,7 @@ export function InterestedModal({ isOpen, onClose, item }) {
       actions=${[]}
       onSubmit=${onClose}
       submitLabel="Close"
+      showCancel=${false}
     >
       <div class="ac-interested-meta">
         <span class="ac-interested-count">${users.length} ${users.length === 1 ? 'person' : 'people'} interested</span>
