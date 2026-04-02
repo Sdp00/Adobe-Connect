@@ -17,7 +17,7 @@ html[data-theme="dark"] .nom-heading {
 
 /* ── Category section ────────────────────────────────────── */
 .nom-section {
-  margin-bottom: 52px;
+  margin-bottom: 48px;
 }
 
 .nom-section-label {
@@ -37,11 +37,11 @@ html[data-theme="dark"] .nom-section-label {
   border-bottom-color: #333;
 }
 
-/* ── Grid — 3 columns ────────────────────────────────────── */
+/* ── Grid — 3 columns desktop ────────────────────────────── */
 .nom-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
 }
 
 /* ── Card ────────────────────────────────────────────────── */
@@ -49,7 +49,7 @@ html[data-theme="dark"] .nom-section-label {
   background: var(--spectrum-gray-50, #fff);
   border-radius: 16px;
   box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
-  padding: 32px 24px 28px;
+  padding: 28px 20px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -70,11 +70,11 @@ html[data-theme="dark"] .nom-card {
 
 /* ── Avatar ──────────────────────────────────────────────── */
 .nom-avatar-wrap {
-  width: 100px;
-  height: 100px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   overflow: hidden;
-  margin: 0 auto 20px;
+  margin: 0 auto 18px;
   flex-shrink: 0;
   box-shadow: 0 0 0 3px var(--spectrum-gray-200, #eaeaea);
 }
@@ -90,7 +90,6 @@ html[data-theme="dark"] .nom-avatar-wrap {
   display: block;
 }
 
-/* Initials fallback */
 .nom-avatar-fallback {
   width: 100%;
   height: 100%;
@@ -98,7 +97,7 @@ html[data-theme="dark"] .nom-avatar-wrap {
   align-items: center;
   justify-content: center;
   font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 700;
   color: #fff;
   letter-spacing: -1px;
@@ -124,7 +123,7 @@ html[data-theme="dark"] .nom-name {
   font-size: 13px;
   font-weight: 500;
   color: var(--spectrum-text-secondary, #8e8e8e);
-  margin: 0 0 16px;
+  margin: 0 0 14px;
 }
 
 html[data-theme="dark"] .nom-role {
@@ -142,6 +141,7 @@ html[data-theme="dark"] .nom-role {
   font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
   font-size: 12px;
   font-weight: 600;
+  margin-top: auto;
 }
 
 html[data-theme="dark"] .nom-badge {
@@ -150,34 +150,37 @@ html[data-theme="dark"] .nom-badge {
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
+
+/* Tablet — 2 columns */
 @media (width <= 1024px) {
   .nom-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
 }
 
-@media (width <= 768px) {
+/* Mobile — 1 column */
+@media (width <= 640px) {
   .nom-heading {
     font-size: 22px;
   }
 
   .nom-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
 
   .nom-card {
-    padding: 24px 20px;
+    padding: 22px 18px;
   }
 
   .nom-section-label {
     font-size: 10px;
   }
-}
 
-@media (width <= 480px) {
   .nom-avatar-wrap {
-    width: 84px;
-    height: 84px;
+    width: 80px;
+    height: 80px;
   }
 
   .nom-avatar-fallback {
