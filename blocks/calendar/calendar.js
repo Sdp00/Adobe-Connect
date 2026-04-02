@@ -1,5 +1,5 @@
 import { html, render } from '../../vendor/htm-preact.js';
-import { useState, useEffect } from '../../vendor/preact-hooks.js';
+import { useState } from '../../vendor/preact-hooks.js';
 import { readBlockConfig } from '../../scripts/aem.js';
 
 const DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
@@ -38,20 +38,21 @@ function renderCell(day, current, todayD, eventMap, dotColor) {
     </div>`;
 }
 
-function CalendarGrid({ currentMonth, currentYear, events, initialMonth, initialYear, legend }) {
+function CalendarGrid({ currentMonth, currentYear, legend, allMonths }) {
   const today = new Date();
   const isTodayMonth = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
   const todayD = isTodayMonth ? today.getDate() : -1;
   const cells = buildGrid(currentYear, currentMonth);
 
-  const isDataMonth = currentMonth === initialMonth && currentYear === initialYear;
+  // ✅ look up events for whatever month is currently displayed
+  const key = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+  const monthEvents = (allMonths && allMonths[key]) || [];
+
   const eventMap = {};
-  if (isDataMonth) {
-    events.forEach(({ date, type }) => {
-      if (!eventMap[date]) eventMap[date] = [];
-      eventMap[date].push(type);
-    });
-  }
+  monthEvents.forEach(({ date, type }) => {
+    if (!eventMap[date]) eventMap[date] = [];
+    eventMap[date].push(type);
+  });
 
   const dotColor = {};
   legend.forEach(({ type, color }) => { dotColor[type] = color; });
@@ -99,10 +100,8 @@ function Calendar({ data }) {
       <${CalendarGrid}
         currentMonth=${currentMonth}
         currentYear=${currentYear}
-        events=${data.events}
-        initialMonth=${data.month_index}
-        initialYear=${data.year}
         legend=${data.legend}
+        allMonths=${data.allMonths}
       />
     </div>`;
 }
@@ -142,7 +141,6 @@ function MobileCalendarPopover({ data }) {
 }
 
 export default async function decorate(block) {
-  // ✅ reads calendarUrl from authoring doc
   const config = readBlockConfig(block);
   const calendarUrl = config.calendarurl;
 
@@ -158,10 +156,12 @@ export default async function decorate(block) {
   block.innerHTML = '';
   render(html`<${Calendar} data=${data} />`, block);
 
-  // ✅ fixed: was calling doInject() which was never defined
   const injectCalendarIcon = () => {
     const header = document.querySelector('header');
     if (!header) return;
+
+    // don't inject twice
+    if (header.querySelector('.cal-popover-mount')) return;
 
     const mount = document.createElement('div');
     mount.className = 'cal-popover-mount';
