@@ -1,32 +1,48 @@
 {
   "calendar": {
     "title": "Team Calendar",
-    "month": "March 2026",
+    "month": "April 2026",
     "year": 2026,
-    "month_index": 2,
+    "month_index": 3,
     "events": [
-      { "date": 4,  "type": "training", "title": "Design Sprint Kickoff" },
-      { "date": 4,  "type": "event",    "title": "Product Sync" },
-      { "date": 11, "type": "both",     "title": "All Hands Meeting" },
-      { "date": 14, "type": "training", "title": "Figma Advanced Workshop" },
-      { "date": 15, "type": "event",    "title": "Design Review" },
-      { "date": 17, "type": "training", "title": "Token-Based Theming" },
-      { "date": 26, "type": "both",     "title": "Q1 Retrospective" }
+      { "date": 2,  "type": "training", "title": "Figma Advanced Components" },
+      { "date": 10, "type": "training", "title": "Design System Workshop" },
+      { "date": 17, "type": "event",    "title": "Token-Based Theming Deep Dive" },
+      { "date": 17, "type": "event",    "title": "Adobe MAX Community Preview" },
+      { "date": 26, "type": "event",    "title": "Q1 All-Hands Retrospective" }
     ],
     "legend": [
       { "type": "event",    "color": "#e63535", "label": "Event" },
       { "type": "training", "color": "#3b82f6", "label": "Training" },
       { "type": "both",     "color": "#8b5cf6", "label": "Both" }
-    ]
+    ],
+    "allMonths": {
+      "2026-03": [
+        { "date": 4,  "type": "training", "title": "Design Sprint Kickoff" },
+        { "date": 4,  "type": "event",    "title": "Product Sync" },
+        { "date": 11, "type": "both",     "title": "All Hands Meeting" },
+        { "date": 14, "type": "training", "title": "Figma Advanced Workshop" },
+        { "date": 15, "type": "event",    "title": "Design Review" },
+        { "date": 17, "type": "training", "title": "Token-Based Theming" },
+        { "date": 26, "type": "both",     "title": "Q1 Retrospective" }
+      ],
+      "2026-04": [
+        { "date": 2,  "type": "training", "title": "Figma Advanced Components" },
+        { "date": 10, "type": "training", "title": "Design System Workshop" },
+        { "date": 17, "type": "event",    "title": "Token-Based Theming Deep Dive" },
+        { "date": 17, "type": "event",    "title": "Adobe MAX Community Preview" },
+        { "date": 26, "type": "event",    "title": "Q1 All-Hands Retrospective" }
+      ]
+    }
   },
   "upcoming": {
     "title": "Upcoming Events/Trainings",
     "items": [
-      { "id": 1, "tag": "UPCOMING TRAINING",    "title": "Design System Workshop",       "date": "Apr 10, 2026", "time": "02:00 PM", "location": "Workshop Room A",      "respond_within": "4 days",  "interested": false },
-      { "id": 2, "tag": "UPCOMING EVENT", "title": "Token-Based Theming Deep Dive","date": "Apr 17, 2026", "time": "10:00 AM", "location": "Online - Zoom",         "respond_within": "6 days",  "interested": false },
-      { "id": 3, "tag": "UPCOMING EVENT", "title": "Q1 All-Hands Retrospective",   "date": "Apr 26, 2026", "time": "03:00 PM", "location": "Main Auditorium",       "respond_within": "15 days", "interested": true  },
-      { "id": 4, "tag": "UPCOMING TRAINING", "title": "Figma Advanced Components",    "date": "Apr 2, 2026",  "time": "11:00 AM", "location": "Design Lab B",          "respond_within": "22 days", "interested": false },
-      { "id": 5, "tag": "UPCOMING EVENT",    "title": "Adobe MAX Community Preview",  "date": "Apr 17, 2026", "time": "09:00 AM", "location": "Online - Adobe Connect","respond_within": "30 days", "interested": false }
+      { "id": 1, "tag": "UPCOMING TRAINING", "title": "Design System Workshop",       "date": "Apr 10, 2026", "time": "02:00 PM", "location": "Workshop Room A",       "respond_within": "4 days",  "interested": false },
+      { "id": 2, "tag": "UPCOMING EVENT",    "title": "Token-Based Theming Deep Dive","date": "Apr 17, 2026", "time": "10:00 AM", "location": "Online - Zoom",          "respond_within": "6 days",  "interested": false },
+      { "id": 3, "tag": "UPCOMING EVENT",    "title": "Q1 All-Hands Retrospective",   "date": "Apr 26, 2026", "time": "03:00 PM", "location": "Main Auditorium",        "respond_within": "15 days", "interested": true  },
+      { "id": 4, "tag": "UPCOMING TRAINING", "title": "Figma Advanced Components",    "date": "Apr 2, 2026",  "time": "11:00 AM", "location": "Design Lab B",           "respond_within": "22 days", "interested": false },
+      { "id": 5, "tag": "UPCOMING EVENT",    "title": "Adobe MAX Community Preview",  "date": "Apr 17, 2026", "time": "09:00 AM", "location": "Online - Adobe Connect", "respond_within": "30 days", "interested": false }
     ]
   }
 }

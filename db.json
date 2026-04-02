@@ -98,7 +98,24 @@
       "trainerName": "Ananya Krishnan",
       "totalSeats": 20,
       "status": "live",
-      "responses": { "accepted": 7, "declined": 3 }
+      "responses": {
+        "accepted": 7,
+        "declined": 3,
+        "acceptedUsers": [
+          { "name": "Priya Sharma",     "email": "priya.sharma@adobe.com" },
+          { "name": "Arjun Mehta",      "email": "arjun.mehta@adobe.com" },
+          { "name": "Divya Nair",       "email": "divya.nair@adobe.com" },
+          { "name": "Rohit Verma",      "email": "rohit.verma@adobe.com" },
+          { "name": "Ananya Krishnan",  "email": "ananya.krishnan@adobe.com" },
+          { "name": "Kabir Singh",      "email": "kabir.singh@adobe.com" },
+          { "name": "Sneha Patel",      "email": "sneha.patel@adobe.com" }
+        ],
+        "declinedUsers": [
+          { "name": "Tanvi Gupta",      "email": "tanvi.gupta@adobe.com",   "reason": "Schedule conflict with another meeting" },
+          { "name": "Nikhil Desai",     "email": "nikhil.desai@adobe.com",  "reason": "Already completed a similar training" },
+          { "name": "Riya Chatterjee",  "email": "riya.chatterjee@adobe.com", "reason": "On planned leave on that date" }
+        ]
+      }
     },
     {
       "id": 6,
@@ -111,7 +128,24 @@
       "trainerName": "Riya Mehta",
       "totalSeats": 25,
       "status": "live",
-      "responses": { "accepted": 6, "declined": 4 }
+      "responses": {
+        "accepted": 6,
+        "declined": 4,
+        "acceptedUsers": [
+          { "name": "Vikram Iyer",      "email": "vikram.iyer@adobe.com" },
+          { "name": "Meera Joshi",      "email": "meera.joshi@adobe.com" },
+          { "name": "Aditya Kumar",     "email": "aditya.kumar@adobe.com" },
+          { "name": "Pooja Reddy",      "email": "pooja.reddy@adobe.com" },
+          { "name": "Siddharth Rao",    "email": "siddharth.rao@adobe.com" },
+          { "name": "Kiran Menon",      "email": "kiran.menon@adobe.com" }
+        ],
+        "declinedUsers": [
+          { "name": "Manish Tiwari",    "email": "manish.tiwari@adobe.com",  "reason": "Manager did not approve attendance" },
+          { "name": "Sonal Shah",       "email": "sonal.shah@adobe.com",     "reason": "Topic not relevant to current role" },
+          { "name": "Deepak Nambiar",   "email": "deepak.nambiar@adobe.com", "reason": "Remote — unable to attend in person" },
+          { "name": "Kavya Pillai",     "email": "kavya.pillai@adobe.com",   "reason": "Personal commitment on that day" }
+        ]
+      }
     },
     {
       "id": 7,
@@ -124,7 +158,24 @@
       "trainerName": "Karthik Suresh",
       "totalSeats": 30,
       "status": "live",
-      "responses": { "accepted": 5, "declined": 5 }
+      "responses": {
+        "accepted": 5,
+        "declined": 5,
+        "acceptedUsers": [
+          { "name": "Harish Bose",      "email": "harish.bose@adobe.com" },
+          { "name": "Nisha Pillai",     "email": "nisha.pillai@adobe.com" },
+          { "name": "Ravi Shankar",     "email": "ravi.shankar@adobe.com" },
+          { "name": "Anita Desai",      "email": "anita.desai@adobe.com" },
+          { "name": "Suresh Kumar",     "email": "suresh.kumar@adobe.com" }
+        ],
+        "declinedUsers": [
+          { "name": "Lakshmi Iyer",     "email": "lakshmi.iyer@adobe.com",   "reason": "Schedule conflict with another meeting" },
+          { "name": "Vijay Nair",       "email": "vijay.nair@adobe.com",     "reason": "Already completed a similar training" },
+          { "name": "Rohan Kulkarni",   "email": "rohan.kulkarni@adobe.com", "reason": "On planned leave on that date" },
+          { "name": "Ishaan Malhotra",  "email": "ishaan.malhotra@adobe.com","reason": "Manager did not approve attendance" },
+          { "name": "Simran Batra",     "email": "simran.batra@adobe.com",   "reason": "Topic not relevant to current role" }
+        ]
+      }
     },
     {
       "id": 8,
@@ -137,7 +188,24 @@
       "trainerName": "Priya Nair",
       "totalSeats": 35,
       "status": "live",
-      "responses": { "accepted": 8, "declined": 2 }
+      "responses": {
+        "accepted": 8,
+        "declined": 2,
+        "acceptedUsers": [
+          { "name": "Yash Chopra",      "email": "yash.chopra@adobe.com" },
+          { "name": "Nidhi Agarwal",    "email": "nidhi.agarwal@adobe.com" },
+          { "name": "Kunal Saxena",     "email": "kunal.saxena@adobe.com" },
+          { "name": "Ritika Singh",     "email": "ritika.singh@adobe.com" },
+          { "name": "Abhishek Das",     "email": "abhishek.das@adobe.com" },
+          { "name": "Shreya Pillai",    "email": "shreya.pillai@adobe.com" },
+          { "name": "Varun Menon",      "email": "varun.menon@adobe.com" },
+          { "name": "Chitra Bose",      "email": "chitra.bose@adobe.com" }
+        ],
+        "declinedUsers": [
+          { "name": "Harish Kumar",     "email": "harish.kumar@adobe.com",   "reason": "Remote — unable to attend in person" },
+          { "name": "Anjali Mishra",    "email": "anjali.mishra@adobe.com",  "reason": "Personal commitment on that day" }
+        ]
+      }
     },
     {
       "id": 9,
@@ -150,7 +218,22 @@
       "trainerName": "Vikram Desai",
       "totalSeats": 20,
       "status": "draft",
-      "responses": { "accepted": 5, "declined": 3 }
+      "responses": {
+        "accepted": 5,
+        "declined": 3,
+        "acceptedUsers": [
+          { "name": "Geeta Rao",        "email": "geeta.rao@adobe.com" },
+          { "name": "Manish Thakur",    "email": "manish.thakur@adobe.com" },
+          { "name": "Deepak Jain",      "email": "deepak.jain@adobe.com" },
+          { "name": "Neha Gupta",       "email": "neha.gupta@adobe.com" },
+          { "name": "Aman Tiwari",      "email": "aman.tiwari@adobe.com" }
+        ],
+        "declinedUsers": [
+          { "name": "Suresh Pandey",    "email": "suresh.pandey@adobe.com",  "reason": "Schedule conflict with another meeting" },
+          { "name": "Pooja Srinivasan", "email": "pooja.srinivasan@adobe.com","reason": "Already completed a similar training" },
+          { "name": "Rahul Verma",      "email": "rahul.verma@adobe.com",    "reason": "On planned leave on that date" }
+        ]
+      }
     },
     {
       "id": 10,

@@ -1,18 +1,15 @@
 /**
  * events-training.js — Adobe Connect EDS block
  *
- * DA.live: add an "events-training" block table on your /events-training document.
- *
- *   | events-training |
- *   |-----------------|
- *   |                 |
- *
- * Folder structure:
- *   /blocks/events-training/events-training.js
- *   /blocks/events-training/events-training.css
- *   /blocks/events-training/mock.json
- *   /styles/buttons.css
+ * DA.live authoring:
+ *   | events-training          |
+ *   |--------------------------|
+ *   | I'm Interested           |   ← optional custom label, leave blank for default
  */
+
+import Modal from '../../helper/modal.js';
+import { html, render } from '../../vendor/htm-preact.js';
+import { useState } from '../../vendor/preact-hooks.js';
 
 /* ── SVG icons ──────────────────────────────────────────── */
 const icons = {
@@ -58,12 +55,6 @@ const icons = {
     <line x1="18" y1="6" x2="6" y2="18"/>
     <line x1="6" y1="6" x2="18" y2="18"/>
   </svg>`,
-
-  play: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <polygon points="5 3 19 12 5 21 5 3"/>
-  </svg>`,
 };
 
 /* ── Canvas placeholder ─────────────────────────────────── */
@@ -96,16 +87,64 @@ function buildPlaceholder(title) {
   return img;
 }
 
-/* ── Countdown ──────────────────────────────────────────── */
+/* ── Date helpers ───────────────────────────────────────── */
+
+/**
+ * Robustly parse both ISO "2026-03-27" and display "Mar 27, 2026" formats.
+ * Returns a Date set to end-of-day (23:59:59) so an event on today is still "upcoming".
+ */
+function parseDate(dateStr) {
+  if (!dateStr) return null;
+
+  // ISO format: "2026-03-27"
+  const isoMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    const [, y, m, d] = isoMatch.map(Number);
+    return new Date(y, m - 1, d, 23, 59, 59);
+  }
+
+  // Display format: "Mar 27, 2026" or "Mar 5, 2026"
+  // Month map to avoid locale issues with new Date() parsing
+  const monthMap = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+  };
+  const displayMatch = dateStr.match(/^([A-Za-z]{3})\s+(\d{1,2}),\s+(\d{4})$/);
+  if (displayMatch) {
+    const [, mon, day, year] = displayMatch;
+    const monthIndex = monthMap[mon];
+    if (monthIndex !== undefined) {
+      return new Date(Number(year), monthIndex, Number(day), 23, 59, 59);
+    }
+  }
+
+  return null;
+}
+
+/** Returns true if the item's date is strictly in the past */
+function isPastItem(item) {
+  const dateStr = item.date || item.displayDate;
+  const d = parseDate(dateStr);
+  if (!d) return false;
+  return d < new Date();
+}
+
+/** Get the best date string from an item for the countdown timer */
+function getDateStr(item) {
+  if (item.date && /^\d{4}-\d{2}-\d{2}$/.test(item.date)) return item.date;
+  return item.date || item.displayDate || '';
+}
+
+/* ── Real-time countdown ────────────────────────────────── */
 function getCountdown(dateStr) {
-  const target = new Date(dateStr);
-  target.setHours(23, 59, 59, 0);
-  const diff = target - new Date();
+  const d = parseDate(dateStr);
+  if (!d) return null;
+  const diff = d - new Date();
   if (diff <= 0) return null;
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  if (days > 0) return `${days}d ${hours}h remaining`;
+  const mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  if (days > 0)  return `${days}d ${hours}h remaining`;
   if (hours > 0) return `${hours}h ${mins}m remaining`;
   return `${mins}m remaining`;
 }
@@ -140,65 +179,51 @@ function buildSeatsBar(occupied, total) {
   return { wrap, count, fill };
 }
 
-/* ── Decline modal ──────────────────────────────────────── */
-function buildDeclineModal(trainingTitle, onConfirm) {
-  const overlay = document.createElement('div');
-  overlay.className = 'et-modal-overlay';
+/* ── Decline modal using Modal component ────────────────── */
+function mountDeclineModal(trainingTitle, onConfirm) {
+  const mountEl = document.createElement('div');
+  document.body.append(mountEl);
 
-  const modal = document.createElement('div');
-  modal.className = 'et-modal';
+  function DeclineModal() {
+    const [isOpen, setIsOpen] = useState(true);
+    const [reason, setReason] = useState('');
 
-  const header = document.createElement('div');
-  header.className = 'et-modal-header';
+    const handleClose = () => {
+      setIsOpen(false);
+      setTimeout(() => mountEl.remove(), 300);
+    };
 
-  const htitle = document.createElement('h3');
-  htitle.className = 'et-modal-title';
-  htitle.textContent = 'Reason for declining';
+    const handleSubmit = () => {
+      if (!reason.trim()) return;
+      onConfirm(reason.trim());
+      handleClose();
+    };
 
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'et-modal-close';
-  closeBtn.setAttribute('aria-label', 'Close');
-  closeBtn.innerHTML = icons.close;
-  closeBtn.addEventListener('click', () => overlay.remove());
+    return html`
+      <${Modal}
+        isOpen=${isOpen}
+        onClose=${handleClose}
+        modalHeader="Reason for declining"
+        onSubmit=${handleSubmit}
+        submitLabel="Confirm decline"
+        cancelLabel="Cancel"
+      >
+        <p style="font-size:13px;color:#8e8e8e;margin:0 0 12px">${trainingTitle}</p>
+        <label style="display:block;font-size:13px;font-weight:600;margin-bottom:8px">
+          Please tell us why you are declining
+        </label>
+        <textarea
+          class="et-modal-textarea"
+          rows="4"
+          placeholder="Type your reason here…"
+          value=${reason}
+          onInput=${(e) => setReason(e.target.value)}
+        />
+      </${Modal}>
+    `;
+  }
 
-  header.append(htitle, closeBtn);
-
-  const sub = document.createElement('p');
-  sub.className = 'et-modal-sub';
-  sub.textContent = trainingTitle;
-
-  const reasonLabel = document.createElement('label');
-  reasonLabel.className = 'et-modal-label';
-  reasonLabel.textContent = 'Please tell us why you are declining';
-
-  const reasonInput = document.createElement('textarea');
-  reasonInput.className = 'et-modal-textarea';
-  reasonInput.placeholder = 'Type your reason here…';
-  reasonInput.rows = 4;
-
-  const confirmBtn = document.createElement('button');
-  confirmBtn.className = 'btn et-modal-confirm';
-  confirmBtn.type = 'button';
-  confirmBtn.textContent = 'Confirm decline';
-  confirmBtn.disabled = true;
-
-  reasonInput.addEventListener('input', () => {
-    confirmBtn.disabled = reasonInput.value.trim().length === 0;
-  });
-
-  confirmBtn.addEventListener('click', () => {
-    onConfirm(reasonInput.value.trim());
-    overlay.remove();
-  });
-
-  modal.append(header, sub, reasonLabel, reasonInput, confirmBtn);
-  overlay.append(modal);
-
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
-
-  return overlay;
+  render(html`<${DeclineModal}/>`, mountEl);
 }
 
 /* ── Build image wrapper ────────────────────────────────── */
@@ -220,10 +245,26 @@ function buildImageWrap(item) {
   return imgWrap;
 }
 
-/* ── Build EVENT card ───────────────────────────────────── */
-function buildEventCard(event) {
-  const isPast = event.type === 'past';
+/* ── Build timer element ────────────────────────────────── */
+function buildTimer(dateStr) {
+  const timerWrap = document.createElement('div');
+  timerWrap.className = 'et-timer';
+  timerWrap.innerHTML = `${icons.clock}<span class="et-timer-text">${getCountdown(dateStr) || 'Starting soon'}</span>`;
 
+  // Live update every minute
+  const ticker = setInterval(() => {
+    const timerText = timerWrap.querySelector('.et-timer-text');
+    if (!timerText) { clearInterval(ticker); return; }
+    const val = getCountdown(dateStr);
+    timerText.textContent = val || 'Starting soon';
+    if (!val) clearInterval(ticker);
+  }, 60000);
+
+  return timerWrap;
+}
+
+/* ── Build EVENT card ───────────────────────────────────── */
+function buildEventCard(event, isPast, interestedLabel) {
   const card = document.createElement('div');
   card.className = `et-card${isPast ? ' et-card-past' : ''}`;
 
@@ -252,31 +293,40 @@ function buildEventCard(event) {
   locEl.innerHTML = `${icons.location}<span>${event.location}</span>`;
 
   meta.append(dateEl, locEl);
+  body.append(title, desc, meta);
 
-  const btn = document.createElement('button');
-  btn.className = 'btn et-card-btn';
-  btn.type = 'button';
+  if (!isPast) {
+    // Timer for upcoming events — same as training
+    body.append(buildTimer(getDateStr(event)));
 
-  if (isPast) {
-    btn.textContent = 'View';
-  } else {
-    btn.innerHTML = `<span class="et-btn-label">I'm Interested</span>`;
+    const btn = document.createElement('button');
+    btn.className = 'btn et-card-btn';
+    btn.type = 'button';
+    btn.innerHTML = `<span class="et-btn-label">${interestedLabel}</span>`;
+
     btn.addEventListener('click', () => {
       const interested = btn.classList.toggle('is-interested');
       btn.innerHTML = interested
-        ? `${icons.tick}<span class="et-btn-label">I'm Interested</span>`
-        : `<span class="et-btn-label">I'm Interested</span>`;
+        ? `${icons.tick}<span class="et-btn-label">${interestedLabel}</span>`
+        : `<span class="et-btn-label">${interestedLabel}</span>`;
     });
+
+    body.append(btn);
+  } else {
+    // Past event — View button, no icon
+    const btn = document.createElement('button');
+    btn.className = 'btn et-card-btn';
+    btn.type = 'button';
+    btn.textContent = 'View';
+    body.append(btn);
   }
 
-  body.append(title, desc, meta, btn);
   card.append(body);
   return card;
 }
 
 /* ── Build TRAINING card ────────────────────────────────── */
-function buildTrainingCard(training) {
-  const isPast = training.type === 'past';
+function buildTrainingCard(training, isPast) {
   let seats = training.seatsOccupied;
   const total = training.seatsTotal;
 
@@ -316,10 +366,8 @@ function buildTrainingCard(training) {
     const { wrap: seatsWrap, count: seatsCount, fill: seatsFill } = buildSeatsBar(seats, total);
     body.append(seatsWrap);
 
-    const timerWrap = document.createElement('div');
-    timerWrap.className = 'et-timer';
-    timerWrap.innerHTML = `${icons.clock}<span class="et-timer-text">${getCountdown(training.date) || 'Starting soon'}</span>`;
-    body.append(timerWrap);
+    // Timer for upcoming trainings
+    body.append(buildTimer(getDateStr(training)));
 
     const btnRow = document.createElement('div');
     btnRow.className = 'et-btn-row';
@@ -332,7 +380,7 @@ function buildTrainingCard(training) {
     const declineBtn = document.createElement('button');
     declineBtn.className = 'btn et-decline-btn';
     declineBtn.type = 'button';
-    declineBtn.innerHTML = `${icons.close}<span>Decline</span>`;
+    declineBtn.innerHTML = `<span>Decline</span>`;
 
     acceptBtn.addEventListener('click', () => {
       if (acceptBtn.classList.contains('is-accepted')) return;
@@ -348,36 +396,42 @@ function buildTrainingCard(training) {
     });
 
     declineBtn.addEventListener('click', () => {
-      const modal = buildDeclineModal(training.title, () => {
+      mountDeclineModal(training.title, () => {
         declineBtn.classList.add('is-declined');
         declineBtn.innerHTML = `${icons.close}<span>Declined</span>`;
         acceptBtn.disabled = true;
         acceptBtn.classList.add('is-disabled');
       });
-      document.body.append(modal);
     });
 
     btnRow.append(acceptBtn, declineBtn);
     body.append(btnRow);
 
-    const ticker = setInterval(() => {
-      const timerText = card.querySelector('.et-timer-text');
-      if (!timerText) { clearInterval(ticker); return; }
-      const val = getCountdown(training.date);
-      timerText.textContent = val || 'Starting soon';
-      if (!val) clearInterval(ticker);
-    }, 60000);
-
   } else {
+    // Past training — Watch Recording button, NO icon
     const recBtn = document.createElement('button');
     recBtn.className = 'btn et-recording-btn';
     recBtn.type = 'button';
-    recBtn.innerHTML = `${icons.play}<span>Watch Recording</span>`;
+    recBtn.textContent = 'Watch Recording';
     body.append(recBtn);
   }
 
   card.append(body);
   return card;
+}
+
+/* ── Split items into upcoming / past by real date ──────── */
+function splitByDate(items) {
+  const upcoming = [];
+  const past = [];
+  items.forEach((item) => {
+    if (isPastItem(item)) {
+      past.push(item);
+    } else {
+      upcoming.push(item);
+    }
+  });
+  return { upcoming, past };
 }
 
 /* ── Build a labelled section with 3-col grid ───────────── */
@@ -399,49 +453,93 @@ function buildSection(items, label, buildFn) {
   return section;
 }
 
-/* ── Build the full EVENTS tab panel ────────────────────── */
-function buildEventsPanel(data) {
+/* ── Build EVENTS tab panel ─────────────────────────────── */
+function buildEventsPanel(rawData, interestedLabel) {
   const panel = document.createElement('div');
   panel.className = 'et-panel';
   panel.dataset.tab = 'events';
 
-  if (data.upcoming?.length) {
-    panel.append(buildSection(data.upcoming, '', buildEventCard));
+  const allEvents = [
+    ...(rawData.upcoming || []),
+    ...(rawData.past || []),
+  ];
+  const { upcoming, past } = splitByDate(allEvents);
+
+  if (upcoming.length) {
+    panel.append(buildSection(
+      upcoming,
+      '',
+      (evt) => buildEventCard(evt, false, interestedLabel),
+    ));
   }
-  if (data.past?.length) {
-    panel.append(buildSection(data.past, 'Past Events', buildEventCard));
+  if (past.length) {
+    panel.append(buildSection(
+      past,
+      'Past Events',
+      (evt) => buildEventCard(evt, true, interestedLabel),
+    ));
   }
   return panel;
 }
 
-/* ── Build the full TRAINING tab panel ──────────────────── */
-function buildTrainingPanel(data) {
+/* ── Build TRAINING tab panel ───────────────────────────── */
+function buildTrainingPanel(rawData) {
   const panel = document.createElement('div');
   panel.className = 'et-panel';
   panel.dataset.tab = 'training';
 
-  if (data.upcoming?.length) {
-    panel.append(buildSection(data.upcoming, '', buildTrainingCard));
+  const allTrainings = [
+    ...(rawData.upcoming || []),
+    ...(rawData.past || []),
+  ];
+  const { upcoming, past } = splitByDate(allTrainings);
+
+  if (upcoming.length) {
+    panel.append(buildSection(
+      upcoming,
+      '',
+      (trn) => buildTrainingCard(trn, false),
+    ));
   }
-  if (data.past?.length) {
-    panel.append(buildSection(data.past, 'Past Trainings', buildTrainingCard));
+  if (past.length) {
+    panel.append(buildSection(
+      past,
+      'Past Trainings',
+      (trn) => buildTrainingCard(trn, true),
+    ));
   }
   return panel;
 }
 
 /* ── EDS decorate ───────────────────────────────────────── */
 export default async function decorate(block) {
-  /* Load buttons.css */
+  /*
+   * Read "I'm Interested" label from DA.live block content.
+   *
+   * In DA.live, author the block like:
+   *   ┌──────────────────┐
+   *   │ events-training  │  ← block name (header row)
+   *   ├──────────────────┤
+   *   │ I'm Interested   │  ← label text in the cell below
+   *   └──────────────────┘
+   *
+   * Leave the cell empty to use the default label.
+   */
+  const authoredLabel = block.querySelector('p')?.textContent?.trim()
+    || block.querySelector('div')?.textContent?.trim();
+  const interestedLabel = authoredLabel || "I'm Interested";
+
+  // Load buttons.css
   const link = document.createElement('link');
   link.rel = 'stylesheet';
   link.href = '/styles/buttons.css';
   document.head.append(link);
 
-  /* Fetch data */
+  // Fetch mock data
   let data = { events: { upcoming: [], past: [] }, training: { upcoming: [], past: [] } };
   try {
     const res = await fetch('/blocks/events-training/mock.json');
-    if (!res.ok) throw new Error(res.status);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     data = await res.json();
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -450,7 +548,7 @@ export default async function decorate(block) {
 
   block.innerHTML = '';
 
-  /* ── Tab bar ── */
+  // Tab bar
   const tabBar = document.createElement('div');
   tabBar.className = 'et-tab-bar';
 
@@ -468,14 +566,12 @@ export default async function decorate(block) {
 
   tabBar.append(tabEvents, tabTraining);
 
-  /* ── Panels ── */
-  const eventsPanel  = buildEventsPanel(data.events);
+  // Panels
+  const eventsPanel   = buildEventsPanel(data.events, interestedLabel);
   const trainingPanel = buildTrainingPanel(data.training);
 
-  /* Training panel hidden by default */
   trainingPanel.classList.add('is-hidden');
 
-  /* ── Tab switching ── */
   function switchTab(targetKey) {
     [tabEvents, tabTraining].forEach((t) => {
       t.classList.toggle('is-active', t.dataset.target === targetKey);
