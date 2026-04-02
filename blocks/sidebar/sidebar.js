@@ -154,8 +154,8 @@ function wireInteractions(sidebar, overlay) {
 /* ── Block decorator ──────────────────────────────────────── */
 
 export default async function decorate(block) {
-  document.getElementById('ac-sidebar')?.remove();
-  document.getElementById('ac-sidebar-overlay')?.remove();
+//   document.getElementById('ac-sidebar')?.remove();
+//   document.getElementById('ac-sidebar-overlay')?.remove();
 
   const sidebar = await buildNav(isAdminPage());
   const overlay = buildOverlay();
