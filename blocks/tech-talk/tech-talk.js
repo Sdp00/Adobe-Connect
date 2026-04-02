@@ -1,85 +1,103 @@
 /**
  * tech-talk.js — Adobe Connect EDS block
  *
- * DA.live: add a "tech-talk" block table on your /tech-talk document.
+ * DA.live authoring — create a "tech-talk" block table:
  *
- *   | tech-talk |
- *   |-----------|
- *   |           |
+ *   | tech-talk                                                                    |
+ *   |-----------------------------------------------------------------------------|
+ *   | Adobe Tech Talks                                                            |
+ *   |-----------------------------------------------------------------------------|
+ *   | Deep-dive sessions from Adobe engineers, designers, and product experts...  |
+ *   |-----------------------------------------------------------------------------|
+ *   | Upcoming Tech Talks (hyperlinked to upcoming URL)                           |
+ *   |-----------------------------------------------------------------------------|
+ *   | Past Tech Talks (hyperlinked to past URL)                                   |
+ *   |-----------------------------------------------------------------------------|
  *
- * Update the two URL constants below to point to the correct
- * Adobe Tech Talks page URLs.
+ * Row 0 → Title
+ * Row 1 → Subtitle
+ * Row 2 → Upcoming button: add hyperlink directly on the label text in DA.live
+ * Row 3 → Past button:     add hyperlink directly on the label text in DA.live
  */
 
-const UPCOMING_URL = 'https://community.adobe.com/t5/tech-talks/eb-p/tech-talks';
-const PAST_URL     = 'https://community.adobe.com/t5/tech-talks/eb-p/tech-talks?filter=past';
-
-/* ── External link icon ─────────────────────────────────── */
-const externalIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-  viewBox="0 0 24 24" fill="none" stroke="currentColor"
-  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-  <polyline points="15 3 21 3 21 9"/>
-  <line x1="10" y1="14" x2="21" y2="3"/>
-</svg>`;
-
-/* ── Calendar icon ──────────────────────────────────────── */
-const upcomingIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-  viewBox="0 0 24 24" fill="none" stroke="currentColor"
-  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-  <line x1="16" y1="2" x2="16" y2="6"/>
-  <line x1="8"  y1="2" x2="8"  y2="6"/>
-  <line x1="3"  y1="10" x2="21" y2="10"/>
-</svg>`;
-
-/* ── Clock icon ─────────────────────────────────────────── */
-const pastIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-  viewBox="0 0 24 24" fill="none" stroke="currentColor"
-  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="12" cy="12" r="10"/>
-  <polyline points="12 6 12 12 16 14"/>
-</svg>`;
-
-/* ── EDS decorate ───────────────────────────────────────── */
 export default function decorate(block) {
+  const rows = [...block.querySelectorAll(':scope > div')];
+
+  /** Text content of column col in a row (strips the anchor text too) */
+  function cellText(row, col = 0) {
+    const cells = [...row.querySelectorAll(':scope > div')];
+    return cells[col]?.textContent?.trim() || '';
+  }
+
+  /**
+   * For button rows: the author hyperlinks the label text directly in DA.live.
+   * So the <a> tag is inside column 0 — grab its href and its text separately.
+   */
+  function cellBtn(row) {
+    const cells = [...row.querySelectorAll(':scope > div')];
+    const cell = cells[0];
+    if (!cell) return { label: '', href: '' };
+
+    const anchor = cell.querySelector('a');
+    if (anchor) {
+      return {
+        label: anchor.textContent?.trim() || '',
+        href: anchor.href || '',
+      };
+    }
+
+    // Fallback: if no anchor, check col 1 for a separate URL cell
+    const href = cells[1]?.querySelector('a')?.href
+      || cells[1]?.textContent?.trim()
+      || '';
+    return { label: cell.textContent?.trim() || '', href };
+  }
+
+  const titleText    = cellText(rows[0], 0);
+  const subtitleText = cellText(rows[1], 0);
+
+  const { label: upcomingLabel, href: upcomingHref } = cellBtn(rows[2]);
+  const { label: pastLabel,     href: pastHref     } = cellBtn(rows[3]);
+
+  /* ── Build DOM ─────────────────────────────────────────── */
   block.innerHTML = '';
 
-  /* Wrapper */
   const wrapper = document.createElement('div');
   wrapper.className = 'tt-wrapper';
 
   /* Title */
   const title = document.createElement('h1');
   title.className = 'tt-title';
-  title.textContent = 'Adobe Tech Talks';
+  title.textContent = titleText || 'Adobe Tech Talks';
 
   /* Subtitle */
   const subtitle = document.createElement('p');
   subtitle.className = 'tt-subtitle';
-  subtitle.textContent = 'Deep-dive sessions from Adobe engineers, designers, and product experts — live and on demand.';
+  subtitle.textContent = subtitleText
+    || 'Deep-dive sessions from Adobe engineers, designers, and product experts — live and on demand.';
 
   /* Button group */
   const btnGroup = document.createElement('div');
   btnGroup.className = 'tt-btn-group';
 
-  /* Upcoming Tech Talks — red filled */
-  const upcomingBtn = document.createElement('a');
-  upcomingBtn.className = 'tt-btn';
-  upcomingBtn.href = UPCOMING_URL;
-  upcomingBtn.target = '_blank';
-  upcomingBtn.rel = 'noopener noreferrer';
-  upcomingBtn.innerHTML = `${upcomingIcon}<span>Upcoming Tech Talks</span>${externalIcon}`;
+  /* Helper — plain text button, no SVG icons */
+  function makeBtn(label, href) {
+    const a = document.createElement('a');
+    a.className = 'tt-btn';
+    a.textContent = label;
+    if (href) {
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    }
+    return a;
+  }
 
-  /* Past Tech Talks — red filled */
-  const pastBtn = document.createElement('a');
-  pastBtn.className = 'tt-btn';
-  pastBtn.href = PAST_URL;
-  pastBtn.target = '_blank';
-  pastBtn.rel = 'noopener noreferrer';
-  pastBtn.innerHTML = `${pastIcon}<span>Past Tech Talks</span>${externalIcon}`;
+  btnGroup.append(
+    makeBtn(upcomingLabel || 'Upcoming Tech Talks', upcomingHref),
+    makeBtn(pastLabel     || 'Past Tech Talks',     pastHref),
+  );
 
-  btnGroup.append(upcomingBtn, pastBtn);
   wrapper.append(title, subtitle, btnGroup);
   block.append(wrapper);
 }
