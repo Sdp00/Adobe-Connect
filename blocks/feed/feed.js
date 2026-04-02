@@ -1,13 +1,25 @@
+import  getBackendBaseUrl  from '../../utils/apiConfig.js';
 import { html, render } from '../../vendor/htm-preact.js';
-import { useState, useEffect,useCallback,useRef } from '../../vendor/preact-hooks.js';
+import { useState, useEffect, useCallback, useRef } from '../../vendor/preact-hooks.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 
 
+const DEFAULT_CONFIG = {
+  hideLikeIcon: false,
+  hideCommentIcon: false,
+  hideImages: false,
+  disableLightbox: false,
+  showAvatars: true,
+  maxCommentsVisible: 3,
+  allowComments: true,
+  dataUrl: "/data/post.json"
+};
 
-/*  Lightbox  */
-
-function Lightbox({ images, startIndex, onClose }) {
-  const [current, setCurrent] = useState(startIndex);
-  const total = images.length;
+function Lightbox({ mediaItems, startIndex, onClose, commentsList, commentInput, setCommentInput, addComment }) {
+  // const [current, setCurrent] = useState(startIndex);
+  const safeIndex = Math.min(startIndex, mediaItems.length - 1);
+const [current, setCurrent] = useState(safeIndex);
+  const total = mediaItems.length;
 
   const prev = useCallback((e) => {
     e.stopPropagation();
@@ -19,7 +31,6 @@ function Lightbox({ images, startIndex, onClose }) {
     setCurrent(i => (i + 1) % total);
   }, [total]);
 
-  // Keyboard navigation
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'ArrowLeft')  setCurrent(i => (i - 1 + total) % total);
@@ -30,49 +41,117 @@ function Lightbox({ images, startIndex, onClose }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [total, onClose]);
 
+  const item = mediaItems[current];
+
+  const renderMedia = () => {
+    if (!item) {
+    return html`<div>No media</div>`;
+  }
+    if (item.type?.startsWith('video/')) {
+      return html`<video class="lightbox-img" src=${item.url} controls autoplay key=${item.url} />`;
+    }
+    if (item.type === 'application/pdf') {
+      return html`<iframe class="lightbox-pdf-frame" src=${item.url} title=${item.name} />`;
+    }
+    // plain image string or object
+    const src = typeof item === 'string' ? item : item.url;
+    return html`<img class="lightbox-img" src=${src} alt="" />`;
+  };
+
+  const getThumb = (m) => {
+    if (typeof m === 'string') return html`<img src=${m} alt="" />`;
+    if (m.type?.startsWith('image/')) return html`<img src=${m.url} alt="" />`;
+    if (m.type?.startsWith('video/')) return html`
+      <div class="lightbox-thumb-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </div>`;
+    if (m.type === 'application/pdf') return html`
+      <div class="lightbox-thumb-icon lightbox-thumb-pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>`;
+  };
+
   return html`
     <div class="lightbox-backdrop" onClick=${onClose}>
+      <div class="lightbox-container" onClick=${(e) => e.stopPropagation()}>
 
-      <!-- Counter -->
-      <div class="lightbox-counter">${current + 1} / ${total}</div>
+        <!-- LEFT: MEDIA -->
+        <div class="lightbox-media">
+          <button class="lightbox-close" onClick=${onClose}>✕</button>
+          <div class="lightbox-counter">${current + 1} / ${total}</div>
 
-      <!-- Close -->
-      <button class="lightbox-close" onClick=${onClose} aria-label="Close">✕</button>
+          <div class="lightbox-media-viewer">
+            ${renderMedia()}
+          </div>
 
-      <!-- Image -->
-      <div class="lightbox-image-wrap" onClick=${(e) => e.stopPropagation()}>
-        <img
-          class="lightbox-img"
-          src=${images[current]}
-          alt=""
-        />
+          ${total > 1 && html`
+            <button class="lightbox-nav lightbox-nav-prev" onClick=${prev}>‹</button>
+            <button class="lightbox-nav lightbox-nav-next" onClick=${next}>›</button>
+          `}
 
-        <!-- Dot indicators -->
-        ${total > 1 && html`
-          <div class="lightbox-dots">
-            ${images.map((_, i) => html`
-              <span
-                class="lightbox-dot ${i === current ? 'lightbox-dot-active' : ''}"
-                onClick=${(e) => { e.stopPropagation(); setCurrent(i); }}
-              />
+          <!-- Thumbnail strip -->
+          ${total > 1 && html`
+            <div class="lightbox-thumbstrip">
+              ${mediaItems.map((m, i) => html`
+                <div
+                  class="lightbox-thumb ${i === current ? 'lightbox-thumb-active' : ''}"
+                  onClick=${(e) => { e.stopPropagation(); setCurrent(i); }}
+                >
+                  ${getThumb(m)}
+                </div>
+              `)}
+            </div>
+          `}
+        </div>
+
+        <!-- RIGHT: COMMENTS -->
+        <div class="lightbox-side">
+          <div class="lightbox-side-header">
+            <div class="feed-avatar">JN</div>
+            <div>
+              <div class="feed-name">You</div>
+              <div class="feed-meta">Now</div>
+            </div>
+          </div>
+          <div class="lightbox-comments">
+            ${commentsList.map(c => html`
+              <div class="feed-comment">
+                <div class="feed-comment-avatar">
+                  ${c.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
+                </div>
+                <div class="feed-comment-body">
+                  <div class="feed-comment-name">${c.name}</div>
+                  <div class="feed-comment-text">${c.text}</div>
+                </div>
+              </div>
             `)}
           </div>
-        `}
+          <div class="lightbox-comment-input-row">
+            <div class="feed-comment-avatar">JN</div>
+            <input
+              class="feed-comment-input"
+              placeholder="Write a comment…"
+              value=${commentInput}
+              onInput=${(e) => setCommentInput(e.target.value)}
+              onKeyDown=${(e) => e.key === 'Enter' && addComment()}
+            />
+            <button class="feed-comment-submit" onClick=${addComment} disabled=${!commentInput.trim()}>
+              Post
+            </button>
+          </div>
+        </div>
+
       </div>
-
-      <!-- Prev / Next -->
-      ${total > 1 && html`
-        <button class="lightbox-nav lightbox-nav-prev" onClick=${prev} aria-label="Previous">‹</button>
-        <button class="lightbox-nav lightbox-nav-next" onClick=${next} aria-label="Next">›</button>
-      `}
-
     </div>
   `;
 }
 
 /*  FeedCard  */
 
-function FeedCard({ post }) {
+function FeedCard({ post ,config }) {
   const [liked,    setLiked]    = useState(false);
   const [likes,    setLikes]    = useState(post.likes);
   const [showComments, setShowComments] = useState(false);
@@ -81,10 +160,40 @@ function FeedCard({ post }) {
   const [commentsList, setCommentsList] = useState(post.commentsList || []);
   const [commentInput, setCommentInput] = useState('');
 
-  const allImages = post.images || [];
-  const [hero, ...rest] = allImages;
-  const gridImages = rest.slice(0, 3);
-  const extraCount = rest.length > 3 ? rest.length - 3 : 0;
+  // const allImages = post.images || [];
+  // const [hero, ...rest] = allImages;
+  // const gridImages = rest.slice(0, 3);
+  // const extraCount = rest.length > 3 ? rest.length - 3 : 0;
+
+  // Build unified media array for lightbox: images → videos → pdfs
+const imageItems = (post.images || []).map(url => ({ url, type: 'image/jpeg' }));
+const videoItems = post.videos || [];
+const pdfItems   = post.pdfs   || [];
+const allMedia   = [...imageItems, ...videoItems, ...pdfItems];
+
+// ALL media goes into the same grid
+// const [heroItem, ...restItems] = allMedia;
+// const gridItems  = restItems.slice(0, 3);
+// const extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
+let heroItem = null;
+let gridItems = [];
+let extraCount = 0;
+
+if (allMedia.length === 1) {
+  heroItem = allMedia[0];
+} else if (allMedia.length === 2) {
+  gridItems = allMedia; //  both side by side
+} else {
+  heroItem = allMedia[0];
+  const restItems = allMedia.slice(1);
+  gridItems = restItems.slice(0, 3);
+  extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
+}
+// Image layout (hero + grid) — unchanged
+// const allImages = post.images || [];
+// const [hero, ...rest] = allImages;
+// const gridImages = rest.slice(0, 3);
+// const extraCount = rest.length > 3 ? rest.length - 3 : 0;
 
   const initials = post.name === "You"
     ? "JN"
@@ -109,43 +218,88 @@ function FeedCard({ post }) {
 };
 
   // Grid image click → open lightbox at hero(0) + grid offset
-  const openLightbox = (imgIndex) => setLightbox(imgIndex);
+  // const openLightbox = (imgIndex) => setLightbox(imgIndex);
+  const openLightbox = (imgIndex) => {
+  if (imgIndex >= allMedia.length) return;
+  setLightbox(imgIndex);
+};
 
   return html`
     <div class="feed-card">
 
       <!-- Header -->
       <div class="feed-header">
+      ${config.showAvatars && html`
         <div class="feed-avatar">${initials}</div>
+      `}
         <div>
           <div class="feed-name">${post.name}</div>
           <div class="feed-meta">${post.role} • ${post.time}</div>
         </div>
       </div>
 
+      <!-- Title -->
+      ${post.title && html`
+        <div class="feed-title">${post.title}</div>
+      `}
+
       <!-- Text -->
       <div class="feed-text" dangerouslySetInnerHTML=${{ __html: post.text }} />
 
       <!-- Hero image -->
-      ${hero && html`
-        <img
-          class="feed-image-hero"
-          src=${hero}
-          alt=""
-          onClick=${() => openLightbox(0)}
-        />
+      <!-- Hero media (first item) -->
+      ${!config.hideImages && heroItem && html`
+        <div
+          class="feed-media-hero-wrap"
+          onClick=${() => !config.disableLightbox && openLightbox(0)}
+        >
+          ${heroItem.type?.startsWith('video/') ? html`
+            <video class="feed-image-hero" src=${heroItem.url} preload="metadata" />
+            <div class="feed-video-play-btn feed-video-play-btn-hero">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          ` : heroItem.type === 'application/pdf' ? html`
+            <div class="feed-pdf-hero">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <span>${heroItem.name}</span>
+            </div>
+          ` : html`
+            <img class="feed-image-hero" src=${heroItem.url} alt="" />
+          `}
+        </div>
       `}
 
-      <!-- Grid images -->
-      ${gridImages.length > 0 && html`
-        <div class="feed-image-grid feed-image-grid-${gridImages.length}">
-          ${gridImages.map((src, i) => html`
+      <!-- Grid: remaining media items -->
+      ${!config.hideImages && gridItems.length > 0 && html`
+        <div class="feed-image-grid feed-image-grid-${gridItems.length}">
+          ${gridItems.map((item, i) => html`
             <div
-              class="feed-image-grid-item ${i === gridImages.length - 1 && extraCount > 0 ? 'feed-image-grid-item--overlay' : ''}"
-              onClick=${() => openLightbox(i + 1)}
+              class="feed-image-grid-item ${i === gridItems.length - 1 && extraCount > 0 ? 'feed-image-grid-item--overlay' : ''}"
+              onClick=${() => !config.disableLightbox &&  openLightbox(heroItem ? i + 1 : i)}
             >
-              <img src=${src} alt="" />
-              ${i === gridImages.length - 1 && extraCount > 0 && html`
+              ${item.type?.startsWith('video/') ? html`
+                <video src=${item.url} preload="metadata" />
+                <div class="feed-grid-play-icon">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              ` : item.type === 'application/pdf' ? html`
+                <div class="feed-grid-pdf-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                  </svg>
+                  <span>${item.name}</span>
+                </div>
+              ` : html`
+                <img src=${item.url} alt="" />
+              `}
+              ${i === gridItems.length - 1 && extraCount > 0 && html`
                 <span class="feed-image-overlay-count">+${extraCount}</span>
               `}
             </div>
@@ -155,6 +309,7 @@ function FeedCard({ post }) {
 
       <!-- Actions bar -->
       <div class="feed-actions">
+      ${!config.hideLikeIcon && html`
         <button
           class="feed-action-btn ${liked ? 'feed-action-btn-liked' : ''}"
           onClick=${toggleLike}
@@ -174,7 +329,8 @@ function FeedCard({ post }) {
           </svg>
           <span>${likes}</span>
         </button>
-
+      `}  
+      ${!config.hideCommentIcon && html`
         <button
           class="feed-action-btn ${showComments ? 'feed-action-btn-active' : ''}"
           onClick=${() => setShowComments(v => !v)}
@@ -185,6 +341,7 @@ function FeedCard({ post }) {
           </svg>
           <span>${commentsList.length}</span>
         </button>
+      `}
       </div>
 
       <!-- Comments placeholder -->
@@ -192,7 +349,9 @@ function FeedCard({ post }) {
         <div class="feed-comments">
 
           <!-- Existing comments -->
-          ${post.commentsList && post.commentsList.map(c => html`
+          ${post.commentsList && post.commentsList
+            .slice(0, config.maxCommentsVisible)
+            .map(c => html`
             <div class="feed-comment">
               <div class="feed-comment-avatar">
                 ${c.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
@@ -205,6 +364,7 @@ function FeedCard({ post }) {
           `)}
 
           <!-- Input -->
+          ${config.allowComments && html`
           <div class="feed-comment-input-row">
             <div class="feed-comment-avatar">JN</div>
             <input
@@ -222,16 +382,22 @@ function FeedCard({ post }) {
               Post
             </button>
           </div>
-
+            `}
         </div>
+        
       `}
 
       <!-- Lightbox -->
-      ${lightbox !== null && html`
+      ${!config.disableLightbox && lightbox !== null && html`
         <${Lightbox}
-          images=${allImages}
+          
+          mediaItems=${allMedia}
           startIndex=${lightbox}
           onClose=${() => setLightbox(null)}
+          commentsList=${commentsList}
+          commentInput=${commentInput}
+          setCommentInput=${setCommentInput}
+          addComment=${addComment}
         />
       `}
 
@@ -241,30 +407,49 @@ function FeedCard({ post }) {
 
 /* Feed  */
 
-function Feed() {
+function Feed({ config }) {
   const [posts, setPosts]           = useState([]);
   const [visibleCount, setVisibleCount] = useState(3);
   const [loading, setLoading]       = useState(false);
   const loaderRef                   = useRef(null);
   const POSTS_PER_PAGE              = 3;
 
+  // const POSTS_API = `${getBackendBaseUrl()}/data/post.json`;
+
+  const POSTS_API = config.dataUrl
+  ? (config.dataUrl.startsWith('http')
+      ? config.dataUrl
+      : `${getBackendBaseUrl()}${config.dataUrl}`)
+  : `${getBackendBaseUrl()}/data/post.json`;
+
   // Load JSON once
   useEffect(() => {
-    fetch('/data/post.json')
+    // fetch('/data/post.json')
+    fetch(POSTS_API)
       .then(res => res.json())
-      .then(data => setPosts(data))
+      .then(data =>setPosts(data))
       .catch(err => console.error('Error loading posts:', err));
 
     const handler = (e) => {
+      const { title, text, files = [] } = e.detail;
+      const mediaItems = files.map(file => ({
+        url: URL.createObjectURL(file),
+        type: file.type,
+        name: file.name,
+      }));
       const newPost = {
         id: Date.now(),
         name: "You",
         role: "Employee",
         time: "now",
+        title: e.detail.title,
         text: e.detail.text,
         likes: 0,
         comments: 0,
-        images: []
+        // images: []
+        images: mediaItems.filter(m => m.type.startsWith('image/')).map(m => m.url),
+        videos: mediaItems.filter(m => m.type.startsWith('video/')),
+        pdfs:   mediaItems.filter(m => m.type === 'application/pdf'),
       };
       setPosts(prev => [newPost, ...prev]);
     };
@@ -311,7 +496,7 @@ function Feed() {
   return html`
     <div class="feed">
       ${visiblePosts.map(post => html`
-        <${FeedCard} key=${post.id} post=${post} />
+        <${FeedCard} key=${post.id} post=${post} config=${config} />
       `)}
 
       <div ref=${loaderRef} class="feed-loader">
@@ -327,6 +512,32 @@ function Feed() {
 }
 
 export default function decorate(block) {
-  render(html`<${Feed} />`, block);
+
+  const rows = [...block.children];
+
+  const config = { ...DEFAULT_CONFIG };
+
+  rows.forEach(row => {
+    const [keyEl, valueEl] = row.children;
+    if (!keyEl || !valueEl) return;
+
+    const key = keyEl.textContent.trim();
+    let value = valueEl.textContent.trim();
+
+    // Convert boolean strings
+    if (value === 'true') value = true;
+    if (value === 'false') value = false;
+
+    // Convert numbers
+    if (!isNaN(value) && value !== '') value = Number(value);
+
+    config[key] = value;
+  });
+
+  // console.log("FEED CONFIG:", config);
+
+  block.innerHTML=''
+
+  render(html`<${Feed} config=${config} />`, block);
 }
 

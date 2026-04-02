@@ -28,13 +28,18 @@ main > .section.calendar-container {
   display: flex !important;
   flex-direction: column !important;
   gap: 16px !important;
-  /* Scroll with feed — stop when panel bottom is reached */
+
+  /* ── The sticky recipe ──────────────────────────────────────
+     ──────────────────────────────────────────────────────── */
   position: sticky !important;
-  top: 0 !important;
-  height: 100vh !important;
-  overflow-y: auto !important;
-  align-self: flex-start !important;
-  scrollbar-width: none !important;
+  bottom: 0 !important;
+  top: unset !important;
+  align-self: flex-end !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overflow-y: visible !important;
+  scrollbar-width: auto !important;
 }
 
 main > .section.calendar-container::-webkit-scrollbar {
@@ -44,10 +49,20 @@ main > .section.calendar-container::-webkit-scrollbar {
 main > .section.calendar-container > .calendar-wrapper,
 main > .section.calendar-container > .upcoming-wrapper,
 main > .section.calendar-container > .trends-wrapper,
-main > .section.calendar-container > .newsletters-wrapper {
+main > .section.calendar-container > .newsletters-wrapper,
+main > .section.calendar-container > .attributes-wrapper,
+main > .section.calendar-container > .fragment-wrapper,
+.fragment .newsletters-wrapper,
+.fragment .trends-wrapper,
+.fragment .insights-wrapper,
+.fragment .section {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
+}
+
+.fragment .insights-wrapper + .insights-wrapper {
+  margin-top: 16px !important;
 }
 
 @media (width <= 1024px) {
@@ -61,6 +76,8 @@ main > .section.calendar-container > .newsletters-wrapper {
     max-width: 100% !important;
     min-width: unset !important;
     position: static !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 }
 
@@ -72,7 +89,8 @@ main > .section.calendar-container > .newsletters-wrapper {
 
   .upcoming-wrapper,
   .trends-wrapper,
-  .newsletters-wrapper {
+  .newsletters-wrapper,
+  .attributes-wrapper {
     display: none !important;
   }
 }
@@ -87,24 +105,9 @@ main > .section.calendar-container > .newsletters-wrapper {
   border: none;
   cursor: pointer;
   padding: 6px;
-  color: #444;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  transition: background 0.15s;
-}
-
-.cal-popover__trigger:hover {
-  background: #f3f3f3;
-}
-
-.cal-popover__icon {
-  width: 20px;
-  height: 20px;
-  display: block;
-  filter: brightness(0) saturate(100%);
-  opacity: 0.7;
 }
 
 .cal-popover__backdrop {
@@ -201,7 +204,6 @@ main > .section.calendar-container > .newsletters-wrapper {
   box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 0 1px rgb(255 255 255 / 8%);
 }
 
-/* Calendar */
 [data-theme="dark"] .calendar-block__title,
 [data-theme="dark"] .calendar-block__month {
   color: #f0f0f0;
@@ -223,7 +225,6 @@ main > .section.calendar-container > .newsletters-wrapper {
   color: #888;
 }
 
-/* Upcoming */
 [data-theme="dark"] .upcoming-block__title {
   color: #f0f0f0;
 }
@@ -276,7 +277,6 @@ main > .section.calendar-container > .newsletters-wrapper {
   color: #f87171;
 }
 
-/* Trends */
 [data-theme="dark"] .trends-block__title {
   color: #f0f0f0;
 }
@@ -301,7 +301,6 @@ main > .section.calendar-container > .newsletters-wrapper {
   color: #444;
 }
 
-/* Newsletters */
 [data-theme="dark"] .newsletters-block__title {
   color: #f0f0f0;
 }
@@ -331,7 +330,6 @@ main > .section.calendar-container > .newsletters-wrapper {
   color: #555;
 }
 
-/* Calendar popover */
 [data-theme="dark"] .cal-popover__panel {
   background: #1e1e1e;
   box-shadow: 0 8px 40px rgb(0 0 0 / 50%);
@@ -350,7 +348,6 @@ main > .section.calendar-container > .newsletters-wrapper {
   color: #f0f0f0;
 }
 
-/* Decline modal textarea */
 [data-theme="dark"] .upcoming-block__decline-textarea {
   background: #2a2a2a;
   border-color: #444;

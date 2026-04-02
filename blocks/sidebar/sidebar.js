@@ -47,6 +47,9 @@ function isActive(href) {
   const [hrefPath, hrefHash] = href.split('#');
   const tgt = hrefPath.replace(/\.html$/, '').replace(/\/$/, '');
 
+  // Home ('/') → tgt is '' — only active on exact root
+  if (tgt === '') return cur === '';
+
   if (cur !== tgt && !cur.startsWith(`${tgt}/`)) return false;
   if (hrefHash) return curHash === `#${hrefHash}`;
   return !curHash; // Dashboard active only when no hash

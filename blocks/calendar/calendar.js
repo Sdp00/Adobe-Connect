@@ -1,85 +1,144 @@
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState } from '../../vendor/preact-hooks.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 
 const DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-const DOT_COLOR = { event: '#e63535', training: '#3b82f6', both: '#8b5cf6' };
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
 
 function buildGrid(year, month) {
   const totalDays = new Date(year, month + 1, 0).getDate();
-  const firstDay  = new Date(year, month, 1).getDay();
-  const prevDays  = new Date(year, month, 0).getDate();
-  const cells     = [];
-  for (let i = firstDay - 1; i >= 0; i--) cells.push({ day: prevDays - i, current: false });
-  for (let d = 1; d <= totalDays; d++)     cells.push({ day: d, current: true });
+  const firstDay = new Date(year, month, 1).getDay();
+  const prevDays = new Date(year, month, 0).getDate();
+  const cells = [];
+  for (let i = firstDay - 1; i >= 0; i -= 1) cells.push({ day: prevDays - i, current: false });
+  for (let d = 1; d <= totalDays; d += 1) cells.push({ day: d, current: true });
   const rem = 7 - (cells.length % 7);
-  if (rem < 7) for (let d = 1; d <= rem; d++) cells.push({ day: d, current: false });
+  if (rem < 7) for (let d = 1; d <= rem; d += 1) cells.push({ day: d, current: false });
   return cells;
 }
 
-function CalendarGrid({ data }) {
-  const { month, year, month_index, events } = data;
-  const today  = new Date();
-  const isCurr = today.getFullYear() === year && today.getMonth() === month_index;
-  const todayD = isCurr ? today.getDate() : -1;
-  const cells  = buildGrid(year, month_index);
+function renderCell(day, current, todayD, eventMap, dotColor) {
+  const types = current ? (eventMap[day] || []) : [];
+  const isToday = current && day === todayD;
+  return html`
+    <div class="calendar-block__cell
+      ${!current ? 'calendar-block__cell--faded' : ''}
+      ${isToday ? 'calendar-block__cell--today' : ''}">
+      <span class="calendar-block__num">${day}</span>
+      ${types.length > 0 && html`
+        <div class="calendar-block__dots">
+          ${types.map((t) => html`
+            <span class="calendar-block__dot"
+              style="background:${dotColor[t] || '#999'}">
+            </span>`)}
+        </div>`}
+    </div>`;
+}
 
+function CalendarGrid({
+  currentMonth,
+  currentYear,
+  events,
+  initialMonth,
+  initialYear,
+  legend,
+}) {
+  const today = new Date();
+  const isTodayMonth = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
+  const todayD = isTodayMonth ? today.getDate() : -1;
+  const cells = buildGrid(currentYear, currentMonth);
+
+  const isDataMonth = currentMonth === initialMonth && currentYear === initialYear;
   const eventMap = {};
-  events.forEach(({ date, type }) => {
-    if (!eventMap[date]) eventMap[date] = [];
-    eventMap[date].push(type);
-  });
+  if (isDataMonth) {
+    events.forEach(({ date, type }) => {
+      if (!eventMap[date]) eventMap[date] = [];
+      eventMap[date].push(type);
+    });
+  }
+
+  const dotColor = {};
+  legend.forEach(({ type, color }) => { dotColor[type] = color; });
 
   return html`
     <div>
-      <p class="calendar-block__month">${month}</p>
       <div class="calendar-block__grid">
-        ${DAYS.map(d => html`<span class="calendar-block__dayname">${d}</span>`)}
-        ${cells.map(({ day, current }) => {
-          const types   = current ? (eventMap[day] || []) : [];
-          const isToday = current && day === todayD;
-          return html`
-            <div class="calendar-block__cell
-              ${!current ? 'calendar-block__cell--faded' : ''}
-              ${isToday  ? 'calendar-block__cell--today' : ''}">
-              <span class="calendar-block__num">${day}</span>
-              ${types.length > 0 && html`
-                <div class="calendar-block__dots">
-                  ${types.map(t => html`
-                    <span class="calendar-block__dot"
-                      style="background:${DOT_COLOR[t] || '#999'}">
-                    </span>`)}
-                </div>`}
-            </div>`;
-        })}
+        ${DAYS.map((d) => html`<span class="calendar-block__dayname">${d}</span>`)}
+        ${cells.map(({ day, current }) => renderCell(day, current, todayD, eventMap, dotColor))}
       </div>
       <div class="calendar-block__legend">
-        ${Object.entries(DOT_COLOR).map(([type, color]) => html`
+        ${legend.map(({ color, label }) => html`
           <span class="calendar-block__legend-item">
             <i class="calendar-block__dot" style="background:${color}"></i>
-            ${type.charAt(0).toUpperCase() + type.slice(1)}
+            ${label}
           </span>`)}
       </div>
     </div>`;
 }
 
 function Calendar({ data }) {
+  const [currentMonth, setCurrentMonth] = useState(data.month_index);
+  const [currentYear, setCurrentYear] = useState(data.year);
+
+  const prevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11);
+      setCurrentYear((y) => y - 1);
+    } else {
+      setCurrentMonth((m) => m - 1);
+    }
+  };
+
+  const nextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0);
+      setCurrentYear((y) => y + 1);
+    } else {
+      setCurrentMonth((m) => m + 1);
+    }
+  };
+
   return html`
     <div class="calendar-block">
-      <h3 class="calendar-block__title">${data.title}</h3>
-      <${CalendarGrid} data=${data} />
+      <div class="calendar-block__header">
+        <h3 class="calendar-block__title">${data.title}</h3>
+        <div class="calendar-block__nav">
+          <button class="calendar-block__nav-btn" onClick=${prevMonth} aria-label="Previous month">\u2190</button>
+          <span class="calendar-block__month">${MONTH_NAMES[currentMonth]} ${currentYear}</span>
+          <button class="calendar-block__nav-btn" onClick=${nextMonth} aria-label="Next month">\u2192</button>
+        </div>
+      </div>
+      <${CalendarGrid}
+        currentMonth=${currentMonth}
+        currentYear=${currentYear}
+        events=${data.events}
+        initialMonth=${data.month_index}
+        initialYear=${data.year}
+        legend=${data.legend}
+      />
     </div>`;
 }
 
 function MobileCalendarPopover({ data }) {
   const [open, setOpen] = useState(false);
+  const [calSvg, setCalSvg] = useState('');
+  const [closeSvg, setCloseSvg] = useState('');
+
+  useEffect(() => {
+    fetchSvg('calendar').then(setCalSvg);
+    fetchSvg('close').then(setCloseSvg);
+  }, []);
 
   return html`
     <div class="cal-popover">
       <button
         class="cal-popover__trigger"
-        onClick=${() => setOpen(o => !o)}
+        onClick=${() => setOpen((o) => !o)}
         aria-label="Open calendar">
-        <img src="/icons/calendar.svg" class="cal-popover__icon" alt="Calendar" />
+        <span dangerouslySetInnerHTML=${{ __html: calSvg }} />
       </button>
 
       ${open && html`
@@ -92,41 +151,37 @@ function MobileCalendarPopover({ data }) {
                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6"  y1="6" x2="18" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
           </div>
-          <${CalendarGrid} data=${data} />
+          <${Calendar} data=${data} />
         </div>`}
     </div>`;
 }
 
 export default async function decorate(block) {
-  const resp = await fetch('public/mock.json');
+  const config = readBlockConfig(block);
+  const calendarUrl = config.calendarurl || 'public/mock.json';
+
+  const resp = await fetch(calendarUrl);
   const json = await resp.json();
   const data = json.calendar;
 
-  // Desktop block
   block.innerHTML = '';
   render(html`<${Calendar} data=${data} />`, block);
 
-  // Mobile icon — inject BEFORE the dark/light mode toggle button in header
-  // Adobe Connect header has a theme-toggle button with class nav-hamburger or similar
-  // We insert between search button and dark mode toggle
   const injectCalendarIcon = () => {
-    // Try to find the dark/light mode button — it usually has a moon/sun icon
     const darkToggle = document.querySelector(
-      'header button[aria-label*="dark"], header button[aria-label*="theme"], header button[aria-label*="color"], header .nav-hamburger, header .theme-toggle, header [class*="dark"], header [class*="theme"]'
+      'header button[aria-label*="dark"], header button[aria-label*="theme"], header button[aria-label*="color"], header .nav-hamburger, header .theme-toggle, header [class*="dark"], header [class*="theme"]',
     );
 
     const mount = document.createElement('div');
     mount.className = 'cal-popover-mount';
 
     if (darkToggle) {
-      // Insert right before the dark/light toggle
       darkToggle.parentElement.insertBefore(mount, darkToggle);
     } else {
-      // Fallback — append to header
       const header = document.querySelector('header');
       if (header) header.appendChild(mount);
     }
@@ -134,15 +189,13 @@ export default async function decorate(block) {
     render(html`<${MobileCalendarPopover} data=${data} />`, mount);
   };
 
-  // Wait for header to be decorated by EDS
   if (document.querySelector('header button')) {
-    injectCalendarIcon();
+    doInject();
   } else {
-    // Header not ready yet — observe DOM
     const observer = new MutationObserver(() => {
       if (document.querySelector('header button')) {
         observer.disconnect();
-        injectCalendarIcon();
+        doInject();
       }
     });
     observer.observe(document.querySelector('header') || document.body, {
