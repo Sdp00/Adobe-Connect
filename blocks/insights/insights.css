@@ -196,3 +196,113 @@
 [data-theme="dark"] .insights.industry-updates .rpf-icon {
   background: #2a1a0a;
 }
+
+/* ============================================================
+   PAGE VIEW — Newsletter & Industry Updates full page cards
+   ============================================================ */
+
+.ins-heading {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0 0 28px;
+}
+
+.ins-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ins-card {
+  background: var(--spectrum-gray-50, #fff);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-sizing: border-box;
+}
+
+.ins-card:hover {
+  box-shadow: 0 6px 20px rgb(0 0 0 / 12%);
+  transform: translateY(-2px);
+}
+
+.ins-card-title {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0;
+}
+
+.ins-desc {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 13px;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+  margin: 0;
+  flex: 1;
+}
+
+.ins-read-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  margin-top: 4px;
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.ins-read-btn:hover {
+  color: #fff !important;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.ins-read-btn:any-link {
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.ins-empty {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 14px;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+}
+
+/* ── Page view dark mode ── */
+html[data-theme="dark"] .ins-heading { color: #fff; }
+
+html[data-theme="dark"] .ins-card {
+  background: #1e1e1e;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+}
+
+html[data-theme="dark"] .ins-card-title { color: #fff; }
+html[data-theme="dark"] .ins-desc { color: #b3b3b3; }
+html[data-theme="dark"] .ins-read-btn { color: #fff !important; }
+html[data-theme="dark"] .ins-empty { color: #b3b3b3; }
+
+/* ── Page view responsive ── */
+@media (width <= 1024px) {
+  .ins-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (width <= 640px) {
+  .ins-heading { font-size: 22px; }
+  .ins-grid { grid-template-columns: 1fr; gap: 14px; }
+  .ins-card { padding: 16px; }
+}

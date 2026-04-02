@@ -1,5 +1,5 @@
 import { html, render } from '../../vendor/htm-preact.js';
-import { useState } from '../../vendor/preact-hooks.js';
+import { useState, useEffect } from '../../vendor/preact-hooks.js';
 import { readBlockConfig } from '../../scripts/aem.js';
 
 const DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
@@ -38,14 +38,7 @@ function renderCell(day, current, todayD, eventMap, dotColor) {
     </div>`;
 }
 
-function CalendarGrid({
-  currentMonth,
-  currentYear,
-  events,
-  initialMonth,
-  initialYear,
-  legend,
-}) {
+function CalendarGrid({ currentMonth, currentYear, events, initialMonth, initialYear, legend }) {
   const today = new Date();
   const isTodayMonth = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
   const todayD = isTodayMonth ? today.getDate() : -1;
@@ -84,21 +77,13 @@ function Calendar({ data }) {
   const [currentYear, setCurrentYear] = useState(data.year);
 
   const prevMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear((y) => y - 1);
-    } else {
-      setCurrentMonth((m) => m - 1);
-    }
+    if (currentMonth === 0) { setCurrentMonth(11); setCurrentYear((y) => y - 1); }
+    else setCurrentMonth((m) => m - 1);
   };
 
   const nextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear((y) => y + 1);
-    } else {
-      setCurrentMonth((m) => m + 1);
-    }
+    if (currentMonth === 11) { setCurrentMonth(0); setCurrentYear((y) => y + 1); }
+    else setCurrentMonth((m) => m + 1);
   };
 
   return html`
@@ -106,9 +91,9 @@ function Calendar({ data }) {
       <div class="calendar-block__header">
         <h3 class="calendar-block__title">${data.title}</h3>
         <div class="calendar-block__nav">
-          <button class="calendar-block__nav-btn" onClick=${prevMonth} aria-label="Previous month">\u2190</button>
+          <button class="calendar-block__nav-btn" onClick=${prevMonth} aria-label="Previous month">←</button>
           <span class="calendar-block__month">${MONTH_NAMES[currentMonth]} ${currentYear}</span>
-          <button class="calendar-block__nav-btn" onClick=${nextMonth} aria-label="Next month">\u2192</button>
+          <button class="calendar-block__nav-btn" onClick=${nextMonth} aria-label="Next month">→</button>
         </div>
       </div>
       <${CalendarGrid}
@@ -124,23 +109,19 @@ function Calendar({ data }) {
 
 function MobileCalendarPopover({ data }) {
   const [open, setOpen] = useState(false);
-  const [calSvg, setCalSvg] = useState('');
-  const [closeSvg, setCloseSvg] = useState('');
-
-  useEffect(() => {
-    fetchSvg('calendar').then(setCalSvg);
-    fetchSvg('close').then(setCloseSvg);
-  }, []);
 
   return html`
     <div class="cal-popover">
-      <button
-        class="cal-popover__trigger"
-        onClick=${() => setOpen((o) => !o)}
-        aria-label="Open calendar">
-        <span dangerouslySetInnerHTML=${{ __html: calSvg }} />
+      <button class="cal-popover__trigger" onClick=${() => setOpen((o) => !o)} aria-label="Open calendar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
       </button>
-
       ${open && html`
         <div class="cal-popover__backdrop" onClick=${() => setOpen(false)}></div>
         <div class="cal-popover__panel">
@@ -161,8 +142,14 @@ function MobileCalendarPopover({ data }) {
 }
 
 export default async function decorate(block) {
+  // ✅ reads calendarUrl from authoring doc
   const config = readBlockConfig(block);
-  const calendarUrl = config.calendarurl || 'public/mock.json';
+  const calendarUrl = config.calendarurl;
+
+  if (!calendarUrl) {
+    block.innerHTML = '<p>No calendarUrl configured.</p>';
+    return;
+  }
 
   const resp = await fetch(calendarUrl);
   const json = await resp.json();
@@ -171,31 +158,31 @@ export default async function decorate(block) {
   block.innerHTML = '';
   render(html`<${Calendar} data=${data} />`, block);
 
+  // ✅ fixed: was calling doInject() which was never defined
   const injectCalendarIcon = () => {
-    const darkToggle = document.querySelector(
-      'header button[aria-label*="dark"], header button[aria-label*="theme"], header button[aria-label*="color"], header .nav-hamburger, header .theme-toggle, header [class*="dark"], header [class*="theme"]',
-    );
+    const header = document.querySelector('header');
+    if (!header) return;
 
     const mount = document.createElement('div');
     mount.className = 'cal-popover-mount';
 
-    if (darkToggle) {
-      darkToggle.parentElement.insertBefore(mount, darkToggle);
-    } else {
-      const header = document.querySelector('header');
-      if (header) header.appendChild(mount);
-    }
+    const darkToggle = header.querySelector(
+      'button[aria-label*="dark"], button[aria-label*="theme"], button[aria-label*="color"], .nav-hamburger, .theme-toggle, [class*="dark"], [class*="theme"]'
+    );
+
+    if (darkToggle) darkToggle.parentElement.insertBefore(mount, darkToggle);
+    else header.appendChild(mount);
 
     render(html`<${MobileCalendarPopover} data=${data} />`, mount);
   };
 
   if (document.querySelector('header button')) {
-    doInject();
+    injectCalendarIcon();
   } else {
     const observer = new MutationObserver(() => {
       if (document.querySelector('header button')) {
         observer.disconnect();
-        doInject();
+        injectCalendarIcon();
       }
     });
     observer.observe(document.querySelector('header') || document.body, {
