@@ -49,12 +49,7 @@ function getInitials(name) {
   return name.trim().split(/\s+/).map((n) => n[0].toUpperCase()).slice(0, 2).join('');
 }
 
-function toAdobeEmail(name) {
-  if (!name) return '';
-  return name.trim().toLowerCase().replace(/\s+/g, '.') + '@adobe.com';
-}
-
-/* ── Mock user data generator ─────────────────────────────── */
+/* ── Avatar color from name hash ─────────────────────────── */
 const AVATAR_COLORS = [
   { bg: '#fff4ec', color: '#c2410c', border: '#fddcca' },
   { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' },
@@ -70,47 +65,20 @@ function getUserColor(name) {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-const DECLINE_REASONS = [
-  'Schedule conflict with another meeting',
-  'Already completed a similar training',
-  'On planned leave on that date',
-  'Manager did not approve attendance',
-  'Topic not relevant to current role',
-  'Remote — unable to attend in person',
-  'Personal commitment on that day',
-];
-
-function generateMockUsers(item) {
-  const acceptedNames = [
-    'Priya Sharma', 'Arjun Mehta', 'Divya Nair', 'Rohit Verma',
-    'Ananya Krishnan', 'Kabir Singh', 'Sneha Patel', 'Vikram Iyer',
-    'Meera Joshi', 'Aditya Kumar', 'Pooja Reddy', 'Siddharth Rao',
-  ];
-  const declinedNames = [
-    'Tanvi Gupta', 'Nikhil Desai', 'Riya Chatterjee', 'Manish Tiwari',
-    'Sonal Shah', 'Deepak Nambiar', 'Kavya Pillai', 'Harish Bose',
-  ];
-
-  const acceptedCount = item.responses?.accepted ?? 0;
-  const declinedCount = item.responses?.declined ?? 0;
-
-  const accepted = acceptedNames.slice(0, acceptedCount).map((name) => ({
-    name,
-    email: toAdobeEmail(name),
-    color: getUserColor(name),
+/* ── Read users directly from item (db.json) ─────────────── */
+function getUsersFromItem(item) {
+  const accepted = (item.responses?.acceptedUsers || []).map((u) => ({
+    ...u,
+    color: getUserColor(u.name),
   }));
-
-  const declined = declinedNames.slice(0, declinedCount).map((name, i) => ({
-    name,
-    email: toAdobeEmail(name),
-    color: getUserColor(name),
-    reason: DECLINE_REASONS[i % DECLINE_REASONS.length],
+  const declined = (item.responses?.declinedUsers || []).map((u) => ({
+    ...u,
+    color: getUserColor(u.name),
   }));
-
   return { accepted, declined };
 }
 
-/* ── Export to CSV (saves as .xlsx-compatible CSV) ─────────── */
+/* ── Export to CSV ────────────────────────────────────────── */
 function exportToExcel(item, accepted, declined) {
   const rows = [
     ['Training Session', item.title || 'Untitled'],
@@ -118,12 +86,11 @@ function exportToExcel(item, accepted, declined) {
     [''],
     ['STATUS', 'NAME', 'EMAIL', 'DECLINE REASON'],
     ...accepted.map((u) => ['Accepted', u.name, u.email, '']),
-    ...declined.map((u) => ['Declined', u.name, u.email, u.reason]),
+    ...declined.map((u) => ['Declined', u.name, u.email, u.reason || '']),
   ];
 
   const csvContent = rows.map((r) => r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-  const BOM = '\uFEFF';
-  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -140,7 +107,7 @@ export function TrainingResponsesModal({ isOpen, onClose, item }) {
 
   if (!item) return null;
 
-  const { accepted, declined } = generateMockUsers(item);
+  const { accepted, declined } = getUsersFromItem(item);
 
   const handleExport = () => exportToExcel(item, accepted, declined);
 
