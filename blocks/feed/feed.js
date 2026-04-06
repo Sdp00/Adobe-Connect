@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
   dataUrl: "/data/post.json"
 };
 
-function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment }) {
+function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike  }) {
   // const [current, setCurrent] = useState(startIndex);
   const safeIndex = Math.min(startIndex, mediaItems.length - 1);
 const [current, setCurrent] = useState(safeIndex);
@@ -43,6 +43,11 @@ const [current, setCurrent] = useState(safeIndex);
 
   const item = mediaItems?.[current]||null;
   const commentsList = item?.comments || [];
+
+  // const likes = item?.stats?.likes || 0;
+  // const commentsCount = item?.stats?.commentsCount || commentsList.length;
+
+  const itemStats = item?.stats || { likes: 0, commentsCount: 0 };
 
   const renderMedia = () => {
     if (!item) {
@@ -88,6 +93,7 @@ const [current, setCurrent] = useState(safeIndex);
             ${renderMedia()}
           </div>
 
+          
           ${total > 1 && html`
             <button class="lightbox-nav lightbox-nav-prev" onClick=${prev}>‹</button>
             <button class="lightbox-nav lightbox-nav-next" onClick=${next}>›</button>
@@ -117,6 +123,27 @@ const [current, setCurrent] = useState(safeIndex);
               <div class="feed-meta">Now</div>
             </div>
           </div>
+          <!-- Stats bar -->
+          <div class="lightbox-stats-bar">
+            <button
+              class="lightbox-stat lightbox-like-btn ${item?.liked ? 'lightbox-stat-liked' : ''}"
+              onClick=${() => toggleMediaLike(current)}
+            >
+              <svg viewBox="0 0 24 24"
+                fill=${item?.liked ? 'currentColor' : 'none'}
+                stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+              </svg>
+              ${itemStats.likes} likes
+            </button>
+            <span class="lightbox-stat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              ${commentsList.length} comments
+            </span>
+          </div>
+
           <div class="lightbox-comments">
             ${commentsList.map(c => html`
               <div class="feed-comment">
@@ -173,17 +200,24 @@ function FeedCard({ post ,config }) {
 // const pdfItems   = post.pdfs   || [];
 // const allMedia   = [...imageItems, ...videoItems, ...pdfItems];
 
+// const allMedia = (post.mediaWithComments || []).map(m => {
+//   if (m.type === 'image') {
+//     return { ...m, type: 'image/jpeg' };
+//   }
+//   if (m.type === 'video') {
+//     return { ...m, type: 'video/mp4' };
+//   }
+//   if (m.type === 'pdf') {
+//     return { ...m, type: 'application/pdf' };
+//   }
+//   return m;
+// });
 const allMedia = (post.mediaWithComments || []).map(m => {
-  if (m.type === 'image') {
-    return { ...m, type: 'image/jpeg' };
-  }
-  if (m.type === 'video') {
-    return { ...m, type: 'video/mp4' };
-  }
-  if (m.type === 'pdf') {
-    return { ...m, type: 'application/pdf' };
-  }
-  return m;
+  const type = m.type === 'image' ? 'image/jpeg'
+             : m.type === 'video' ? 'video/mp4'
+             : m.type === 'pdf'   ? 'application/pdf'
+             : m.type;
+  return { ...m, type, liked: false };  //  ADD liked: false
 });
 const [mediaState, setMediaState] = useState(allMedia);
 
@@ -292,6 +326,23 @@ const addComment = () => {
   }
 
   setCommentInput('');
+};
+
+const toggleMediaLike = (index) => {
+  setMediaState(prev => {
+    const updated = [...prev];
+    const item = updated[index];
+    const wasLiked = item.liked;
+    updated[index] = {
+      ...item,
+      liked: !wasLiked,
+      stats: {
+        ...item.stats,
+        likes: wasLiked ? item.stats.likes - 1 : item.stats.likes + 1
+      }
+    };
+    return updated;
+  });
 };
 
   // Grid image click → open lightbox at hero(0) + grid offset
@@ -467,7 +518,7 @@ const addComment = () => {
       <!-- Lightbox -->
       ${!config.disableLightbox && lightbox !== null && html`
         <${Lightbox}
-          
+          toggleMediaLike=${toggleMediaLike}
           mediaItems=${mediaState}
           startIndex=${lightbox}
           onClose=${() => setLightbox(null)}
@@ -648,6 +699,7 @@ function transformPost(apiPost) {
       type: m.type,
       url: fullUrl,
       name: m.name,
+      stats: m.stats || { likes: 0, commentsCount: 0 },
       comments: (m.comments || []).map(c => ({
         id: c._id,
         name: c.author?.name || 'User',
