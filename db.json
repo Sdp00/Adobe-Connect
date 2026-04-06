@@ -74,19 +74,7 @@
       "time": "17:00",
       "venue": "Virtual – Teams",
       "status": "draft",
-      "responses": {
-        "interested": 8,
-        "interestedUsers": [
-          { "name": "Ananya Krishnan",  "email": "ananya.k@adobe.com" },
-          { "name": "Riya Mehta",       "email": "riya.mehta@adobe.com" },
-          { "name": "Karthik Suresh",   "email": "karthik.s@adobe.com" },
-          { "name": "Priya Nair",       "email": "priya.nair@adobe.com" },
-          { "name": "Vikram Desai",     "email": "vikram.d@adobe.com" },
-          { "name": "Sneha Iyer",       "email": "sneha.iyer@adobe.com" },
-          { "name": "Arjun Patel",      "email": "arjun.p@adobe.com" },
-          { "name": "Divya Sharma",     "email": "divya.s@adobe.com" }
-        ]
-      }
+      "responses": null
     },
     {
       "id": 4,
@@ -97,16 +85,7 @@
       "time": "",
       "venue": "TBD",
       "status": "draft",
-      "responses": {
-        "interested": 5,
-        "interestedUsers": [
-          { "name": "Rahul Verma",      "email": "rahul.v@adobe.com" },
-          { "name": "Meera Nambiar",    "email": "meera.n@adobe.com" },
-          { "name": "Siddharth Rao",    "email": "siddharth.r@adobe.com" },
-          { "name": "Kavya Reddy",      "email": "kavya.red@adobe.com" },
-          { "name": "Aditya Bhatt",     "email": "aditya.b@adobe.com" }
-        ]
-      }
+      "responses": null
     },
     {
       "id": 5,

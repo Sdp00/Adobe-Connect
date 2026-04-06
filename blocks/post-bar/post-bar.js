@@ -122,9 +122,54 @@ const resetForm = () => {
 
     if (hasError) return;
 
+    // window.dispatchEvent(
+    //   new CustomEvent('create-post', {
+    //     detail: { title,text ,files}
+    //   })
+    // );
+
+    //  Convert files → backend media format
+    const media = files.map((file, index) => {
+      let type = 'image';
+
+      if (file.type.startsWith('video/')) type = 'video';
+      else if (file.type === 'application/pdf') type = 'pdf';
+
+      return {
+        _id: `media_${Date.now()}_${index}`,
+        type,
+        url: URL.createObjectURL(file),
+        name: file.name,
+        stats: {
+          likes: 0,
+          commentsCount: 0
+        },
+        comments: []
+      };
+    });
+
+    // Create backend-style post
+    const newPost = {
+      _id: `post_${Date.now()}`,
+      author: {
+        avatar: "avatar.jpg",
+        name: "You",
+        role: "Employee",
+        userId: "current_user"
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      content: {
+        title,
+        text,
+        media
+      }
+    };
+
+    //  Dispatch
     window.dispatchEvent(
       new CustomEvent('create-post', {
-        detail: { title,text ,files}
+        detail: newPost
       })
     );
 
@@ -135,6 +180,8 @@ const resetForm = () => {
     setErrors({ title: '', text: '', files: [] });
     setIsModalOpen(false);
   };
+
+
 
   
 

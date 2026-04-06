@@ -15,7 +15,7 @@ const DEFAULT_CONFIG = {
   dataUrl: "/data/post.json"
 };
 
-function Lightbox({ mediaItems, startIndex, onClose, commentsList, commentInput, setCommentInput, addComment }) {
+function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike  }) {
   // const [current, setCurrent] = useState(startIndex);
   const safeIndex = Math.min(startIndex, mediaItems.length - 1);
 const [current, setCurrent] = useState(safeIndex);
@@ -41,7 +41,13 @@ const [current, setCurrent] = useState(safeIndex);
     return () => window.removeEventListener('keydown', onKey);
   }, [total, onClose]);
 
-  const item = mediaItems[current];
+  const item = mediaItems?.[current]||null;
+  const commentsList = item?.comments || [];
+
+  // const likes = item?.stats?.likes || 0;
+  // const commentsCount = item?.stats?.commentsCount || commentsList.length;
+
+  const itemStats = item?.stats || { likes: 0, commentsCount: 0 };
 
   const renderMedia = () => {
     if (!item) {
@@ -87,6 +93,7 @@ const [current, setCurrent] = useState(safeIndex);
             ${renderMedia()}
           </div>
 
+          
           ${total > 1 && html`
             <button class="lightbox-nav lightbox-nav-prev" onClick=${prev}>‹</button>
             <button class="lightbox-nav lightbox-nav-next" onClick=${next}>›</button>
@@ -116,6 +123,27 @@ const [current, setCurrent] = useState(safeIndex);
               <div class="feed-meta">Now</div>
             </div>
           </div>
+          <!-- Stats bar -->
+          <div class="lightbox-stats-bar">
+            <button
+              class="lightbox-stat lightbox-like-btn ${item?.liked ? 'lightbox-stat-liked' : ''}"
+              onClick=${() => toggleMediaLike(current)}
+            >
+              <svg viewBox="0 0 24 24"
+                fill=${item?.liked ? 'currentColor' : 'none'}
+                stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+              </svg>
+              ${itemStats.likes} likes
+            </button>
+            <span class="lightbox-stat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              ${commentsList.length} comments
+            </span>
+          </div>
+
           <div class="lightbox-comments">
             ${commentsList.map(c => html`
               <div class="feed-comment">
@@ -159,6 +187,7 @@ function FeedCard({ post ,config }) {
 
   const [commentsList, setCommentsList] = useState(post.commentsList || []);
   const [commentInput, setCommentInput] = useState('');
+  
 
   // const allImages = post.images || [];
   // const [hero, ...rest] = allImages;
@@ -166,10 +195,31 @@ function FeedCard({ post ,config }) {
   // const extraCount = rest.length > 3 ? rest.length - 3 : 0;
 
   // Build unified media array for lightbox: images → videos → pdfs
-const imageItems = (post.images || []).map(url => ({ url, type: 'image/jpeg' }));
-const videoItems = post.videos || [];
-const pdfItems   = post.pdfs   || [];
-const allMedia   = [...imageItems, ...videoItems, ...pdfItems];
+// const imageItems = (post.images || []).map(url => ({ url, type: 'image/jpeg' }));
+// const videoItems = post.videos || [];
+// const pdfItems   = post.pdfs   || [];
+// const allMedia   = [...imageItems, ...videoItems, ...pdfItems];
+
+// const allMedia = (post.mediaWithComments || []).map(m => {
+//   if (m.type === 'image') {
+//     return { ...m, type: 'image/jpeg' };
+//   }
+//   if (m.type === 'video') {
+//     return { ...m, type: 'video/mp4' };
+//   }
+//   if (m.type === 'pdf') {
+//     return { ...m, type: 'application/pdf' };
+//   }
+//   return m;
+// });
+const allMedia = (post.mediaWithComments || []).map(m => {
+  const type = m.type === 'image' ? 'image/jpeg'
+             : m.type === 'video' ? 'video/mp4'
+             : m.type === 'pdf'   ? 'application/pdf'
+             : m.type;
+  return { ...m, type, liked: false };  //  ADD liked: false
+});
+const [mediaState, setMediaState] = useState(allMedia);
 
 // ALL media goes into the same grid
 // const [heroItem, ...restItems] = allMedia;
@@ -179,13 +229,13 @@ let heroItem = null;
 let gridItems = [];
 let extraCount = 0;
 
-if (allMedia.length === 1) {
-  heroItem = allMedia[0];
-} else if (allMedia.length === 2) {
-  gridItems = allMedia; //  both side by side
+if (mediaState.length === 1) {
+  heroItem = mediaState[0];
+} else if (mediaState.length === 2) {
+  gridItems = mediaState; //  both side by side
 } else {
-  heroItem = allMedia[0];
-  const restItems = allMedia.slice(1);
+  heroItem = mediaState[0];
+  const restItems = mediaState.slice(1);
   gridItems = restItems.slice(0, 3);
   extraCount = restItems.length > 3 ? restItems.length - 3 : 0;
 }
@@ -204,7 +254,40 @@ if (allMedia.length === 1) {
     setLikes(n => liked ? n - 1 : n + 1);
   };
 
-  const addComment = () => {
+//   const addComment = () => {
+//   if (!commentInput.trim()) return;
+
+//   const newComment = {
+//     id: Date.now(),
+//     name: "You",
+//     text: commentInput
+//   };
+
+//   setCommentsList(prev => [...prev, newComment]);
+//   setCommentInput('');
+// };
+
+// const addComment = () => {
+//   if (!commentInput.trim()) return;
+
+//   const newComment = {
+//     id: Date.now(),
+//     name: "You",
+//     text: commentInput
+//   };
+
+//   // Update merged (FEED)
+//   setCommentsList(prev => [...prev, newComment]);
+
+//   // Update current media (LIGHTBOX)
+//   if (lightbox !== null) {
+//     allMedia[lightbox].comments.push(newComment);
+//   }
+
+//   setCommentInput('');
+// };
+
+const addComment = () => {
   if (!commentInput.trim()) return;
 
   const newComment = {
@@ -213,14 +296,59 @@ if (allMedia.length === 1) {
     text: commentInput
   };
 
+  // Update FEED (merged)
   setCommentsList(prev => [...prev, newComment]);
+
+  // Update MEDIA (IMMUTABLE)
+  if (lightbox !== null) {
+    // setMediaState(prev => {
+    //   const updated = [...prev];
+    //   updated[lightbox] = {
+    //     ...updated[lightbox],
+    //     comments: [...(updated[lightbox].comments || []), newComment]
+    //   };
+    //   return updated;
+    // });
+    setMediaState(prev => {
+  if (lightbox === null) return prev;
+
+  const updated = [...prev];
+
+  const currentItem = updated[lightbox] || {};
+  
+  updated[lightbox] = {
+    ...currentItem,
+    comments: [...(currentItem.comments || []), newComment]
+  };
+
+  return updated;
+});
+  }
+
   setCommentInput('');
+};
+
+const toggleMediaLike = (index) => {
+  setMediaState(prev => {
+    const updated = [...prev];
+    const item = updated[index];
+    const wasLiked = item.liked;
+    updated[index] = {
+      ...item,
+      liked: !wasLiked,
+      stats: {
+        ...item.stats,
+        likes: wasLiked ? item.stats.likes - 1 : item.stats.likes + 1
+      }
+    };
+    return updated;
+  });
 };
 
   // Grid image click → open lightbox at hero(0) + grid offset
   // const openLightbox = (imgIndex) => setLightbox(imgIndex);
   const openLightbox = (imgIndex) => {
-  if (imgIndex >= allMedia.length) return;
+  if (imgIndex >= mediaState.length) return;
   setLightbox(imgIndex);
 };
 
@@ -349,7 +477,7 @@ if (allMedia.length === 1) {
         <div class="feed-comments">
 
           <!-- Existing comments -->
-          ${post.commentsList && post.commentsList
+          ${commentsList
             .slice(0, config.maxCommentsVisible)
             .map(c => html`
             <div class="feed-comment">
@@ -390,11 +518,11 @@ if (allMedia.length === 1) {
       <!-- Lightbox -->
       ${!config.disableLightbox && lightbox !== null && html`
         <${Lightbox}
-          
-          mediaItems=${allMedia}
+          toggleMediaLike=${toggleMediaLike}
+          mediaItems=${mediaState}
           startIndex=${lightbox}
           onClose=${() => setLightbox(null)}
-          commentsList=${commentsList}
+          commentsList=${mediaState[lightbox]?.comments || []}
           commentInput=${commentInput}
           setCommentInput=${setCommentInput}
           addComment=${addComment}
@@ -427,35 +555,190 @@ function Feed({ config }) {
     // fetch('/data/post.json')
     fetch(POSTS_API)
       .then(res => res.json())
-      .then(data =>setPosts(data))
+      // .then(data =>setPosts(data))
+      .then(data => {
+        const transformed = data.map(transformPost);
+        setPosts(transformed);
+      })
       .catch(err => console.error('Error loading posts:', err));
 
+    // const handler = (e) => {
+    //   const { title, text, files = [] } = e.detail;
+    //   const mediaItems = files.map(file => ({
+    //     url: URL.createObjectURL(file),
+    //     type: file.type,
+    //     name: file.name,
+    //   }));
+    //   const newPost = {
+    //     id: Date.now(),
+    //     name: "You",
+    //     role: "Employee",
+    //     time: "now",
+    //     title: e.detail.title,
+    //     text: e.detail.text,
+    //     likes: 0,
+    //     comments: 0,
+    //     // images: []
+    //     images: mediaItems.filter(m => m.type.startsWith('image/')).map(m => m.url),
+    //     videos: mediaItems.filter(m => m.type.startsWith('video/')),
+    //     pdfs:   mediaItems.filter(m => m.type === 'application/pdf'),
+    //   };
+    //   setPosts(prev => [newPost, ...prev]);
+    // };
     const handler = (e) => {
-      const { title, text, files = [] } = e.detail;
-      const mediaItems = files.map(file => ({
-        url: URL.createObjectURL(file),
-        type: file.type,
-        name: file.name,
-      }));
-      const newPost = {
-        id: Date.now(),
-        name: "You",
-        role: "Employee",
-        time: "now",
-        title: e.detail.title,
-        text: e.detail.text,
-        likes: 0,
-        comments: 0,
-        // images: []
-        images: mediaItems.filter(m => m.type.startsWith('image/')).map(m => m.url),
-        videos: mediaItems.filter(m => m.type.startsWith('video/')),
-        pdfs:   mediaItems.filter(m => m.type === 'application/pdf'),
-      };
-      setPosts(prev => [newPost, ...prev]);
-    };
+    const apiPost = e.detail;
+
+    const transformed = transformPost(apiPost);
+
+    setPosts(prev => [transformed, ...prev]);
+  };
+
+
     window.addEventListener('create-post', handler);
     return () => window.removeEventListener('create-post', handler);
   }, []);
+
+//   function transformPost(apiPost) {
+//   const media = apiPost.content?.media || [];
+
+//   const images = [];
+//   const videos = [];
+//   const pdfs = [];
+//   let commentsList = [];
+//   let totalLikes = 0;
+
+//   media.forEach((m) => {
+//     // normalize URL (important if backend is relative)
+//     const fullUrl = m.url.startsWith('http')
+//       ? m.url
+//       : `${getBackendBaseUrl()}${m.url}`;
+
+//     if (m.type === 'image') {
+//       images.push(fullUrl);
+//     } else if (m.type === 'video') {
+//       videos.push({
+//         url: fullUrl,
+//         type: 'video/mp4'
+//       });
+//     } else if (m.type === 'pdf') {
+//       pdfs.push({
+//         url: fullUrl,
+//         type: 'application/pdf',
+//         name: m.name
+//       });
+//     }
+
+//     // comments
+//     if (m.comments) {
+//       commentsList = [
+//         ...commentsList,
+//         ...m.comments.map(c => ({
+//           id: c._id,
+//           name: c.author?.name || 'User',
+//           text: c.text
+//         }))
+//       ];
+//     }
+
+//     // likes
+//     totalLikes += m.stats?.likes || 0;
+//   });
+
+//   return {
+//     id: apiPost._id,
+//     name: apiPost.author?.name || 'User',
+//     role: apiPost.author?.role || '',
+//     time: new Date(apiPost.createdAt).toLocaleString(),
+//     title: apiPost.content?.title,
+//     text: apiPost.content?.text,
+//     likes: totalLikes,
+//     commentsList,
+//     images,
+//     videos,
+//     pdfs
+//   };
+// }
+
+function transformPost(apiPost) {
+  const media = apiPost.content?.media || [];
+
+  const images = [];
+  const videos = [];
+  const pdfs = [];
+  const mediaWithComments = [];
+  let commentsList = [];
+  let totalLikes = 0;
+
+  media.forEach((m) => {
+    // const fullUrl = m.url.startsWith('http')
+    //   ? m.url
+    //   : `${getBackendBaseUrl()}${m.url}`;
+
+    const fullUrl =
+  m.url.startsWith('http') || m.url.startsWith('blob:')
+    ? m.url
+    : `${getBackendBaseUrl()}${m.url}`;
+
+    // MEDIA TYPE MAPPING (IMPORTANT FIX)
+    if (m.type === 'image') {
+      images.push(fullUrl);
+    } else if (m.type === 'video') {
+      videos.push({
+        url: fullUrl,
+        type: 'video/mp4'
+      });
+    } else if (m.type === 'pdf') {
+      pdfs.push({
+        url: fullUrl,
+        type: 'application/pdf',
+        name: m.name
+      });
+    }
+
+    mediaWithComments.push({
+      type: m.type,
+      url: fullUrl,
+      name: m.name,
+      stats: m.stats || { likes: 0, commentsCount: 0 },
+      comments: (m.comments || []).map(c => ({
+        id: c._id,
+        name: c.author?.name || 'User',
+        text: c.text
+      }))
+    });
+
+    // COMMENTS
+    if (m.comments) {
+      commentsList = [
+        ...commentsList,
+        ...m.comments.map(c => ({
+          id: c._id,
+          name: c.author?.name || 'User',
+          text: c.text
+        }))
+      ];
+    }
+
+    // LIKES
+    totalLikes += m.stats?.likes || 0;
+  });
+
+  return {
+    id: apiPost._id,
+    name: apiPost.author?.name || 'User',
+    role: apiPost.author?.role || '',
+    time: new Date(apiPost.createdAt).toLocaleString(),
+    title: apiPost.content?.title || "",
+    text: apiPost.content?.text || "",
+    likes: totalLikes,
+    commentsList,
+    images,
+    videos,
+    pdfs,
+    mediaWithComments
+  };
+}
+
 
   // IntersectionObserver — reads latest posts/visibleCount via refs
   const postsRef       = useRef(posts);
@@ -540,4 +823,3 @@ export default function decorate(block) {
 
   render(html`<${Feed} config=${config} />`, block);
 }
-
