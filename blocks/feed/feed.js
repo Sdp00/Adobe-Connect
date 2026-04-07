@@ -544,11 +544,19 @@ function Feed({ config }) {
 
   // const POSTS_API = `${getBackendBaseUrl()}/data/post.json`;
 
+  // const POSTS_API = config.dataUrl
+  // ? (config.dataUrl.startsWith('http')
+  //     ? config.dataUrl
+  //     : `${getBackendBaseUrl()}${config.dataUrl}`)
+  // : `${getBackendBaseUrl()}/data/post.json`;
+
+  const baseUrl = getBackendBaseUrl();
+
   const POSTS_API = config.dataUrl
   ? (config.dataUrl.startsWith('http')
       ? config.dataUrl
-      : `${getBackendBaseUrl()}${config.dataUrl}`)
-  : `${getBackendBaseUrl()}/data/post.json`;
+      : `${baseUrl || ''}${config.dataUrl}`)
+  : `${baseUrl || ''}/data/post.json`;
 
   // Load JSON once
   useEffect(() => {

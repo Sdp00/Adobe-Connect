@@ -5,5 +5,5 @@ export default function getBackendBaseUrl() {
 
   return envUrl && envUrl.trim() !== ''
     ? envUrl.replace(/\/$/, '')
-    : 'http://localhost:3000';
+    : '';
 }
