@@ -1,7 +1,7 @@
 /* ============================================================
    NOMINATIONS BLOCK — Adobe Connect EDS
    ============================================================ */
-
+ 
 /* ── Page heading ────────────────────────────────────────── */
 .nom-heading {
   font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
@@ -10,16 +10,16 @@
   color: var(--spectrum-text-primary, #2c2c2c);
   margin: 0 0 32px;
 }
-
+ 
 html[data-theme="dark"] .nom-heading {
   color: #fff;
 }
-
+ 
 /* ── Category section ────────────────────────────────────── */
 .nom-section {
   margin-bottom: 48px;
 }
-
+ 
 .nom-section-label {
   font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
   font-size: 11px;
@@ -31,43 +31,61 @@ html[data-theme="dark"] .nom-heading {
   padding-bottom: 10px;
   border-bottom: 1px solid var(--spectrum-border-divider, #eaeaea);
 }
-
+ 
 html[data-theme="dark"] .nom-section-label {
   color: #b3b3b3;
   border-bottom-color: #333;
 }
-
+ 
+/* ── Section + block container ───────────────────────────── */
+.section.nominations-container {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+ 
+.nominations.block {
+  width: 100%;
+  box-sizing: border-box;
+}
+ 
 /* ── Grid — 3 columns desktop ────────────────────────────── */
 .nom-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: stretch;
 }
-
+ 
 /* ── Card ────────────────────────────────────────────────── */
 .nom-card {
   background: var(--spectrum-gray-50, #fff);
   border-radius: 16px;
   box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
-  padding: 28px 20px 24px;
+  padding: 32px 24px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   transition: box-shadow 0.2s, transform 0.2s;
   box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
 }
-
+ 
 .nom-card:hover {
   box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
   transform: translateY(-3px);
 }
-
+ 
 html[data-theme="dark"] .nom-card {
   background: #1e1e1e;
   box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
 }
-
+ 
 /* ── Avatar ──────────────────────────────────────────────── */
 .nom-avatar-wrap {
   width: 96px;
@@ -78,18 +96,18 @@ html[data-theme="dark"] .nom-card {
   flex-shrink: 0;
   box-shadow: 0 0 0 3px var(--spectrum-gray-200, #eaeaea);
 }
-
+ 
 html[data-theme="dark"] .nom-avatar-wrap {
   box-shadow: 0 0 0 3px #333;
 }
-
+ 
 .nom-avatar-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
-
+ 
 .nom-avatar-fallback {
   width: 100%;
   height: 100%;
@@ -102,7 +120,7 @@ html[data-theme="dark"] .nom-avatar-wrap {
   color: #fff;
   letter-spacing: -1px;
 }
-
+ 
 /* ── Name ────────────────────────────────────────────────── */
 .nom-name {
   font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
@@ -112,11 +130,11 @@ html[data-theme="dark"] .nom-avatar-wrap {
   margin: 0 0 6px;
   line-height: 1.3;
 }
-
+ 
 html[data-theme="dark"] .nom-name {
   color: #fff;
 }
-
+ 
 /* ── Role ────────────────────────────────────────────────── */
 .nom-role {
   font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
@@ -125,11 +143,11 @@ html[data-theme="dark"] .nom-name {
   color: var(--spectrum-text-secondary, #8e8e8e);
   margin: 0 0 14px;
 }
-
+ 
 html[data-theme="dark"] .nom-role {
   color: #b3b3b3;
 }
-
+ 
 /* ── Category badge ──────────────────────────────────────── */
 .nom-badge {
   display: inline-flex;
@@ -143,50 +161,51 @@ html[data-theme="dark"] .nom-role {
   font-weight: 600;
   margin-top: auto;
 }
-
+ 
 html[data-theme="dark"] .nom-badge {
   background: #3f1212;
   color: #fca5a5;
 }
-
+ 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
-
-/* Tablet — 2 columns */
+ 
+/* Tablet — 2 columns (601px – 1024px) */
 @media (width <= 1024px) {
   .nom-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 20px;
   }
 }
-
-/* Mobile — 1 column */
-@media (width <= 640px) {
+ 
+/* Mobile — 1 column (up to 600px) */
+@media (width <= 600px) {
   .nom-heading {
     font-size: 22px;
+    margin-bottom: 24px;
   }
-
+ 
   .nom-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 16px;
   }
-
+ 
   .nom-card {
-    padding: 22px 18px;
+    padding: 24px 20px;
   }
-
+ 
   .nom-section-label {
     font-size: 10px;
   }
-
+ 
   .nom-avatar-wrap {
     width: 80px;
     height: 80px;
   }
-
+ 
   .nom-avatar-fallback {
     font-size: 26px;
   }
-
+ 
   .nom-name {
     font-size: 16px;
   }
