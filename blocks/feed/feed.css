@@ -485,6 +485,7 @@ opacity: 0.65;
 .lightbox-comments {
   flex: 1;
   overflow-y: auto;
+  margin-top: 10px;
 }
 
 /* INPUT */
