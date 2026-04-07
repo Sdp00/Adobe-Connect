@@ -2,7 +2,7 @@
 /* =============================================================
    Right Panel Layout — styles/rightpanel.css
    ============================================================= */
-
+ 
 main {
   display: flex !important;
   flex-direction: row !important;
@@ -12,12 +12,12 @@ main {
   margin: 0 auto;
   box-sizing: border-box;
 }
-
+ 
 main > .section.post-bar-container {
   flex: 1 1 auto !important;
   min-width: 0 !important;
 }
-
+ 
 main > .section.calendar-container {
   flex: 0 0 340px !important;
   width: 340px !important;
@@ -28,7 +28,7 @@ main > .section.calendar-container {
   display: flex !important;
   flex-direction: column !important;
   gap: 16px !important;
-
+ 
   /* ── The sticky recipe ──────────────────────────────────────
      ──────────────────────────────────────────────────────── */
   position: sticky !important;
@@ -38,20 +38,13 @@ main > .section.calendar-container {
   height: auto !important;
   max-height: none !important;
   overflow: visible !important;
-  overflow-y: visible !important;
   scrollbar-width: auto !important;
 }
-
+ 
 main > .section.calendar-container::-webkit-scrollbar {
   display: none !important;
 }
-
-main > .section.calendar-container > .calendar-wrapper,
-main > .section.calendar-container > .upcoming-wrapper,
-main > .section.calendar-container > .trends-wrapper,
-main > .section.calendar-container > .newsletters-wrapper,
-main > .section.calendar-container > .attributes-wrapper,
-main > .section.calendar-container > .fragment-wrapper,
+ 
 .fragment .newsletters-wrapper,
 .fragment .trends-wrapper,
 .fragment .insights-wrapper,
@@ -60,16 +53,27 @@ main > .section.calendar-container > .fragment-wrapper,
   padding: 0 !important;
   width: 100% !important;
 }
-
+ 
 .fragment .insights-wrapper + .insights-wrapper {
   margin-top: 16px !important;
 }
-
+ 
+main > .section.calendar-container > .calendar-wrapper,
+main > .section.calendar-container > .upcoming-wrapper,
+main > .section.calendar-container > .trends-wrapper,
+main > .section.calendar-container > .newsletters-wrapper,
+main > .section.calendar-container > .attributes-wrapper,
+main > .section.calendar-container > .fragment-wrapper {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+ 
 @media (width <= 1024px) {
   main {
     flex-direction: column !important;
   }
-
+ 
   main > .section.calendar-container {
     flex: unset !important;
     width: 100% !important;
@@ -80,7 +84,7 @@ main > .section.calendar-container > .fragment-wrapper,
     overflow: visible !important;
   }
 }
-
+ 
 /* ── Mobile: hide entire right panel section ── */
 @media (width <= 768px) {
   .section.calendar-container {
@@ -90,16 +94,21 @@ main > .section.calendar-container > .fragment-wrapper,
   .upcoming-wrapper,
   .trends-wrapper,
   .newsletters-wrapper,
-  .attributes-wrapper {
+  .attributes-wrapper,
+  .fragment-wrapper {
+    display: none !important;
+  }
+
+  .section.calendar-container .insights-wrapper {
     display: none !important;
   }
 }
-
+ 
 /* ── Calendar popover trigger ── */
 .cal-popover-mount {
   display: none;
 }
-
+ 
 .cal-popover__trigger {
   background: none;
   border: none;
@@ -109,14 +118,14 @@ main > .section.calendar-container > .fragment-wrapper,
   align-items: center;
   justify-content: center;
 }
-
+ 
 .cal-popover__backdrop {
   position: fixed;
   inset: 0;
   z-index: 999;
   background: rgb(0 0 0 / 30%);
 }
-
+ 
 .cal-popover__panel {
   position: fixed;
   top: 60px;
@@ -132,32 +141,32 @@ main > .section.calendar-container > .fragment-wrapper,
   box-sizing: border-box;
   animation: cal-slide-in 0.2s ease;
 }
-
+ 
 @keyframes cal-slide-in {
   from {
     opacity: 0;
     transform: translateX(-50%) translateY(-8px);
   }
-
+ 
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
 }
-
+ 
 .cal-popover__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
 }
-
+ 
 .cal-popover__label {
   font-size: 15px;
   font-weight: 700;
   color: #1a1a1a;
 }
-
+ 
 .cal-popover__close {
   background: none;
   border: none;
@@ -169,22 +178,22 @@ main > .section.calendar-container > .fragment-wrapper,
   border-radius: 6px;
   transition: background 0.15s;
 }
-
+ 
 .cal-popover__close:hover {
   background: #f3f3f3;
   color: #333;
 }
-
+ 
 @media (width <= 768px) {
   .cal-popover-mount {
     display: block;
   }
-
+ 
   .section.calendar-container .calendar-wrapper {
     display: none;
   }
 }
-
+ 
 @media (width >= 769px) {
   .cal-popover__trigger,
   .cal-popover__backdrop,
@@ -192,7 +201,7 @@ main > .section.calendar-container > .fragment-wrapper,
     display: none !important;
   }
 }
-
+ 
 /* =============================================================
    Dark theme — all right panel blocks
    ============================================================= */
@@ -203,157 +212,157 @@ main > .section.calendar-container > .fragment-wrapper,
   background: #1e1e1e;
   box-shadow: 0 1px 4px rgb(0 0 0 / 30%), 0 0 0 1px rgb(255 255 255 / 8%);
 }
-
+ 
 [data-theme="dark"] .calendar-block__title,
 [data-theme="dark"] .calendar-block__month {
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .calendar-block__dayname {
   color: #666;
 }
-
+ 
 [data-theme="dark"] .calendar-block__num {
   color: #ccc;
 }
-
+ 
 [data-theme="dark"] .calendar-block__cell--faded .calendar-block__num {
   color: #444;
 }
-
+ 
 [data-theme="dark"] .calendar-block__legend {
   color: #888;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__title {
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__card {
   border-color: #333;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__event-title {
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__meta li {
   color: #aaa;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__icon {
   filter: brightness(0) invert(1);
 }
-
+ 
 [data-theme="dark"] .upcoming-block__arrow {
   border-color: #444;
   color: #ccc;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__arrow:not(:disabled):hover {
   background: #2a2a2a;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__dot {
   background: #444;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__btn-decline {
   border-color: #e63535;
   color: #e63535;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__btn-decline:hover {
   background: #2a1a1a;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__status--accepted {
   background: #052e1c;
   color: #34d399;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__status--declined {
   background: #2a1a1a;
   color: #f87171;
 }
-
+ 
 [data-theme="dark"] .trends-block__title {
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .trends-block__item {
   border-top-color: #2a2a2a;
 }
-
+ 
 [data-theme="dark"] .trends-block__thumb {
   background: #2a1a1a;
 }
-
+ 
 [data-theme="dark"] .trends-block__item-title {
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .trends-block__meta {
   color: #666;
 }
-
+ 
 [data-theme="dark"] .trends-block__sep {
   color: #444;
 }
-
+ 
 [data-theme="dark"] .newsletters-block__title {
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .newsletters-block__item {
   border-top-color: #2a2a2a;
   border-left-color: #1d4ed8;
 }
-
+ 
 [data-theme="dark"] .newsletters-block__thumb {
   background: #1a2035;
 }
-
+ 
 [data-theme="dark"] .newsletters-block__item-title {
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .newsletters-block__meta {
   color: #666;
 }
-
+ 
 [data-theme="dark"] .newsletters-block__sep {
   color: #444;
 }
-
+ 
 [data-theme="dark"] .newsletters-block__read-time {
   color: #555;
 }
-
+ 
 [data-theme="dark"] .cal-popover__panel {
   background: #1e1e1e;
   box-shadow: 0 8px 40px rgb(0 0 0 / 50%);
 }
-
+ 
 [data-theme="dark"] .cal-popover__label {
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .cal-popover__close {
   color: #888;
 }
-
+ 
 [data-theme="dark"] .cal-popover__close:hover {
   background: #2a2a2a;
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__decline-textarea {
   background: #2a2a2a;
   border-color: #444;
   color: #f0f0f0;
 }
-
+ 
 [data-theme="dark"] .upcoming-block__decline-textarea:focus {
   border-color: #e63535;
 }

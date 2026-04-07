@@ -12,10 +12,11 @@ export default function decorate(block) {
   if (block.classList.contains('industry-updates')) type = 'industry-updates';
   else if (block.classList.contains('newsletter')) type = 'newsletter';
 
-  const isPage = window.location.pathname.includes('/newsletter')
-    || window.location.pathname.includes('/industry-updates');
+  const path = window.location.pathname;
+  const isPage = path.includes('/newsletter') || path.includes('/industry-updates');
 
   if (isPage) {
+    block.classList.add('ins-page');
     renderPageCards(block, items, type);
   } else {
     renderFeedBlock(block, items, type);
@@ -23,7 +24,7 @@ export default function decorate(block) {
 }
 
 function renderPageCards(block, items, type) {
-  const accentColor = type === 'industry-updates' ? '#e8412a' : '#0369a1';
+  const accentColor = '#e8412a';
   const heading = type === 'industry-updates' ? 'Industry Updates' : 'Newsletter';
 
   block.innerHTML = `

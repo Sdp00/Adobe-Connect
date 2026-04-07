@@ -3,7 +3,7 @@
    Upcoming Block — Spectrum design tokens
    Buttons powered by /styles/buttons.css (.btn system)
    ============================================================= */
-
+ 
 .upcoming-block {
   background: var(--spectrum-gray-50);
   border-radius: var(--spectrum-corner-radius-200, 8px);
@@ -12,39 +12,39 @@
   font-family: var(--spectrum-sans-font-family-stack, 'Adobe Clean', adobe-clean, ui-sans-serif, system-ui, sans-serif);
   position: relative;
 }
-
+ 
 .upcoming-block__title {
   font-size: var(--spectrum-font-size-300, 18px);
   font-weight: var(--spectrum-bold-font-weight, 700);
   color: var(--spectrum-gray-900, #1a1a1a);
   margin: 0 0 var(--spectrum-spacing-300, 12px);
 }
-
+ 
 /* ── Card ── */
 .upcoming-block__card {
   border-radius: var(--spectrum-corner-radius-200, 8px);
   overflow: hidden;
   border: 1px solid var(--spectrum-gray-300, #e0e0e0);
 }
-
+ 
 .upcoming-block__visual {
   height: 120px;
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4c1d95 100%);
   position: relative;
   overflow: hidden;
 }
-
+ 
 .upcoming-block__visual--training {
   background: linear-gradient(135deg, #064e3b 0%, #065f46 45%, #047857 100%);
 }
-
+ 
 .upcoming-block__visual::before,
 .upcoming-block__visual::after {
   content: '';
   position: absolute;
   border-radius: 50%;
 }
-
+ 
 .upcoming-block__visual::before {
   width: 110px;
   height: 110px;
@@ -52,7 +52,7 @@
   right: -22px;
   top: -28px;
 }
-
+ 
 .upcoming-block__visual::after {
   width: 64px;
   height: 64px;
@@ -60,7 +60,7 @@
   right: 28px;
   bottom: -10px;
 }
-
+ 
 /* Tag badge */
 .upcoming-block__tag {
   position: absolute;
@@ -74,37 +74,37 @@
   border-radius: var(--spectrum-corner-radius-full, 9999px);
   z-index: 1;
 }
-
+ 
 .upcoming-block__tag--upcoming-event {
   background: var(--spectrum-informative-color-700, #1d4ed8);
   color: #fff;
 }
-
+ 
 .upcoming-block__tag--upcoming-training {
   background: var(--spectrum-positive-color-700, #059669);
   color: #fff;
 }
-
+ 
 .upcoming-block__tag--today {
   background: var(--spectrum-negative-color-700, #e63535);
   color: #fff;
 }
-
+ 
 .upcoming-block__tag--event {
   background: var(--spectrum-notice-color-700, #d97706);
   color: #fff;
 }
-
+ 
 .upcoming-block__tag--training {
   background: var(--spectrum-positive-color-700, #059669);
   color: #fff;
 }
-
+ 
 /* Card body */
 .upcoming-block__body {
   padding: var(--spectrum-spacing-300, 12px) var(--spectrum-spacing-400, 16px);
 }
-
+ 
 .upcoming-block__event-title {
   font-size: var(--spectrum-font-size-200, 16px);
   font-weight: var(--spectrum-bold-font-weight, 700);
@@ -112,7 +112,7 @@
   margin: 0 0 var(--spectrum-spacing-200, 8px);
   line-height: var(--spectrum-line-height-100, 1.3);
 }
-
+ 
 .upcoming-block__meta {
   list-style: none;
   padding: 0;
@@ -121,7 +121,7 @@
   flex-direction: column;
   gap: var(--spectrum-spacing-100, 6px);
 }
-
+ 
 .upcoming-block__meta li {
   display: flex;
   align-items: center;
@@ -129,7 +129,7 @@
   font-size: var(--spectrum-font-size-75, 12px);
   color: var(--spectrum-gray-700, #6e6e6e);
 }
-
+ 
 .upcoming-block__icon {
   width: 14px;
   height: 14px;
@@ -137,7 +137,7 @@
   opacity: 0.55;
   filter: brightness(0);
 }
-
+ 
 /* ── I'm Interested button
      Base styles from .btn in buttons.css
      Usage: <button class="btn upcoming-block__btn">I'm Interested</button>
@@ -149,20 +149,21 @@
   border-radius: var(--spectrum-corner-radius-full, 9999px);
   font-size: var(--spectrum-font-size-100, 14px);
   letter-spacing: 0.01em;
+ 
   /* background, color, font-weight, cursor, transition inherited from .btn */
 }
-
+ 
 /* Confirmed "interested" state — switch to green */
 .upcoming-block__btn--active,
 .upcoming-block__btn--active:hover {
   background: var(--spectrum-positive-color-700, #059669);
   transform: none;
 }
-
+ 
 .upcoming-block__btn--active:hover {
   background: var(--spectrum-positive-color-800, #047857);
 }
-
+ 
 /* ── Accept / Decline group
      Usage:
        <button class="btn upcoming-block__btn-accept">Accept</button>
@@ -172,7 +173,7 @@
   display: flex;
   gap: var(--spectrum-spacing-200, 8px);
 }
-
+ 
 /* Accept — inherits .btn red fill; size overrides only */
 .upcoming-block__btn-accept {
   flex: 1;
@@ -180,29 +181,19 @@
   padding: 0 var(--spectrum-spacing-300, 12px);
   border-radius: var(--spectrum-corner-radius-full, 9999px);
   font-size: var(--spectrum-font-size-100, 14px);
+ 
   /* background & color from .btn */
 }
-
-/* Decline — ghost/outlined; overrides .btn fill */
+ 
+/* Decline — uses .btn-outline from styles/buttons.css; size overrides only */
 .upcoming-block__btn-decline {
   flex: 1;
   height: var(--spectrum-component-height-100, 32px);
   padding: 0 var(--spectrum-spacing-300, 12px);
-  background: transparent;
-  border: 2px solid var(--spectrum-gray-400, #c0c0c0);
-  color: var(--spectrum-gray-800, #333);
   border-radius: var(--spectrum-corner-radius-full, 9999px);
   font-size: var(--spectrum-font-size-100, 14px);
-  transition: border-color 0.13s, color 0.13s, background 0.13s;
 }
-
-.upcoming-block__btn-decline:hover {
-  background: transparent;
-  border-color: var(--spectrum-negative-color-700, #e63535);
-  color: var(--spectrum-negative-color-700, #e63535);
-  transform: none;
-}
-
+ 
 /* ── Status badges ── */
 .upcoming-block__status {
   padding: var(--spectrum-spacing-200, 8px) var(--spectrum-spacing-300, 12px);
@@ -211,19 +202,19 @@
   font-weight: var(--spectrum-bold-font-weight, 700);
   text-align: center;
 }
-
+ 
 .upcoming-block__status--accepted {
   background: var(--spectrum-positive-color-100, #ecfdf5);
   color: var(--spectrum-positive-color-900, #059669);
   border: 1px solid var(--spectrum-positive-color-300, #a7f3d0);
 }
-
+ 
 .upcoming-block__status--declined {
   background: var(--spectrum-negative-color-100, #fef2f2);
   color: var(--spectrum-negative-color-900, #e63535);
   border: 1px solid var(--spectrum-negative-color-300, #fca5a5);
 }
-
+ 
 /* ── Carousel nav ── */
 .upcoming-block__nav {
   display: flex;
@@ -232,7 +223,7 @@
   gap: var(--spectrum-spacing-200, 8px);
   margin-top: var(--spectrum-spacing-300, 12px);
 }
-
+ 
 .upcoming-block__arrow {
   background: var(--spectrum-gray-100, #fff);
   border: 1px solid var(--spectrum-gray-300, #e0e0e0);
@@ -248,28 +239,34 @@
   flex-shrink: 0;
   padding: 0;
 }
-
+ 
 .upcoming-block__arrow:disabled {
   opacity: 0.3;
   cursor: default;
 }
-
+ 
+[data-theme="dark"] .upcoming-block__arrow {
+  background: var(--spectrum-gray-200, #2a2a2a);
+  border-color: var(--spectrum-gray-300, #3a3a3a);
+  color: var(--spectrum-gray-700, #aaa);
+}
+ 
 .upcoming-block__arrow:not(:disabled):hover {
   background: var(--spectrum-gray-200, #f5f5f5);
   border-color: var(--spectrum-gray-400, #c0c0c0);
 }
-
+ 
 .upcoming-block__arrow svg {
   display: block;
   pointer-events: none;
 }
-
+ 
 .upcoming-block__dots {
   display: flex;
   gap: var(--spectrum-spacing-100, 6px);
   align-items: center;
 }
-
+ 
 .upcoming-block__dot {
   width: 6px;
   height: 6px;
@@ -280,12 +277,12 @@
   cursor: pointer;
   transition: background 0.13s, transform 0.13s;
 }
-
+ 
 .upcoming-block__dot--active {
   background: var(--spectrum-accent-color-700, #e63535);
   transform: scale(1.4);
 }
-
+ 
 /* ── Decline textarea ── */
 .upcoming-block__decline-textarea {
   width: 100%;
@@ -302,44 +299,36 @@
   line-height: var(--spectrum-line-height-100, 1.5);
   background: var(--spectrum-gray-100, #fff);
 }
-
+ 
 .upcoming-block__decline-textarea:focus {
   border-color: var(--spectrum-accent-color-700, #e63535);
   box-shadow: 0 0 0 1px var(--spectrum-accent-color-700, #e63535);
 }
-
+ 
 /* ── Dark theme ── */
 [data-theme="dark"] .upcoming-block {
   background: var(--spectrum-gray-100, #1e1e1e);
   border-color: var(--spectrum-gray-300, #3a3a3a);
 }
-
+ 
 [data-theme="dark"] .upcoming-block__title,
 [data-theme="dark"] .upcoming-block__event-title {
   color: var(--spectrum-gray-900, #f0f0f0);
 }
-
+ 
 [data-theme="dark"] .upcoming-block__meta li {
   color: var(--spectrum-gray-600, #999);
 }
-
+ 
 [data-theme="dark"] .upcoming-block__card {
   border-color: var(--spectrum-gray-300, #3a3a3a);
 }
-
-[data-theme="dark"] .upcoming-block__arrow {
-  background: var(--spectrum-gray-200, #2a2a2a);
-  border-color: var(--spectrum-gray-300, #3a3a3a);
-  color: var(--spectrum-gray-700, #aaa);
-}
-
-[data-theme="dark"] .upcoming-block__btn-decline {
-  border-color: var(--spectrum-gray-500, #555);
-  color: var(--spectrum-gray-800, #ccc);
-}
-
+ 
+/* Decline button dark mode handled by .btn-outline in styles/buttons.css */
+ 
 [data-theme="dark"] .upcoming-block__decline-textarea {
   background: var(--spectrum-gray-200, #2a2a2a);
   border-color: var(--spectrum-gray-400, #555);
   color: var(--spectrum-gray-900, #f0f0f0);
 }
+ 
