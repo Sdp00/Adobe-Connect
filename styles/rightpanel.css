@@ -95,8 +95,11 @@ main > .section.calendar-container > .fragment-wrapper {
   .trends-wrapper,
   .newsletters-wrapper,
   .attributes-wrapper,
-  .insights-wrapper,
   .fragment-wrapper {
+    display: none !important;
+  }
+
+  .section.calendar-container .insights-wrapper {
     display: none !important;
   }
 }
