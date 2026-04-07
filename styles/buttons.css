@@ -50,3 +50,29 @@
 .btn-danger:hover {
   background: #b91c1c;
 }
+ 
+/* ── Ghost / Outline variant (e.g. Decline button) ── */
+.btn-outline {
+  background: transparent;
+  border: 2px solid #c0c0c0;
+  color: #333;
+}
+ 
+.btn-outline:hover {
+  background: transparent;
+  border-color: #dc2626;
+  color: #dc2626;
+  transform: none;
+}
+ 
+[data-theme="dark"] .btn-outline {
+  background: transparent;
+  border-color: #888;
+  color: #ddd;
+}
+ 
+[data-theme="dark"] .btn-outline:hover {
+  background: transparent;
+  border-color: #e63535;
+  color: #e63535;
+}
