@@ -1,0 +1,146 @@
+{
+  "eventInterest": [
+    {
+      "eventId": 1,
+      "interested": 14,
+      "interestedUsers": [
+        { "name": "Ananya Krishnan",  "email": "ananya.k@adobe.com" },
+        { "name": "Riya Mehta",       "email": "riya.mehta@adobe.com" },
+        { "name": "Karthik Suresh",   "email": "karthik.s@adobe.com" },
+        { "name": "Priya Nair",       "email": "priya.nair@adobe.com" },
+        { "name": "Vikram Desai",     "email": "vikram.d@adobe.com" },
+        { "name": "Sneha Iyer",       "email": "sneha.iyer@adobe.com" },
+        { "name": "Arjun Patel",      "email": "arjun.p@adobe.com" },
+        { "name": "Divya Sharma",     "email": "divya.s@adobe.com" },
+        { "name": "Rahul Verma",      "email": "rahul.v@adobe.com" },
+        { "name": "Meera Nambiar",    "email": "meera.n@adobe.com" },
+        { "name": "Siddharth Rao",    "email": "siddharth.r@adobe.com" },
+        { "name": "Kavya Reddy",      "email": "kavya.red@adobe.com" },
+        { "name": "Aditya Bhatt",     "email": "aditya.b@adobe.com" },
+        { "name": "Tanvi Joshi",      "email": "tanvi.j@adobe.com" }
+      ]
+    },
+    {
+      "eventId": 2,
+      "interested": 21,
+      "interestedUsers": [
+        { "name": "Neha Gupta",       "email": "neha.g@adobe.com" },
+        { "name": "Rohan Kulkarni",   "email": "rohan.k@adobe.com" },
+        { "name": "Ishaan Malhotra",  "email": "ishaan.m@adobe.com" },
+        { "name": "Pooja Srinivasan", "email": "pooja.sr@adobe.com" },
+        { "name": "Aman Tiwari",      "email": "aman.t@adobe.com" },
+        { "name": "Simran Batra",     "email": "simran.b@adobe.com" },
+        { "name": "Yash Chopra",      "email": "yash.c@adobe.com" },
+        { "name": "Nidhi Agarwal",    "email": "nidhi.a@adobe.com" },
+        { "name": "Kunal Saxena",     "email": "kunal.s@adobe.com" },
+        { "name": "Ritika Singh",     "email": "ritika.si@adobe.com" },
+        { "name": "Abhishek Das",     "email": "abhishek.d@adobe.com" },
+        { "name": "Shreya Pillai",    "email": "shreya.p@adobe.com" },
+        { "name": "Varun Menon",      "email": "varun.m@adobe.com" },
+        { "name": "Lakshmi Iyer",     "email": "lakshmi.i@adobe.com" },
+        { "name": "Deepak Jain",      "email": "deepak.j@adobe.com" },
+        { "name": "Chitra Bose",      "email": "chitra.b@adobe.com" },
+        { "name": "Harish Kumar",     "email": "harish.k@adobe.com" },
+        { "name": "Anjali Mishra",    "email": "anjali.m@adobe.com" },
+        { "name": "Suresh Pandey",    "email": "suresh.p@adobe.com" },
+        { "name": "Geeta Rao",        "email": "geeta.r@adobe.com" },
+        { "name": "Manish Thakur",    "email": "manish.t@adobe.com" }
+      ]
+    }
+  ],
+  "trainingResponses": [
+    {
+      "trainingId": 5,
+      "accepted": 7,
+      "declined": 3,
+      "acceptedUsers": [
+        { "name": "Priya Sharma",     "email": "priya.sharma@adobe.com" },
+        { "name": "Arjun Mehta",      "email": "arjun.mehta@adobe.com" },
+        { "name": "Divya Nair",       "email": "divya.nair@adobe.com" },
+        { "name": "Rohit Verma",      "email": "rohit.verma@adobe.com" },
+        { "name": "Ananya Krishnan",  "email": "ananya.krishnan@adobe.com" },
+        { "name": "Kabir Singh",      "email": "kabir.singh@adobe.com" },
+        { "name": "Sneha Patel",      "email": "sneha.patel@adobe.com" }
+      ],
+      "declinedUsers": [
+        { "name": "Tanvi Gupta",      "email": "tanvi.gupta@adobe.com",      "reason": "Schedule conflict with another meeting" },
+        { "name": "Nikhil Desai",     "email": "nikhil.desai@adobe.com",     "reason": "Already completed a similar training" },
+        { "name": "Riya Chatterjee",  "email": "riya.chatterjee@adobe.com",  "reason": "On planned leave on that date" }
+      ]
+    },
+    {
+      "trainingId": 6,
+      "accepted": 6,
+      "declined": 4,
+      "acceptedUsers": [
+        { "name": "Vikram Iyer",      "email": "vikram.iyer@adobe.com" },
+        { "name": "Meera Joshi",      "email": "meera.joshi@adobe.com" },
+        { "name": "Aditya Kumar",     "email": "aditya.kumar@adobe.com" },
+        { "name": "Pooja Reddy",      "email": "pooja.reddy@adobe.com" },
+        { "name": "Siddharth Rao",    "email": "siddharth.rao@adobe.com" },
+        { "name": "Kiran Menon",      "email": "kiran.menon@adobe.com" }
+      ],
+      "declinedUsers": [
+        { "name": "Manish Tiwari",    "email": "manish.tiwari@adobe.com",    "reason": "Manager did not approve attendance" },
+        { "name": "Sonal Shah",       "email": "sonal.shah@adobe.com",       "reason": "Topic not relevant to current role" },
+        { "name": "Deepak Nambiar",   "email": "deepak.nambiar@adobe.com",   "reason": "Remote — unable to attend in person" },
+        { "name": "Kavya Pillai",     "email": "kavya.pillai@adobe.com",     "reason": "Personal commitment on that day" }
+      ]
+    },
+    {
+      "trainingId": 7,
+      "accepted": 5,
+      "declined": 5,
+      "acceptedUsers": [
+        { "name": "Harish Bose",      "email": "harish.bose@adobe.com" },
+        { "name": "Nisha Pillai",     "email": "nisha.pillai@adobe.com" },
+        { "name": "Ravi Shankar",     "email": "ravi.shankar@adobe.com" },
+        { "name": "Anita Desai",      "email": "anita.desai@adobe.com" },
+        { "name": "Suresh Kumar",     "email": "suresh.kumar@adobe.com" }
+      ],
+      "declinedUsers": [
+        { "name": "Lakshmi Iyer",     "email": "lakshmi.iyer@adobe.com",     "reason": "Schedule conflict with another meeting" },
+        { "name": "Vijay Nair",       "email": "vijay.nair@adobe.com",       "reason": "Already completed a similar training" },
+        { "name": "Rohan Kulkarni",   "email": "rohan.kulkarni@adobe.com",   "reason": "On planned leave on that date" },
+        { "name": "Ishaan Malhotra",  "email": "ishaan.malhotra@adobe.com",  "reason": "Manager did not approve attendance" },
+        { "name": "Simran Batra",     "email": "simran.batra@adobe.com",     "reason": "Topic not relevant to current role" }
+      ]
+    },
+    {
+      "trainingId": 8,
+      "accepted": 8,
+      "declined": 2,
+      "acceptedUsers": [
+        { "name": "Yash Chopra",      "email": "yash.chopra@adobe.com" },
+        { "name": "Nidhi Agarwal",    "email": "nidhi.agarwal@adobe.com" },
+        { "name": "Kunal Saxena",     "email": "kunal.saxena@adobe.com" },
+        { "name": "Ritika Singh",     "email": "ritika.singh@adobe.com" },
+        { "name": "Abhishek Das",     "email": "abhishek.das@adobe.com" },
+        { "name": "Shreya Pillai",    "email": "shreya.pillai@adobe.com" },
+        { "name": "Varun Menon",      "email": "varun.menon@adobe.com" },
+        { "name": "Chitra Bose",      "email": "chitra.bose@adobe.com" }
+      ],
+      "declinedUsers": [
+        { "name": "Harish Kumar",     "email": "harish.kumar@adobe.com",     "reason": "Remote — unable to attend in person" },
+        { "name": "Anjali Mishra",    "email": "anjali.mishra@adobe.com",    "reason": "Personal commitment on that day" }
+      ]
+    },
+    {
+      "trainingId": 9,
+      "accepted": 5,
+      "declined": 3,
+      "acceptedUsers": [
+        { "name": "Geeta Rao",        "email": "geeta.rao@adobe.com" },
+        { "name": "Manish Thakur",    "email": "manish.thakur@adobe.com" },
+        { "name": "Deepak Jain",      "email": "deepak.jain@adobe.com" },
+        { "name": "Neha Gupta",       "email": "neha.gupta@adobe.com" },
+        { "name": "Aman Tiwari",      "email": "aman.tiwari@adobe.com" }
+      ],
+      "declinedUsers": [
+        { "name": "Suresh Pandey",    "email": "suresh.pandey@adobe.com",    "reason": "Schedule conflict with another meeting" },
+        { "name": "Pooja Srinivasan", "email": "pooja.srinivasan@adobe.com", "reason": "Already completed a similar training" },
+        { "name": "Rahul Verma",      "email": "rahul.verma@adobe.com",      "reason": "On planned leave on that date" }
+      ]
+    }
+  ]
+}
