@@ -1,10 +1,14 @@
 /**
  * events-training.js — Adobe Connect EDS block
  *
+ * Fetches from /db.json (flat array of eventsAndTrainings)
+ * Splits by type: "event" | "training"
+ * Splits into upcoming/past by date at runtime
+ *
  * DA.live authoring:
  *   | events-training          |
  *   |--------------------------|
- *   | I'm Interested           |   ← optional custom label, leave blank for default
+ *   | I'm Interested           |   ← optional custom label
  */
 
 import Modal from '../../helper/modal.js';
@@ -21,34 +25,29 @@ const icons = {
     <line x1="8" y1="2" x2="8" y2="6"/>
     <line x1="3" y1="10" x2="21" y2="10"/>
   </svg>`,
-
   location: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
     viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
     <circle cx="12" cy="10" r="3"/>
   </svg>`,
-
   trainer: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
     viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
     <circle cx="12" cy="7" r="4"/>
   </svg>`,
-
   clock: `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
     viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10"/>
     <polyline points="12 6 12 12 16 14"/>
   </svg>`,
-
   tick: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
     viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
     <polyline points="20 6 9 17 4 12"/>
   </svg>`,
-
   close: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
     viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -88,23 +87,13 @@ function buildPlaceholder(title) {
 }
 
 /* ── Date helpers ───────────────────────────────────────── */
-
-/**
- * Robustly parse both ISO "2026-03-27" and display "Mar 27, 2026" formats.
- * Returns a Date set to end-of-day (23:59:59) so an event on today is still "upcoming".
- */
 function parseDate(dateStr) {
   if (!dateStr) return null;
-
-  // ISO format: "2026-03-27"
   const isoMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (isoMatch) {
     const [, y, m, d] = isoMatch.map(Number);
     return new Date(y, m - 1, d, 23, 59, 59);
   }
-
-  // Display format: "Mar 27, 2026" or "Mar 5, 2026"
-  // Month map to avoid locale issues with new Date() parsing
   const monthMap = {
     Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
     Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
@@ -117,22 +106,21 @@ function parseDate(dateStr) {
       return new Date(Number(year), monthIndex, Number(day), 23, 59, 59);
     }
   }
-
   return null;
 }
 
-/** Returns true if the item's date is strictly in the past */
 function isPastItem(item) {
-  const dateStr = item.date || item.displayDate;
-  const d = parseDate(dateStr);
+  const d = parseDate(item.date);
   if (!d) return false;
   return d < new Date();
 }
 
-/** Get the best date string from an item for the countdown timer */
-function getDateStr(item) {
-  if (item.date && /^\d{4}-\d{2}-\d{2}$/.test(item.date)) return item.date;
-  return item.date || item.displayDate || '';
+/* ── Format date for display ────────────────────────────── */
+function formatDate(dateStr) {
+  if (!dateStr) return 'TBD';
+  const d = parseDate(dateStr);
+  if (!d) return dateStr;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 /* ── Real-time countdown ────────────────────────────────── */
@@ -153,33 +141,26 @@ function getCountdown(dateStr) {
 function buildSeatsBar(occupied, total) {
   const wrap = document.createElement('div');
   wrap.className = 'et-seats';
-
   const row = document.createElement('div');
   row.className = 'et-seats-row';
-
   const label = document.createElement('span');
   label.className = 'et-seats-label';
   label.textContent = 'Seats occupied';
-
   const count = document.createElement('span');
   count.className = 'et-seats-count';
   count.textContent = `${occupied} / ${total}`;
-
   row.append(label, count);
-
   const track = document.createElement('div');
   track.className = 'et-seats-track';
-
   const fill = document.createElement('div');
   fill.className = 'et-seats-fill';
   fill.style.width = `${Math.min((occupied / total) * 100, 100)}%`;
-
   track.append(fill);
   wrap.append(row, track);
   return { wrap, count, fill };
 }
 
-/* ── Decline modal using Modal component ────────────────── */
+/* ── Decline modal ──────────────────────────────────────── */
 function mountDeclineModal(trainingTitle, onConfirm) {
   const mountEl = document.createElement('div');
   document.body.append(mountEl);
@@ -187,18 +168,15 @@ function mountDeclineModal(trainingTitle, onConfirm) {
   function DeclineModal() {
     const [isOpen, setIsOpen] = useState(true);
     const [reason, setReason] = useState('');
-
     const handleClose = () => {
       setIsOpen(false);
       setTimeout(() => mountEl.remove(), 300);
     };
-
     const handleSubmit = () => {
       if (!reason.trim()) return;
       onConfirm(reason.trim());
       handleClose();
     };
-
     return html`
       <${Modal}
         isOpen=${isOpen}
@@ -222,7 +200,6 @@ function mountDeclineModal(trainingTitle, onConfirm) {
       </${Modal}>
     `;
   }
-
   render(html`<${DeclineModal}/>`, mountEl);
 }
 
@@ -230,7 +207,6 @@ function mountDeclineModal(trainingTitle, onConfirm) {
 function buildImageWrap(item) {
   const imgWrap = document.createElement('div');
   imgWrap.className = 'et-card-image';
-
   if (item.image) {
     const img = document.createElement('img');
     img.src = item.image;
@@ -241,7 +217,6 @@ function buildImageWrap(item) {
   } else {
     imgWrap.append(buildPlaceholder(item.title));
   }
-
   return imgWrap;
 }
 
@@ -250,8 +225,6 @@ function buildTimer(dateStr) {
   const timerWrap = document.createElement('div');
   timerWrap.className = 'et-timer';
   timerWrap.innerHTML = `${icons.clock}<span class="et-timer-text">${getCountdown(dateStr) || 'Starting soon'}</span>`;
-
-  // Live update every minute
   const ticker = setInterval(() => {
     const timerText = timerWrap.querySelector('.et-timer-text');
     if (!timerText) { clearInterval(ticker); return; }
@@ -259,7 +232,6 @@ function buildTimer(dateStr) {
     timerText.textContent = val || 'Starting soon';
     if (!val) clearInterval(ticker);
   }, 60000);
-
   return timerWrap;
 }
 
@@ -267,7 +239,6 @@ function buildTimer(dateStr) {
 function buildEventCard(event, isPast, interestedLabel) {
   const card = document.createElement('div');
   card.className = `et-card${isPast ? ' et-card-past' : ''}`;
-
   card.append(buildImageWrap(event));
 
   const body = document.createElement('div');
@@ -284,36 +255,34 @@ function buildEventCard(event, isPast, interestedLabel) {
   const meta = document.createElement('div');
   meta.className = 'et-card-meta';
 
+  // Use venue from db.json (mapped as location)
+  const dateDisplay = event.date ? `${formatDate(event.date)} · ${event.time || ''}` : 'TBD';
   const dateEl = document.createElement('span');
   dateEl.className = 'et-meta-row';
-  dateEl.innerHTML = `${icons.calendar}<span>${event.date} · ${event.time}</span>`;
+  dateEl.innerHTML = `${icons.calendar}<span>${dateDisplay}</span>`;
 
   const locEl = document.createElement('span');
   locEl.className = 'et-meta-row';
-  locEl.innerHTML = `${icons.location}<span>${event.location}</span>`;
+  locEl.innerHTML = `${icons.location}<span>${event.venue || 'TBD'}</span>`;
 
   meta.append(dateEl, locEl);
   body.append(title, desc, meta);
 
   if (!isPast) {
-    // Timer for upcoming events — same as training
-    body.append(buildTimer(getDateStr(event)));
+    body.append(buildTimer(event.date));
 
     const btn = document.createElement('button');
     btn.className = 'btn et-card-btn';
     btn.type = 'button';
     btn.innerHTML = `<span class="et-btn-label">${interestedLabel}</span>`;
-
     btn.addEventListener('click', () => {
       const interested = btn.classList.toggle('is-interested');
       btn.innerHTML = interested
         ? `${icons.tick}<span class="et-btn-label">${interestedLabel}</span>`
         : `<span class="et-btn-label">${interestedLabel}</span>`;
     });
-
     body.append(btn);
   } else {
-    // Past event — View button, no icon
     const btn = document.createElement('button');
     btn.className = 'btn et-card-btn';
     btn.type = 'button';
@@ -327,12 +296,12 @@ function buildEventCard(event, isPast, interestedLabel) {
 
 /* ── Build TRAINING card ────────────────────────────────── */
 function buildTrainingCard(training, isPast) {
-  let seats = training.seatsOccupied;
-  const total = training.seatsTotal;
+  // db.json has totalSeats but no seatsOccupied — default to 0
+  let seats = training.seatsOccupied ?? 0;
+  const total = training.totalSeats ?? training.seatsTotal ?? 0;
 
   const card = document.createElement('div');
   card.className = `et-card${isPast ? ' et-card-past' : ''}`;
-
   card.append(buildImageWrap(training));
 
   const body = document.createElement('div');
@@ -349,10 +318,15 @@ function buildTrainingCard(training, isPast) {
   const meta = document.createElement('div');
   meta.className = 'et-card-meta';
 
+  const dateDisplay = training.date
+    ? `${formatDate(training.date)} · ${training.time || ''}`
+    : 'TBD';
+
   [
-    { icon: icons.calendar, text: `${training.displayDate} · ${training.time}` },
-    { icon: icons.location, text: training.location },
-    { icon: icons.trainer,  text: `Trainer: <strong>${training.trainer}</strong>` },
+    { icon: icons.calendar, text: dateDisplay },
+    { icon: icons.location, text: training.venue || 'TBD' },
+    // db.json uses trainerName instead of trainer
+    { icon: icons.trainer,  text: `Trainer: <strong>${training.trainerName || 'TBD'}</strong>` },
   ].forEach(({ icon, text }) => {
     const row = document.createElement('span');
     row.className = 'et-meta-row';
@@ -363,52 +337,51 @@ function buildTrainingCard(training, isPast) {
   body.append(title, desc, meta);
 
   if (!isPast) {
-    const { wrap: seatsWrap, count: seatsCount, fill: seatsFill } = buildSeatsBar(seats, total);
-    body.append(seatsWrap);
+    if (total > 0) {
+      const { wrap: seatsWrap, count: seatsCount, fill: seatsFill } = buildSeatsBar(seats, total);
+      body.append(seatsWrap);
 
-    // Timer for upcoming trainings
-    body.append(buildTimer(getDateStr(training)));
+      const btnRow = document.createElement('div');
+      btnRow.className = 'et-btn-row';
 
-    const btnRow = document.createElement('div');
-    btnRow.className = 'et-btn-row';
+      const acceptBtn = document.createElement('button');
+      acceptBtn.className = 'btn et-accept-btn';
+      acceptBtn.type = 'button';
+      acceptBtn.innerHTML = `<span>Accept</span>`;
 
-    const acceptBtn = document.createElement('button');
-    acceptBtn.className = 'btn et-accept-btn';
-    acceptBtn.type = 'button';
-    acceptBtn.innerHTML = `<span>Accept</span>`;
+      const declineBtn = document.createElement('button');
+      declineBtn.className = 'btn et-decline-btn';
+      declineBtn.type = 'button';
+      declineBtn.innerHTML = `<span>Decline</span>`;
 
-    const declineBtn = document.createElement('button');
-    declineBtn.className = 'btn et-decline-btn';
-    declineBtn.type = 'button';
-    declineBtn.innerHTML = `<span>Decline</span>`;
-
-    acceptBtn.addEventListener('click', () => {
-      if (acceptBtn.classList.contains('is-accepted')) return;
-      acceptBtn.classList.add('is-accepted');
-      acceptBtn.innerHTML = `${icons.tick}<span>Accepted</span>`;
-      declineBtn.disabled = true;
-      declineBtn.classList.add('is-disabled');
-      if (seats < total) {
-        seats += 1;
-        seatsCount.textContent = `${seats} / ${total}`;
-        seatsFill.style.width = `${Math.min((seats / total) * 100, 100)}%`;
-      }
-    });
-
-    declineBtn.addEventListener('click', () => {
-      mountDeclineModal(training.title, () => {
-        declineBtn.classList.add('is-declined');
-        declineBtn.innerHTML = `${icons.close}<span>Declined</span>`;
-        acceptBtn.disabled = true;
-        acceptBtn.classList.add('is-disabled');
+      acceptBtn.addEventListener('click', () => {
+        if (acceptBtn.classList.contains('is-accepted')) return;
+        acceptBtn.classList.add('is-accepted');
+        acceptBtn.innerHTML = `${icons.tick}<span>Accepted</span>`;
+        declineBtn.disabled = true;
+        declineBtn.classList.add('is-disabled');
+        if (seats < total) {
+          seats += 1;
+          seatsCount.textContent = `${seats} / ${total}`;
+          seatsFill.style.width = `${Math.min((seats / total) * 100, 100)}%`;
+        }
       });
-    });
 
-    btnRow.append(acceptBtn, declineBtn);
-    body.append(btnRow);
+      declineBtn.addEventListener('click', () => {
+        mountDeclineModal(training.title, () => {
+          declineBtn.classList.add('is-declined');
+          declineBtn.innerHTML = `${icons.close}<span>Declined</span>`;
+          acceptBtn.disabled = true;
+          acceptBtn.classList.add('is-disabled');
+        });
+      });
 
+      btnRow.append(acceptBtn, declineBtn);
+      body.append(buildTimer(training.date), btnRow);
+    } else {
+      body.append(buildTimer(training.date));
+    }
   } else {
-    // Past training — Watch Recording button, NO icon
     const recBtn = document.createElement('button');
     recBtn.className = 'btn et-recording-btn';
     recBtn.type = 'button';
@@ -420,12 +393,15 @@ function buildTrainingCard(training, isPast) {
   return card;
 }
 
-/* ── Split items into upcoming / past by real date ──────── */
+/* ── Split items into upcoming / past ───────────────────── */
 function splitByDate(items) {
   const upcoming = [];
   const past = [];
   items.forEach((item) => {
-    if (isPastItem(item)) {
+    // Items with no date (TBD / draft) go to upcoming
+    if (!item.date) {
+      upcoming.push(item);
+    } else if (isPastItem(item)) {
       past.push(item);
     } else {
       upcoming.push(item);
@@ -438,14 +414,12 @@ function splitByDate(items) {
 function buildSection(items, label, buildFn) {
   const section = document.createElement('div');
   section.className = 'et-section';
-
   if (label) {
     const h2 = document.createElement('h2');
     h2.className = 'et-section-label';
     h2.textContent = label;
     section.append(h2);
   }
-
   const grid = document.createElement('div');
   grid.className = 'et-grid';
   items.forEach((item) => grid.append(buildFn(item)));
@@ -454,28 +428,22 @@ function buildSection(items, label, buildFn) {
 }
 
 /* ── Build EVENTS tab panel ─────────────────────────────── */
-function buildEventsPanel(rawData, interestedLabel) {
+function buildEventsPanel(events, interestedLabel) {
   const panel = document.createElement('div');
   panel.className = 'et-panel';
   panel.dataset.tab = 'events';
 
-  const allEvents = [
-    ...(rawData.upcoming || []),
-    ...(rawData.past || []),
-  ];
-  const { upcoming, past } = splitByDate(allEvents);
+  const { upcoming, past } = splitByDate(events);
 
   if (upcoming.length) {
     panel.append(buildSection(
-      upcoming,
-      '',
+      upcoming, '',
       (evt) => buildEventCard(evt, false, interestedLabel),
     ));
   }
   if (past.length) {
     panel.append(buildSection(
-      past,
-      'Past Events',
+      past, 'Past Events',
       (evt) => buildEventCard(evt, true, interestedLabel),
     ));
   }
@@ -483,28 +451,22 @@ function buildEventsPanel(rawData, interestedLabel) {
 }
 
 /* ── Build TRAINING tab panel ───────────────────────────── */
-function buildTrainingPanel(rawData) {
+function buildTrainingPanel(trainings) {
   const panel = document.createElement('div');
   panel.className = 'et-panel';
   panel.dataset.tab = 'training';
 
-  const allTrainings = [
-    ...(rawData.upcoming || []),
-    ...(rawData.past || []),
-  ];
-  const { upcoming, past } = splitByDate(allTrainings);
+  const { upcoming, past } = splitByDate(trainings);
 
   if (upcoming.length) {
     panel.append(buildSection(
-      upcoming,
-      '',
+      upcoming, '',
       (trn) => buildTrainingCard(trn, false),
     ));
   }
   if (past.length) {
     panel.append(buildSection(
-      past,
-      'Past Trainings',
+      past, 'Past Trainings',
       (trn) => buildTrainingCard(trn, true),
     ));
   }
@@ -513,37 +475,31 @@ function buildTrainingPanel(rawData) {
 
 /* ── EDS decorate ───────────────────────────────────────── */
 export default async function decorate(block) {
-  /*
-   * Read "I'm Interested" label from DA.live block content.
-   *
-   * In DA.live, author the block like:
-   *   ┌──────────────────┐
-   *   │ events-training  │  ← block name (header row)
-   *   ├──────────────────┤
-   *   │ I'm Interested   │  ← label text in the cell below
-   *   └──────────────────┘
-   *
-   * Leave the cell empty to use the default label.
-   */
   const authoredLabel = block.querySelector('p')?.textContent?.trim()
     || block.querySelector('div')?.textContent?.trim();
   const interestedLabel = authoredLabel || "I'm Interested";
 
-  // Load buttons.css
   const link = document.createElement('link');
   link.rel = 'stylesheet';
   link.href = '/styles/buttons.css';
   document.head.append(link);
 
-  // Fetch mock data
-  let data = { events: { upcoming: [], past: [] }, training: { upcoming: [], past: [] } };
+  // Fetch from db.json at root
+  let events = [];
+  let trainings = [];
+
   try {
-    const res = await fetch('/blocks/events-training/mock.json');
+    const res = await fetch('/db.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    data = await res.json();
+    const data = await res.json();
+
+    // Flat array — split by type field
+    const all = data.eventsAndTrainings || [];
+    events    = all.filter((item) => item.type === 'event');
+    trainings = all.filter((item) => item.type === 'training');
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.warn('[events-training] data fetch failed:', err);
+    console.warn('[events-training] db.json fetch failed:', err);
   }
 
   block.innerHTML = '';
@@ -566,9 +522,8 @@ export default async function decorate(block) {
 
   tabBar.append(tabEvents, tabTraining);
 
-  // Panels
-  const eventsPanel   = buildEventsPanel(data.events, interestedLabel);
-  const trainingPanel = buildTrainingPanel(data.training);
+  const eventsPanel   = buildEventsPanel(events, interestedLabel);
+  const trainingPanel = buildTrainingPanel(trainings);
 
   trainingPanel.classList.add('is-hidden');
 
