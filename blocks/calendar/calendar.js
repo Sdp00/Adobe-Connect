@@ -8,6 +8,14 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
+const LEGEND = [
+  { type: 'event',    color: '#e63535', label: 'Event' },
+  { type: 'training', color: '#3b82f6', label: 'Training' },
+  { type: 'both',     color: '#8b5cf6', label: 'Both' },
+];
+
+const DOT_COLOR = Object.fromEntries(LEGEND.map(({ type, color }) => [type, color]));
+
 function buildGrid(year, month) {
   const totalDays = new Date(year, month + 1, 0).getDate();
   const firstDay = new Date(year, month, 1).getDay();
@@ -20,7 +28,7 @@ function buildGrid(year, month) {
   return cells;
 }
 
-function renderCell(day, current, todayD, eventMap, dotColor) {
+function renderCell(day, current, todayD, eventMap) {
   const types = current ? (eventMap[day] || []) : [];
   const isToday = current && day === todayD;
   return html`
@@ -32,19 +40,43 @@ function renderCell(day, current, todayD, eventMap, dotColor) {
         <div class="calendar-block__dots">
           ${types.map((t) => html`
             <span class="calendar-block__dot"
-              style="background:${dotColor[t] || '#999'}">
+              style="background:${DOT_COLOR[t] || '#999'}">
             </span>`)}
         </div>`}
     </div>`;
 }
 
-function CalendarGrid({ currentMonth, currentYear, legend, allMonths }) {
+function buildAllMonths(json) {
+  const allMonths = {};
+  const items = json.eventsAndTrainings || [];
+
+  items.forEach(({ date, type }) => {
+    if (!date) return;
+    const d = new Date(date);
+    if (Number.isNaN(d.getTime())) return;
+
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!allMonths[key]) allMonths[key] = [];
+
+    const dayNum = d.getDate();
+    const existing = allMonths[key].find((e) => e.date === dayNum);
+
+    if (existing) {
+      existing.type = 'both';
+    } else {
+      allMonths[key].push({ date: dayNum, type });
+    }
+  });
+
+  return allMonths;
+}
+
+function CalendarGrid({ currentMonth, currentYear, allMonths }) {
   const today = new Date();
   const isTodayMonth = today.getFullYear() === currentYear && today.getMonth() === currentMonth;
   const todayD = isTodayMonth ? today.getDate() : -1;
   const cells = buildGrid(currentYear, currentMonth);
 
-  // ✅ look up events for whatever month is currently displayed
   const key = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
   const monthEvents = (allMonths && allMonths[key]) || [];
 
@@ -54,17 +86,14 @@ function CalendarGrid({ currentMonth, currentYear, legend, allMonths }) {
     eventMap[date].push(type);
   });
 
-  const dotColor = {};
-  legend.forEach(({ type, color }) => { dotColor[type] = color; });
-
   return html`
     <div>
       <div class="calendar-block__grid">
         ${DAYS.map((d) => html`<span class="calendar-block__dayname">${d}</span>`)}
-        ${cells.map(({ day, current }) => renderCell(day, current, todayD, eventMap, dotColor))}
+        ${cells.map(({ day, current }) => renderCell(day, current, todayD, eventMap))}
       </div>
       <div class="calendar-block__legend">
-        ${legend.map(({ color, label }) => html`
+        ${LEGEND.map(({ color, label }) => html`
           <span class="calendar-block__legend-item">
             <i class="calendar-block__dot" style="background:${color}"></i>
             ${label}
@@ -100,7 +129,6 @@ function Calendar({ data }) {
       <${CalendarGrid}
         currentMonth=${currentMonth}
         currentYear=${currentYear}
-        legend=${data.legend}
         allMonths=${data.allMonths}
       />
     </div>`;
@@ -151,7 +179,16 @@ export default async function decorate(block) {
 
   const resp = await fetch(calendarUrl);
   const json = await resp.json();
-  const data = json.calendar;
+
+  const allMonths = buildAllMonths(json);
+  const today = new Date();
+
+  const data = {
+    title: 'Team Calendar',
+    year: today.getFullYear(),
+    month_index: today.getMonth(),
+    allMonths,
+  };
 
   block.innerHTML = '';
   render(html`<${Calendar} data=${data} />`, block);
@@ -159,15 +196,13 @@ export default async function decorate(block) {
   const injectCalendarIcon = () => {
     const header = document.querySelector('header');
     if (!header) return;
-
-    // don't inject twice
     if (header.querySelector('.cal-popover-mount')) return;
 
     const mount = document.createElement('div');
     mount.className = 'cal-popover-mount';
 
     const darkToggle = header.querySelector(
-      'button[aria-label*="dark"], button[aria-label*="theme"], button[aria-label*="color"], .nav-hamburger, .theme-toggle, [class*="dark"], [class*="theme"]'
+      'button[aria-label*="dark"], button[aria-label*="theme"], button[aria-label*="color"], .nav-hamburger, .theme-toggle, [class*="dark"], [class*="theme"]',
     );
 
     if (darkToggle) darkToggle.parentElement.insertBefore(mount, darkToggle);

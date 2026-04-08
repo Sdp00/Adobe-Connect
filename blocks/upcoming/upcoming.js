@@ -1,12 +1,28 @@
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState, useCallback } from '../../vendor/preact-hooks.js';
 import Modal from '../../helper/modal.js';
- 
-/* ── Single Item Card ── */
+
+function buildUpcomingData(json) {
+  const items = (json.eventsAndTrainings || [])
+    .filter(({ date, status }) => date && status === 'live')
+    .map((item) => ({
+      id: item.id,
+      tag: item.type === 'training' ? 'UPCOMING TRAINING' : 'UPCOMING EVENT',
+      title: item.title,
+      date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      time: item.time || '',
+      location: item.venue || '',
+      respond_within: '',
+      interested: false,
+    }));
+
+  return { title: 'Upcoming Events/Trainings', items };
+}
+
 function ItemCard({ item, interested, trainingStatus, onToggleInterested, onAccept, onDecline }) {
   const isTraining = item.tag.includes('TRAINING');
   const status = trainingStatus[item.id];
- 
+
   return html`
     <div class="upcoming-block__card">
       <div class="upcoming-block__visual ${isTraining ? 'upcoming-block__visual--training' : ''}">
@@ -17,77 +33,77 @@ function ItemCard({ item, interested, trainingStatus, onToggleInterested, onAcce
         <ul class="upcoming-block__meta">
           <li>
             <img class="upcoming-block__icon" src="/icons/events-training.svg" alt="" />
-            ${item.date} • ${item.time}
+            ${item.date}${item.time ? ` • ${item.time}` : ''}
           </li>
           <li>
             <img class="upcoming-block__icon" src="/icons/events.svg" alt="" />
             ${item.location}
           </li>
-          <li>
-            <img class="upcoming-block__icon" src="/icons/participation.svg" alt="" />
-            Respond within ${item.respond_within}
-          </li>
+          ${item.respond_within && html`
+            <li>
+              <img class="upcoming-block__icon" src="/icons/participation.svg" alt="" />
+              Respond within ${item.respond_within}
+            </li>`}
         </ul>
- 
+
         ${!isTraining && html`
           <button
             class="btn upcoming-block__btn ${interested[item.id] ? 'upcoming-block__btn--active' : ''}"
             onClick=${() => onToggleInterested(item.id)}>
             ${interested[item.id] ? 'Interested!' : "I'm Interested"}
           </button>`}
- 
+
         ${isTraining && !status && html`
           <div class="upcoming-block__btn-group">
-            <button class="btn btn-outline upcoming-block__btn-decline" onClick=${() => onDecline(item.id)}>
+            <button class="btn upcoming-block__btn-decline" onClick=${() => onDecline(item.id)}>
               Decline
             </button>
             <button class="btn upcoming-block__btn-accept" onClick=${() => onAccept(item.id)}>
               Accept
             </button>
           </div>`}
- 
+
         ${isTraining && status === 'accepted' && html`
           <div class="upcoming-block__status upcoming-block__status--accepted">✓ Accepted</div>`}
- 
+
         ${isTraining && status === 'declined' && html`
           <div class="upcoming-block__status upcoming-block__status--declined">✕ Declined</div>`}
       </div>
     </div>`;
 }
- 
-/* ── Main Upcoming Component ── */
+
 function Upcoming({ data }) {
   const { title, items } = data;
   const [current, setCurrent]               = useState(0);
   const [interested, setInterested]         = useState(() =>
-    items.reduce((acc, i) => ({ ...acc, [i.id]: i.interested }), {})
+    items.reduce((acc, i) => ({ ...acc, [i.id]: i.interested }), {}),
   );
   const [trainingStatus, setTrainingStatus] = useState({});
   const [declineId, setDeclineId]           = useState(null);
   const [reason, setReason]                 = useState('');
- 
-  const prev = useCallback(() => setCurrent(c => Math.max(0, c - 1)), []);
-  const next = useCallback(() => setCurrent(c => Math.min(items.length - 1, c + 1)), [items.length]);
- 
-  const toggleInterested    = (id) => setInterested(s => ({ ...s, [id]: !s[id] }));
-  const handleAccept        = (id) => setTrainingStatus(s => ({ ...s, [id]: 'accepted' }));
+
+  const prev = useCallback(() => setCurrent((c) => Math.max(0, c - 1)), []);
+  const next = useCallback(() => setCurrent((c) => Math.min(items.length - 1, c + 1)), [items.length]);
+
+  const toggleInterested    = (id) => setInterested((s) => ({ ...s, [id]: !s[id] }));
+  const handleAccept        = (id) => setTrainingStatus((s) => ({ ...s, [id]: 'accepted' }));
   const handleDeclineOpen   = (id) => { setDeclineId(id); setReason(''); };
   const handleDeclineClose  = () => { setDeclineId(null); setReason(''); };
   const handleDeclineSubmit = () => {
     if (!reason.trim()) return;
-    setTrainingStatus(s => ({ ...s, [declineId]: 'declined' }));
+    setTrainingStatus((s) => ({ ...s, [declineId]: 'declined' }));
     handleDeclineClose();
   };
- 
+
   const item = items[current];
- 
+
   const ArrowLeft  = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
   const ArrowRight = html`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
- 
+
   return html`
     <div class="upcoming-block">
       <h3 class="upcoming-block__title">${title}</h3>
- 
+
       <${ItemCard}
         item=${item}
         interested=${interested}
@@ -95,7 +111,7 @@ function Upcoming({ data }) {
         onToggleInterested=${toggleInterested}
         onAccept=${handleAccept}
         onDecline=${handleDeclineOpen} />
- 
+
       <div class="upcoming-block__nav">
         <button class="upcoming-block__arrow" onClick=${prev}
           disabled=${current === 0}>${ArrowLeft}</button>
@@ -109,7 +125,7 @@ function Upcoming({ data }) {
         <button class="upcoming-block__arrow" onClick=${next}
           disabled=${current === items.length - 1}>${ArrowRight}</button>
       </div>
- 
+
       <${Modal}
         isOpen=${declineId !== null}
         onClose=${handleDeclineClose}
@@ -127,17 +143,17 @@ function Upcoming({ data }) {
       </${Modal}>
     </div>`;
 }
- 
+
 export default async function decorate(block) {
-  /* Load buttons.css — same pattern as events-training.js */
   const link = document.createElement('link');
   link.rel = 'stylesheet';
   link.href = '/styles/buttons.css';
   document.head.append(link);
- 
-  const resp = await fetch('public/mock.json');
+
+  const resp = await fetch('/db.json');
   const json = await resp.json();
-  const data = json.upcoming;
+  const data = buildUpcomingData(json);
+
   block.innerHTML = '';
   render(html`<${Upcoming} data=${data} />`, block);
 }
