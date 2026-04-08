@@ -38,10 +38,43 @@
       "type": "event",
       "title": "Connect BuildFest 2026 – 48-Hour Design Hackathon",
       "description": "Form a team of 2–4 and build something using Adobe Connect APIs. Prizes for Best UX, Most Innovative Use Case, and Community Favourite.",
-      "date": "",
-      "time": "",
-      "venue": "TBD",
-      "status": "draft",
+      "date": "2026-05-02",
+      "time": "09:00",
+      "venue": "Adobe HQ – Innovation Hub",
+      "status": "live",
+      "responses": null
+    },
+    {
+      "id": 11,
+      "type": "event",
+      "title": "Design Systems Summit 2026",
+      "description": "A full-day summit bringing together designers and engineers to explore scalable design systems, component governance, token strategies, and cross-team collaboration.",
+      "date": "2026-04-24",
+      "time": "10:00",
+      "venue": "Adobe HQ – Main Auditorium",
+      "status": "live",
+      "responses": null
+    },
+    {
+      "id": 12,
+      "type": "event",
+      "title": "Adobe Connect Anniversary Celebration & Networking Night",
+      "description": "Celebrate another year of community, creativity, and connection. Join us for an evening of networking, live demos, team shoutouts, and a few surprises.",
+      "date": "2026-05-15",
+      "time": "18:00",
+      "venue": "Adobe HQ – Rooftop Terrace",
+      "status": "live",
+      "responses": null
+    },
+    {
+      "id": 13,
+      "type": "event",
+      "title": "Future of Remote Collaboration – Panel Discussion",
+      "description": "Industry leaders and Adobe Connect power users come together to discuss async workflows, hybrid team dynamics, and what the next generation of remote collaboration looks like.",
+      "date": "2026-06-05",
+      "time": "14:00",
+      "venue": "Virtual – Zoom",
+      "status": "live",
       "responses": null
     },
     {
