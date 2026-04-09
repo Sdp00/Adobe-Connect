@@ -278,5 +278,4 @@ async function loadPage() {
   await loadLazy(document);
   loadDelayed();
 }
-
 loadPage();
