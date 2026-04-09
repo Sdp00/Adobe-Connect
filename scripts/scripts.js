@@ -12,7 +12,9 @@ import {
   loadSection,
   loadSections,
   loadCSS,
+  loadScript,
 } from './aem.js';
+import getConfig from './config.js';
 
 async function loadSidebar() {
   const block = buildBlock('sidebar', '');
@@ -226,12 +228,37 @@ async function loadEager(doc) {
 }
 
 /**
+ * Loads Adobe IMS library and initializes the IMS object.
+ * @returns {Promise<void>} - Resolves when IMS is ready or rejects on timeout/error.
+ */
+export async function loadIms() {
+  const { ims } = getConfig();
+  window.imsLoaded = window.imsLoaded || new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error('IMS timeout')), 5000);
+    window.adobeid = {
+      scope: 'AdobeID,additional_info.company,additional_info.ownerOrg,avatar,openid,read_organizations,read_pc,session,account_cluster.read',
+      locale: 'en',
+      ...ims,
+      onReady: () => {
+        // eslint-disable-next-line no-console
+        console.log('Adobe IMS Ready!');
+        resolve(); // resolve the promise, consumers can now use window.adobeIMS
+        clearTimeout(timeout);
+      },
+      onError: reject,
+    };
+    loadScript('https://auth.services.adobe.com/imslib/imslib.min.js');
+  });
+  return window.imsLoaded;
+}
+
+/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
   loadHeader(doc.querySelector('header'));
-
+  loadIms();
   // ── SIDEBAR ────────────────────────────────────────────────
   loadSidebar();
   // ──────────────────────────────────────────────────────────

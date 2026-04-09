@@ -2,6 +2,7 @@ import { html, render } from '../../vendor/htm-preact.js';
 import { useState,useEffect } from '../../vendor/preact-hooks.js';
 import Modal from '../../helper/modal.js';
 import MediaUpload from '../../helper/media-upload.js';
+import { isSignedInUser } from '../../scripts/auth.js';
 
 
 function getConfig(block) {
@@ -190,6 +191,15 @@ const resetForm = () => {
   setIsModalOpen(false);
   };
 
+  const handleOpenPostComposer = async () => {
+    const isSignedIn = await isSignedInUser();
+    if (!isSignedIn) {
+      window?.adobeIMS?.signIn();
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
 
   return html`
     <div class="postbar">
@@ -208,7 +218,7 @@ const resetForm = () => {
       <button
         class="postbar-button"
         
-        onClick=${() => setIsModalOpen(true)}
+        onClick=${handleOpenPostComposer}
       >
         ${postButtonLabel}
       </button>
@@ -218,7 +228,7 @@ const resetForm = () => {
     ${showFab && html`
       <button
         class="postbar-fab"
-        onClick=${() => setIsModalOpen(true)}
+        onClick=${handleOpenPostComposer}
         aria-label="Create post"
       >
         +

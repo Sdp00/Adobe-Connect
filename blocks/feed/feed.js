@@ -1,7 +1,7 @@
-import  getBackendBaseUrl  from '../../utils/apiConfig.js';
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState, useEffect, useCallback, useRef } from '../../vendor/preact-hooks.js';
 import { readBlockConfig } from '../../scripts/aem.js';
+import getConfig from '../../scripts/config.js';
 
 
 const DEFAULT_CONFIG = {
@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
   showAvatars: true,
   maxCommentsVisible: 3,
   allowComments: true,
-  dataUrl: "/data/post.json"
+  dataUrl: "/feed",
 };
 
 function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike  }) {
@@ -542,21 +542,14 @@ function Feed({ config }) {
   const loaderRef                   = useRef(null);
   const POSTS_PER_PAGE              = 3;
 
-  // const POSTS_API = `${getBackendBaseUrl()}/data/post.json`;
-
-  // const POSTS_API = config.dataUrl
-  // ? (config.dataUrl.startsWith('http')
-  //     ? config.dataUrl
-  //     : `${getBackendBaseUrl()}${config.dataUrl}`)
-  // : `${getBackendBaseUrl()}/data/post.json`;
-
-  const baseUrl = getBackendBaseUrl();
+  const { adobeIoEndpoint } = getConfig();
+  const baseUrl = adobeIoEndpoint || '';
 
   const POSTS_API = config.dataUrl
   ? (config.dataUrl.startsWith('http')
       ? config.dataUrl
       : `${baseUrl || ''}${config.dataUrl}`)
-  : `${baseUrl || ''}/data/post.json`;
+  : `${baseUrl || ''}/user-blog`;
 
   // Load JSON once
   useEffect(() => {
@@ -682,10 +675,11 @@ function transformPost(apiPost) {
     //   ? m.url
     //   : `${getBackendBaseUrl()}${m.url}`;
 
+    const { adobeIoEndpoint } = getConfig();
     const fullUrl =
   m.url.startsWith('http') || m.url.startsWith('blob:')
     ? m.url
-    : `${getBackendBaseUrl()}${m.url}`;
+    : `${adobeIoEndpoint}${m.url}`;
 
     // MEDIA TYPE MAPPING (IMPORTANT FIX)
     if (m.type === 'image') {
@@ -808,22 +802,22 @@ export default function decorate(block) {
 
   const config = { ...DEFAULT_CONFIG };
 
-  rows.forEach(row => {
-    const [keyEl, valueEl] = row.children;
-    if (!keyEl || !valueEl) return;
+  // rows.forEach(row => {
+  //   const [keyEl, valueEl] = row.children;
+  //   if (!keyEl || !valueEl) return;
 
-    const key = keyEl.textContent.trim();
-    let value = valueEl.textContent.trim();
+  //   const key = keyEl.textContent.trim();
+  //   let value = valueEl.textContent.trim();
 
-    // Convert boolean strings
-    if (value === 'true') value = true;
-    if (value === 'false') value = false;
+  //   // Convert boolean strings
+  //   if (value === 'true') value = true;
+  //   if (value === 'false') value = false;
 
-    // Convert numbers
-    if (!isNaN(value) && value !== '') value = Number(value);
+  //   // Convert numbers
+  //   if (!isNaN(value) && value !== '') value = Number(value);
 
-    config[key] = value;
-  });
+  //   config[key] = value;
+  // });
 
   // console.log("FEED CONFIG:", config);
 
