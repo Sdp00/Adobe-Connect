@@ -339,7 +339,7 @@ const addComment = async () => {
   const payload = {
     comment: commentInput,
     feedId: post.id,
-    mediaId: currentMedia._id, //  IMPORTANT
+    mediaId: currentMedia._id, 
     userId: "YOUR_USER_ID" // replace with auth user
   };
 
