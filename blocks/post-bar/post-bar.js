@@ -230,8 +230,8 @@ const submitPost = async () => {
     // const userId = profile?.userId || profile?.sub;
     // const currentUser = await getCurrentUser(baseUrl);
     // const userId = currentUser._id;
-    const employee = getCachedEmployee();
-    if (!employee?._id) throw new Error('Employee not loaded');
+    // const employee = getCachedEmployee();
+    // if (!employee?._id) throw new Error('Employee not loaded');
 
     const formData = new FormData();
 
@@ -241,7 +241,7 @@ const submitPost = async () => {
     formData.append('title', title);
     formData.append('description', text);
 
-    //  important: field name MUST be "files"
+    //  field name is "files"
     files.forEach((file) => {
       formData.append('files', file);
     });
@@ -331,12 +331,12 @@ const submitPost = async () => {
       return;
     }
     //  await syncUserToEmployee(baseUrl);
-    try {
-    await syncAndGetEmployee(baseUrl); // syncs + caches employee on first call
-  } catch (err) {
-    console.error('Failed to sync employee:', err);
-    return;
-  }
+  //   try {
+  //   await syncAndGetEmployee(baseUrl); // syncs + caches employee on first call
+  // } catch (err) {
+  //   console.error('Failed to sync employee:', err);
+  //   return;
+  // }
     setIsModalOpen(true);
   };
 
