@@ -190,6 +190,20 @@ const resetForm = () => {
   const baseUrl = adobeIoEndpoint || '';
   // const profile = window.adobeIMS.getProfile();
 
+  async function getCurrentUser(baseUrl) {
+  const token = window.adobeIMS.getAccessToken();
+
+  const res = await fetch(`${baseUrl}/employee/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
+    }
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch current user');
+
+  return res.json(); 
+}
 
 const submitPost = async () => {
   const validationErrors = validatePost({ title, text, files });
@@ -212,7 +226,9 @@ const submitPost = async () => {
     console.log("PROFILE:", profile);
 
 
-    const userId = profile?.userId || profile?.sub;
+    // const userId = profile?.userId || profile?.sub;
+    const currentUser = await getCurrentUser(baseUrl);
+    const userId = currentUser._id;
     const formData = new FormData();
 
     formData.append('userId', userId); 
@@ -269,12 +285,47 @@ const submitPost = async () => {
   setIsModalOpen(false);
   };
 
+  async function syncUserToEmployee(baseUrl) {
+  const token = window.adobeIMS.getAccessToken();
+  const profile = window.adobeIMS.getProfile();
+
+  // avoid duplicate calls
+  // const existing = localStorage.getItem('user');
+
+  // if (existing) return JSON.parse(existing);
+
+  const res = await fetch(`${baseUrl}/employee`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
+    },
+    body: JSON.stringify({
+      // imsId: profile.userId,
+      email: profile.email,
+      first_name: profile.first_name,
+      last_name: profile.last_name
+    })
+  });
+
+  if (!res.ok) throw new Error('Failed to sync user');
+
+  const user = await res.json();
+
+  // store DB user
+  // localStorage.setItem('user', JSON.stringify(user));
+
+  return user;
+}
+
   const handleOpenPostComposer = async () => {
     const isSignedIn = await isSignedInUser();
     if (!isSignedIn) {
       window?.adobeIMS?.signIn();
       return;
     }
+     await syncUserToEmployee(baseUrl);
     setIsModalOpen(true);
   };
 
