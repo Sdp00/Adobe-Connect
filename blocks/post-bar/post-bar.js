@@ -2,7 +2,8 @@ import { html, render } from '../../vendor/htm-preact.js';
 import { useState,useEffect } from '../../vendor/preact-hooks.js';
 import Modal from '../../helper/modal.js';
 import MediaUpload from '../../helper/media-upload.js';
-import { isSignedInUser } from '../../scripts/auth.js';
+// import { isSignedInUser } from '../../scripts/auth.js';
+import { isSignedInUser, syncAndGetEmployee, getCachedEmployee } from '../../scripts/auth.js';
 import getConfig from '../../scripts/config.js';
 // import {getConfig as authConfig} from '../../scripts/config.js';
 
@@ -190,20 +191,20 @@ const resetForm = () => {
   const baseUrl = adobeIoEndpoint || '';
   // const profile = window.adobeIMS.getProfile();
 
-  async function getCurrentUser(baseUrl) {
-  const token = window.adobeIMS.getAccessToken();
+//   async function getCurrentUser(baseUrl) {
+//   const token = window.adobeIMS.getAccessToken();
 
-  const res = await fetch(`${baseUrl}/employee/`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
-    }
-  });
+//   const res = await fetch(`${baseUrl}/employee/`, {
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
+//     }
+//   });
 
-  if (!res.ok) throw new Error('Failed to fetch current user');
+//   if (!res.ok) throw new Error('Failed to fetch current user');
 
-  return res.json(); 
-}
+//   return res.json(); 
+// }
 
 const submitPost = async () => {
   const validationErrors = validatePost({ title, text, files });
@@ -227,11 +228,15 @@ const submitPost = async () => {
 
 
     // const userId = profile?.userId || profile?.sub;
-    const currentUser = await getCurrentUser(baseUrl);
-    const userId = currentUser._id;
+    // const currentUser = await getCurrentUser(baseUrl);
+    // const userId = currentUser._id;
+    const employee = getCachedEmployee();
+    if (!employee?._id) throw new Error('Employee not loaded');
+
     const formData = new FormData();
 
-    formData.append('userId', userId); 
+    // formData.append('userId', userId); 
+    formData.append('userId', employee._id);
     formData.append('createdAt', new Date().toISOString());
     formData.append('title', title);
     formData.append('description', text);
@@ -285,39 +290,39 @@ const submitPost = async () => {
   setIsModalOpen(false);
   };
 
-  async function syncUserToEmployee(baseUrl) {
-  const token = window.adobeIMS.getAccessToken();
-  const profile = window.adobeIMS.getProfile();
+//   async function syncUserToEmployee(baseUrl) {
+//   const token = window.adobeIMS.getAccessToken();
+//   const profile = window.adobeIMS.getProfile();
 
-  // avoid duplicate calls
-  // const existing = localStorage.getItem('user');
+//   // avoid duplicate calls
+//   // const existing = localStorage.getItem('user');
 
-  // if (existing) return JSON.parse(existing);
+//   // if (existing) return JSON.parse(existing);
 
-  const res = await fetch(`${baseUrl}/employee`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
-    },
-    body: JSON.stringify({
-      // imsId: profile.userId,
-      email: profile.email,
-      first_name: profile.first_name,
-      last_name: profile.last_name
-    })
-  });
+//   const res = await fetch(`${baseUrl}/employee`, {
+//     method: 'POST',
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       'Content-Type': 'application/json',
+//       'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
+//     },
+//     body: JSON.stringify({
+//       // imsId: profile.userId,
+//       email: profile.email,
+//       first_name: profile.first_name,
+//       last_name: profile.last_name
+//     })
+//   });
 
-  if (!res.ok) throw new Error('Failed to sync user');
+//   if (!res.ok) throw new Error('Failed to sync user');
 
-  const user = await res.json();
+//   const user = await res.json();
 
-  // store DB user
-  // localStorage.setItem('user', JSON.stringify(user));
+//   // store DB user
+//   // localStorage.setItem('user', JSON.stringify(user));
 
-  return user;
-}
+//   return user;
+// }
 
   const handleOpenPostComposer = async () => {
     const isSignedIn = await isSignedInUser();
@@ -325,7 +330,13 @@ const submitPost = async () => {
       window?.adobeIMS?.signIn();
       return;
     }
-     await syncUserToEmployee(baseUrl);
+    //  await syncUserToEmployee(baseUrl);
+    try {
+    await syncAndGetEmployee(baseUrl); // syncs + caches employee on first call
+  } catch (err) {
+    console.error('Failed to sync employee:', err);
+    return;
+  }
     setIsModalOpen(true);
   };
 
