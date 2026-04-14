@@ -48,7 +48,7 @@ export async function syncAndGetEmployee(baseUrl) {
   if (cachedEmployee) return cachedEmployee;
 
   const token = window.adobeIMS.getAccessToken();
-  const profile = window.adobeIMS.getProfile();
+  const profile = await window.adobeIMS.getProfile();
 
   const res = await fetch(`${baseUrl}/employee`, {
     method: 'POST',
