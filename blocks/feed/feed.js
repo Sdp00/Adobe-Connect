@@ -12,7 +12,8 @@ const DEFAULT_CONFIG = {
   showAvatars: true,
   maxCommentsVisible: 3,
   allowComments: true,
-  dataUrl: "/feed",
+  // dataUrl: "/data/post.json"
+  dataUrl:"/feed"
 };
 
 function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike  }) {
@@ -187,6 +188,8 @@ function FeedCard({ post ,config }) {
 
   const [commentsList, setCommentsList] = useState(post.commentsList || []);
   const [commentInput, setCommentInput] = useState('');
+  const { adobeIoEndpoint } = getConfig();
+  const baseUrl = adobeIoEndpoint || '';
   
 
   // const allImages = post.images || [];
@@ -287,45 +290,100 @@ if (mediaState.length === 1) {
 //   setCommentInput('');
 // };
 
-const addComment = () => {
+// const addComment = () => {
+//   if (!commentInput.trim()) return;
+
+//   const newComment = {
+//     id: Date.now(),
+//     name: "You",
+//     text: commentInput
+//   };
+
+//   // Update FEED (merged)
+//   setCommentsList(prev => [...prev, newComment]);
+
+//   // Update MEDIA (IMMUTABLE)
+//   if (lightbox !== null) {
+//     // setMediaState(prev => {
+//     //   const updated = [...prev];
+//     //   updated[lightbox] = {
+//     //     ...updated[lightbox],
+//     //     comments: [...(updated[lightbox].comments || []), newComment]
+//     //   };
+//     //   return updated;
+//     // });
+//     setMediaState(prev => {
+//   if (lightbox === null) return prev;
+
+//   const updated = [...prev];
+
+//   const currentItem = updated[lightbox] || {};
+  
+//   updated[lightbox] = {
+//     ...currentItem,
+//     comments: [...(currentItem.comments || []), newComment]
+//   };
+
+//   return updated;
+// });
+//   }
+
+//   setCommentInput('');
+// };
+
+const addComment = async () => {
   if (!commentInput.trim()) return;
 
-  const newComment = {
-    id: Date.now(),
-    name: "You",
-    text: commentInput
+  const currentMedia = mediaState[lightbox];
+
+  const payload = {
+    comment: commentInput,
+    feedId: post.id,
+    mediaId: currentMedia._id, //  IMPORTANT
+    userId: "YOUR_USER_ID" // replace with auth user
   };
 
-  // Update FEED (merged)
-  setCommentsList(prev => [...prev, newComment]);
+  try {
+    const res = await fetch(`${baseUrl}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
 
-  // Update MEDIA (IMMUTABLE)
-  if (lightbox !== null) {
-    // setMediaState(prev => {
-    //   const updated = [...prev];
-    //   updated[lightbox] = {
-    //     ...updated[lightbox],
-    //     comments: [...(updated[lightbox].comments || []), newComment]
-    //   };
-    //   return updated;
-    // });
+    const savedComment = await res.json();
+
+    const newComment = {
+      id: savedComment._id,
+      name: "You",
+      text: savedComment.comment
+    };
+
+    //  Update FEED comments
+    setCommentsList(prev => [...prev, newComment]);
+
+    //  Update MEDIA comments
     setMediaState(prev => {
-  if (lightbox === null) return prev;
+      const updated = [...prev];
+      const item = updated[lightbox];
 
-  const updated = [...prev];
+      updated[lightbox] = {
+        ...item,
+        comments: [...(item.comments || []), newComment],
+        stats: {
+          ...item.stats,
+          commentsCount: (item.stats?.commentsCount || 0) + 1
+        }
+      };
 
-  const currentItem = updated[lightbox] || {};
-  
-  updated[lightbox] = {
-    ...currentItem,
-    comments: [...(currentItem.comments || []), newComment]
-  };
+      return updated;
+    });
 
-  return updated;
-});
+    setCommentInput('');
+  } catch (err) {
+    console.error("Failed to post comment", err);
   }
-
-  setCommentInput('');
 };
 
 const toggleMediaLike = (index) => {
@@ -544,12 +602,13 @@ function Feed({ config }) {
 
   const { adobeIoEndpoint } = getConfig();
   const baseUrl = adobeIoEndpoint || '';
+  // const baseUrl = '';
 
   const POSTS_API = config.dataUrl
   ? (config.dataUrl.startsWith('http')
       ? config.dataUrl
       : `${baseUrl || ''}${config.dataUrl}`)
-  : `${baseUrl || ''}/user-blog`;
+  : `${baseUrl || ''}/feed`;
 
   // Load JSON once
   useEffect(() => {
@@ -559,6 +618,7 @@ function Feed({ config }) {
       // .then(data =>setPosts(data))
       .then(data => {
         const transformed = data.map(transformPost);
+        console.log(data)
         setPosts(transformed);
       })
       .catch(err => console.error('Error loading posts:', err));
@@ -661,14 +721,25 @@ function Feed({ config }) {
 // }
 
 function transformPost(apiPost) {
-  const media = apiPost.content?.media || [];
+  // const media = apiPost.content?.media || [];
+
+  const media = apiPost?.files || [];
+  
 
   const images = [];
   const videos = [];
   const pdfs = [];
   const mediaWithComments = [];
-  let commentsList = [];
-  let totalLikes = 0;
+  // let commentsList = [];
+  // let totalLikes = 0;
+
+  const commentsList = (apiPost.comments || []).map(c => ({
+    id: c._id,
+    name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+    text: c.comment
+  }));
+
+  let totalLikes = apiPost.comments?.filter(c => c.like)?.length || 0;
 
   media.forEach((m) => {
     // const fullUrl = m.url.startsWith('http')
@@ -676,50 +747,103 @@ function transformPost(apiPost) {
     //   : `${getBackendBaseUrl()}${m.url}`;
 
     const { adobeIoEndpoint } = getConfig();
-    const fullUrl =
-  m.url.startsWith('http') || m.url.startsWith('blob:')
-    ? m.url
-    : `${adobeIoEndpoint}${m.url}`;
+  //   const fullUrl =
+  // m.url.startsWith('http') || m.url.startsWith('blob:')
+  //   ? m.url
+  //   : `${adobeIoEndpoint}${m.url}`;
+
+  const fileUrl = m.url || m.filePath || '';
+
+const fullUrl =
+  fileUrl.startsWith('http') || fileUrl.startsWith('blob:')
+    ? fileUrl
+    : `${adobeIoEndpoint}${fileUrl}`;
 
     // MEDIA TYPE MAPPING (IMPORTANT FIX)
-    if (m.type === 'image') {
-      images.push(fullUrl);
-    } else if (m.type === 'video') {
-      videos.push({
-        url: fullUrl,
-        type: 'video/mp4'
-      });
-    } else if (m.type === 'pdf') {
-      pdfs.push({
-        url: fullUrl,
-        type: 'application/pdf',
-        name: m.name
-      });
-    }
+    // if (m.type === 'image') {
+    //   images.push(fullUrl);
+    // } else if (m.type === 'video') {
+    //   videos.push({
+    //     url: fullUrl,
+    //     type: 'video/mp4'
+    //   });
+    // } else if (m.type === 'pdf') {
+    //   pdfs.push({
+    //     url: fullUrl,
+    //     type: 'application/pdf',
+    //     name: m.name
+    //   });
+    // }
+
+    const mime = m.type || m.mimetype || '';
+
+if (mime.startsWith('image/')) {
+  images.push(fullUrl);
+} else if (mime.startsWith('video/')) {
+  videos.push({
+    url: fullUrl,
+    type: mime
+  });
+} else if (mime === 'application/pdf') {
+  pdfs.push({
+    url: fullUrl,
+    type: 'application/pdf',
+    name: m.fileName || m.name
+  });
+}
+
+    // mediaWithComments.push({
+    //   type: m.type,
+    //   url: fullUrl,
+    //   name: m.name,
+    //   stats: m.stats || { likes: 0, commentsCount: 0 },
+    //   comments: (m.comments || []).map(c => ({
+    //     id: c._id,
+    //     name: c.author?.name || 'User',
+    //     text: c.text
+    //   }))
+    // });
 
     mediaWithComments.push({
-      type: m.type,
-      url: fullUrl,
-      name: m.name,
-      stats: m.stats || { likes: 0, commentsCount: 0 },
-      comments: (m.comments || []).map(c => ({
-        id: c._id,
-        name: c.author?.name || 'User',
-        text: c.text
-      }))
-    });
+      _id: m._id,
+  type: mime.startsWith('image/') ? 'image'
+       : mime.startsWith('video/') ? 'video'
+       : mime === 'application/pdf' ? 'pdf'
+       : mime,
+  url: fullUrl,
+  name: m.fileName || m.name,
+  // stats: m.stats || { likes: 0, commentsCount: 0 },
+  stats: {
+        likes: totalLikes,
+        commentsCount: commentsList.length
+      },
+  // comments: (m.comments || []).map(c => ({
+  //   id: c._id,
+  //   name: c.author?.name || 'User',
+  //   text: c.text
+  // }))
+  comments: (apiPost.comments || [])
+    .filter(c => c.mediaId === m._id)
+    .map(c => ({
+      id: c._id,
+      name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+      text: c.comment
+    }))
+  // comments: commentsList
+});
 
     // COMMENTS
-    if (m.comments) {
-      commentsList = [
-        ...commentsList,
-        ...m.comments.map(c => ({
-          id: c._id,
-          name: c.author?.name || 'User',
-          text: c.text
-        }))
-      ];
-    }
+    // if (m.comments) {
+    //   commentsList = [
+    //     ...commentsList,
+    //     ...m.comments.map(c => ({
+    //       id: c._id,
+    //       name: c.author?.name || 'User',
+    //       text: c.text
+    //     }))
+    //   ];
+    // }
+
 
     // LIKES
     totalLikes += m.stats?.likes || 0;
@@ -727,11 +851,15 @@ function transformPost(apiPost) {
 
   return {
     id: apiPost._id,
-    name: apiPost.author?.name || 'User',
-    role: apiPost.author?.role || '',
+    // name: apiPost.author?.name || 'User',
+     name: `${apiPost.author?.first_name || ''} ${apiPost.author?.last_name || ''}`.trim() || 'User',
+    // role: apiPost.author?.role || '',
+    role: apiPost.author?.email || '',
     time: new Date(apiPost.createdAt).toLocaleString(),
-    title: apiPost.content?.title || "",
-    text: apiPost.content?.text || "",
+    // title: apiPost.content?.title || "",
+    title: apiPost?.title || "",
+    // text: apiPost.content?.text || "",
+    text: apiPost?.description || "",
     likes: totalLikes,
     commentsList,
     images,
