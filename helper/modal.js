@@ -10,6 +10,7 @@ export default function Modal({
   cancelLabel = 'Cancel', //  default
   showCancel = true,
   actions = [], //  NEW
+  isSubmitting = false,
   children,
 }) {
   // ESC to close
@@ -66,7 +67,7 @@ export default function Modal({
                 <!-- Submit -->
                 ${onSubmit && html`
                 <button class="modal-submit" onClick=${onSubmit}>
-                    ${submitLabel}
+                    ${isSubmitting ? 'Posting...' : submitLabel}
                 </button>
                 `}
 
