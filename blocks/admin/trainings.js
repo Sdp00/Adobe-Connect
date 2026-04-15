@@ -65,7 +65,7 @@ function getUserColor(name) {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-/* ── Read users directly from item (db.json) ─────────────── */
+/* ── Read users directly from item ───────────────────────── */
 function getUsersFromItem(item) {
   const accepted = (item.responses?.acceptedUsers || []).map((u) => ({
     ...u,
@@ -273,7 +273,7 @@ export function TrainingCard({ item, onEdit, onPreview, onToggleStatus, onViewRe
   const hasResponses = item.responses && item.responses.accepted != null;
 
   return html`
-    <div class="ac-card">
+    <div class="ac-card" data-id=${item.id}>
       <div class="ac-card-badge ac-card-badge--training">TRAINING</div>
       <h3 class="ac-card-title">${item.title}</h3>
       <p class="ac-card-desc">${item.description}</p>

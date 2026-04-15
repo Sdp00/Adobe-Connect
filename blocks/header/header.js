@@ -25,13 +25,88 @@ const HAMBURGER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 2
 const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
  
 /* ─────────────────────────────────────────────
-   SEARCH — fetches employees (backend TBD)
+   SEARCH
 ───────────────────────────────────────────── */
 let searchDebounceTimer = null;
- 
-async function searchEmployees(query) {
-  // TODO: Replace with AEM Forms or MongoDB API call
+
+async function searchEmployees() {
   return [];
+}
+
+/* ── Admin search (events & trainings) ── */
+const AC_API = 'https://293924-adobeconnectmw-dev.adobeio-static.net/api/v1/web/adobe-connect';
+let acItemsCache = null;
+
+async function fetchAdminItems() {
+  if (acItemsCache) return acItemsCache;
+  const res = await fetch(`${AC_API}/eventsAndTrainings`);
+  if (!res.ok) return [];
+  const json = await res.json();
+  const items = Array.isArray(json) ? json : (json.eventsAndTrainings || []);
+  acItemsCache = items.map((item) => ({ ...item, id: item.id ?? item._id }));
+  return acItemsCache;
+}
+
+function renderAdminDropdown(dropdown, results, query) {
+  dropdown.innerHTML = '';
+  if (results.length === 0) {
+    dropdown.innerHTML = `<div class="nav-search-no-results">No results for "<strong>${query}</strong>"</div>`;
+    dropdown.classList.add('is-open');
+    return;
+  }
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  results.forEach((item) => {
+    const el = document.createElement('div');
+    el.className = 'nav-search-item';
+    const isEvent = item.type === 'event';
+    el.innerHTML = `
+      <span class="nav-search-badge nav-search-badge--${item.type}">${isEvent ? 'EVENT' : 'TRAINING'}</span>
+      <div class="nav-search-info">
+        <span class="nav-search-name">${(item.title || '').replace(regex, '<mark>$1</mark>')}</span>
+        <span class="nav-search-role">${item.date || 'Date TBD'}${item.venue ? ' · ' + item.venue : ''}</span>
+      </div>
+    `;
+    el.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      closeDropdown(dropdown);
+      document.dispatchEvent(new CustomEvent('ac:filter-change', { detail: item.type }));
+      document.dispatchEvent(new CustomEvent('ac:highlight-item', { detail: item.id }));
+      const section = document.getElementById('events-training');
+      if (section) section.scrollIntoView({ behavior: 'smooth' });
+    });
+    dropdown.appendChild(el);
+  });
+  dropdown.classList.add('is-open');
+}
+
+function attachAdminSearch(inputEl) {
+  const dropdown = document.createElement('div');
+  dropdown.className = 'nav-search-dropdown';
+  inputEl.parentElement.style.position = 'relative';
+  inputEl.parentElement.appendChild(dropdown);
+  let debounce = null;
+
+  inputEl.addEventListener('input', () => {
+    const query = inputEl.value.trim();
+    clearTimeout(debounce);
+    if (query.length < 2) { closeDropdown(dropdown); return; }
+    debounce = setTimeout(async () => {
+      const items = await fetchAdminItems();
+      const q = query.toLowerCase();
+      const results = items.filter((i) =>
+        (i.title || '').toLowerCase().includes(q) || (i.description || '').toLowerCase().includes(q),
+      );
+      renderAdminDropdown(dropdown, results, query);
+    }, 200);
+  });
+
+  inputEl.addEventListener('blur', () => { setTimeout(() => closeDropdown(dropdown), 200); });
+  inputEl.addEventListener('focus', () => {
+    if (inputEl.value.trim().length >= 2 && dropdown.innerHTML) dropdown.classList.add('is-open');
+  });
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeDropdown(dropdown); inputEl.blur(); }
+  });
 }
  
 function closeDropdown(dropdown) {
@@ -320,12 +395,13 @@ export default async function decorate(block) {
     hamburgerBtn.innerHTML = HAMBURGER_SVG;
   });
  
-  /* ── Attach employee search to both desktop and mobile inputs ── */
+  /* ── Attach search to both desktop and mobile inputs ── */
+  const attachFn = isAdminPage ? attachAdminSearch : attachSearch;
   const desktopInput = nav.querySelector('.nav-search input');
-  if (desktopInput) attachSearch(desktopInput);
- 
+  if (desktopInput) attachFn(desktopInput);
+
   const mobileInput = mobileSearchBar.querySelector('input');
-  if (mobileInput) attachSearch(mobileInput);
+  if (mobileInput) attachFn(mobileInput);
  
   /* DARK / LIGHT MODE TOGGLE */
   const themeBtn = nav.querySelector('.theme-toggle-btn');

@@ -57,14 +57,10 @@
 }
 
 .admin-stats-icon-training {
-  background: #ecfdf5;
-  color: var(--spectrum-green-900);
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 
-.admin-stats-icon-newsletters {
-  background: #eff6ff;
-  color: var(--spectrum-accent-background-color-default);
-}
 
 .admin-stats-left {
   display: flex;
@@ -571,6 +567,17 @@ html[data-theme="dark"] .ac-action-btn:hover {
   border-color: var(--ac-blue-600);
 }
 
+html[data-theme="dark"] .ac-action-btn--live {
+  background: #14532d;
+  color: #86efac;
+  border-color: #166534;
+}
+
+html[data-theme="dark"] .ac-action-btn--live:hover {
+  background: #166534;
+  border-color: #15803d;
+}
+
 html[data-theme="dark"] .ac-action-btn--media {
   background: #1e3a5f;
   color: #93c5fd;
@@ -687,20 +694,6 @@ html[data-theme="dark"] .ac-section-actions .ac-btn--outline:last-child:hover {
   background: #4c2010;
 }
 
-.ac-btn--ghost {
-  background: transparent;
-  color: var(--ac-gray-700);
-  border-color: var(--ac-gray-200);
-}
-
-.ac-btn--ghost:hover {
-  background: var(--ac-gray-100);
-}
-
-html[data-theme="dark"] .ac-btn--ghost {
-  color: #d1d5db;
-  border-color: #374151;
-}
 /* stylelint-enable selector-class-pattern */
 
 /* ─────────────────────────────────────────────
@@ -1291,102 +1284,17 @@ html[data-theme="dark"] .ac-preview-notice {
   transform: translateY(-1px);
 }
 
-.ac-interested-meta {
-  margin-bottom: 12px;
+
+/* ─── Card highlight (from search) ─── */
+.ac-card--highlight {
+  border-color: var(--ac-red-600) !important;
+  animation: ac-card-pulse 1.8s ease;
 }
 
-.ac-interested-count {
-  font-size: 13px;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.ac-interested-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-height: 420px;
-  overflow-y: auto;
-}
-
-.ac-interested-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  transition: background 0.15s;
-}
-
-.ac-interested-row:hover {
-  background: #f9fafb;
-}
-
-.ac-interested-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #fff4ec;
-  color: #c2410c;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 1px solid #fddcca;
-}
-
-.ac-interested-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.ac-interested-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ac-interested-email {
-  font-size: 12px;
-  color: #6b7280;
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ac-interested-email:hover {
-  color: #eb1000;
-  text-decoration: underline;
-}
-
-html[data-theme="dark"] .ac-interested-row:hover {
-  background: #1f2937;
-}
-
-html[data-theme="dark"] .ac-interested-avatar {
-  background: #3b1a0e;
-  color: #fca072;
-  border-color: #7c2d12;
-}
-
-html[data-theme="dark"] .ac-interested-name {
-  color: #f9fafb;
-}
-
-html[data-theme="dark"] .ac-interested-email {
-  color: #9ca3af;
-}
-
-html[data-theme="dark"] .ac-interested-count {
-  color: #9ca3af;
+@keyframes ac-card-pulse {
+  0%   { box-shadow: 0 0 0 0 rgb(225 29 72 / 0%); }
+  30%  { box-shadow: 0 0 0 5px rgb(225 29 72 / 30%); }
+  100% { box-shadow: 0 0 0 0 rgb(225 29 72 / 0%); }
 }
 
 /* ─── Loading / Error states ─── */
@@ -1888,44 +1796,6 @@ html[data-theme="dark"] .ac-resp-reason {
   border-color: #5a3800;
   color: #fbbf24;
 }
-
-/* Status badge on the right */
-.ac-resp-badge {
-  flex-shrink: 0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  padding: 3px 9px;
-  border-radius: 999px;
-  align-self: center;
-}
-
-/* stylelint-disable selector-class-pattern */
-.ac-resp-badge--accepted {
-  background: #f0fdf4;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
-}
-
-.ac-resp-badge--declined {
-  background: #fff1f2;
-  color: #be123c;
-  border: 1px solid #fecdd3;
-}
-
-html[data-theme="dark"] .ac-resp-badge--accepted {
-  background: #052e16;
-  color: #4ade80;
-  border-color: #14532d;
-}
-
-html[data-theme="dark"] .ac-resp-badge--declined {
-  background: #3b0a14;
-  color: #fda4af;
-  border-color: #7f1d36;
-}
-/* stylelint-enable selector-class-pattern */
 
 /* Footer */
 .ac-resp-footer {
