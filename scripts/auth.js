@@ -50,23 +50,47 @@ export async function syncAndGetEmployee(baseUrl) {
   const token = window.adobeIMS.getAccessToken();
   const profile = await window.adobeIMS.getProfile();
 
+  console.log('IMS PROFILE:', profile);
+
+  const formData = new FormData();
+  formData.append('email', profile.email);
+  formData.append('first_name', profile.first_name);
+  formData.append('last_name', profile.last_name);
+
+  // for (const [key, value] of formData.entries()) {
+  //   console.log('EMPLOYEE PAYLOAD:', key, value);
+  // }
+
   const res = await fetch(`${baseUrl}/employee`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/json',
       'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg',
     },
-    body: JSON.stringify({
-      email: profile.email,
-      first_name: profile.first_name,
-      last_name: profile.last_name,
-    }),
+    body: formData,
+    // body: JSON.stringify({
+    //   email: profile.email,
+    //   first_name: profile.first_name,
+    //   last_name: profile.last_name,
+    // }),
   });
 
-  if (!res.ok) throw new Error('Failed to sync employee');
+  // if (!res.ok) throw new Error('Failed to sync employee');
 
-  cachedEmployee = await res.json();
+  // cachedEmployee = await res.json();
+  // return cachedEmployee;
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('EMPLOYEE API ERROR:', err);
+    throw new Error(err);
+  }
+
+  const data = await res.json();
+
+  console.log('EMPLOYEE RESPONSE:', data);
+
+  cachedEmployee = data;
   return cachedEmployee;
 }
 
