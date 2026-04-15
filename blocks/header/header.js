@@ -359,6 +359,14 @@ export default async function decorate(block) {
   nav.querySelector('.menu-add-info')?.addEventListener('click', () => {
     openProfileModal(nav);
   });
+
+  nav.querySelector('.menu-logout')?.addEventListener('click', () => {
+  if (window?.adobeIMS) {
+    window.adobeIMS.signOut();
+  } else {
+    console.error('Adobe IMS not available');
+  }
+});
  
   block.append(nav);
  

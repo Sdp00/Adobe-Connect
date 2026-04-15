@@ -36,3 +36,81 @@ export async function getUserData() {
     };
   }
 }
+
+/**
+ * Syncs the IMS user to /employee on the backend, caches result in memory.
+ * @param {string} baseUrl - The API base URL.
+ * @returns {Promise<Object>} - The employee record including _id.
+ */
+let cachedEmployee = null;
+
+export async function syncAndGetEmployee(baseUrl) {
+  if (cachedEmployee) return cachedEmployee;
+
+  const token = window.adobeIMS.getAccessToken();
+  // const profile = await window.adobeIMS.getProfile();
+
+  let profile;
+
+  try {
+    profile = await window.adobeIMS.getProfile();
+    console.log('IMS PROFILE:', profile);
+  } catch (err) {
+    console.error('IMS PROFILE FAILED:', err);
+  }
+
+  console.log('IMS PROFILE:', profile);
+
+  const formData = new FormData();
+  formData.append('email', profile.email);
+  formData.append('first_name', profile.first_name);
+  formData.append('last_name', profile.last_name);
+
+  // for (const [key, value] of formData.entries()) {
+  //   console.log('EMPLOYEE PAYLOAD:', key, value);
+  // }
+
+  Array.from(formData.entries()).forEach(([key, value]) => {
+    console.log('EMPLOYEE PAYLOAD:', key, value);
+  });
+
+  const res = await fetch(`${baseUrl}/employee`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // 'Content-Type': 'application/json',
+      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg',
+    },
+    body: formData,
+    // body: JSON.stringify({
+    //   email: profile.email,
+    //   first_name: profile.first_name,
+    //   last_name: profile.last_name,
+    // }),
+  });
+
+  // if (!res.ok) throw new Error('Failed to sync employee');
+
+  // cachedEmployee = await res.json();
+  // return cachedEmployee;
+  if (!res.ok) {
+    const err = await res.text();
+    console.error('EMPLOYEE API ERROR:', err);
+    throw new Error(err);
+  }
+
+  const data = await res.json();
+
+  console.log('EMPLOYEE RESPONSE:', data);
+
+  cachedEmployee = data;
+  return cachedEmployee;
+}
+
+/**
+ * Returns the cached employee or fetches it if not yet loaded.
+ * @returns {Object|null}
+ */
+export function getCachedEmployee() {
+  return cachedEmployee;
+}
