@@ -48,7 +48,16 @@ export async function syncAndGetEmployee(baseUrl) {
   if (cachedEmployee) return cachedEmployee;
 
   const token = window.adobeIMS.getAccessToken();
-  const profile = await window.adobeIMS.getProfile();
+  // const profile = await window.adobeIMS.getProfile();
+
+  let profile;
+
+  try {
+    profile = await window.adobeIMS.getProfile();
+    console.log('IMS PROFILE:', profile);
+  } catch (err) {
+    console.error('IMS PROFILE FAILED:', err);
+  }
 
   console.log('IMS PROFILE:', profile);
 
@@ -60,6 +69,10 @@ export async function syncAndGetEmployee(baseUrl) {
   // for (const [key, value] of formData.entries()) {
   //   console.log('EMPLOYEE PAYLOAD:', key, value);
   // }
+
+  Array.from(formData.entries()).forEach(([key, value]) => {
+    console.log('EMPLOYEE PAYLOAD:', key, value);
+  });
 
   const res = await fetch(`${baseUrl}/employee`, {
     method: 'POST',
