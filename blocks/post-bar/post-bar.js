@@ -230,8 +230,15 @@ const submitPost = async () => {
     // const userId = profile?.userId || profile?.sub;
     // const currentUser = await getCurrentUser(baseUrl);
     // const userId = currentUser._id;
-    // const employee = getCachedEmployee();
+    const employee = getCachedEmployee();
     // if (!employee?._id) throw new Error('Employee not loaded');
+    if (!employee) {
+      employee = await syncAndGetEmployee(baseUrl); // fallback
+    }
+
+    if (!employee?._id) {
+      throw new Error('Employee not available');
+    }
 
     const formData = new FormData();
 
@@ -331,12 +338,12 @@ const submitPost = async () => {
       return;
     }
     //  await syncUserToEmployee(baseUrl);
-  //   try {
-  //   await syncAndGetEmployee(baseUrl); // syncs + caches employee on first call
-  // } catch (err) {
-  //   console.error('Failed to sync employee:', err);
-  //   return;
-  // }
+    try {
+    await syncAndGetEmployee(baseUrl); // syncs + caches employee on first call
+  } catch (err) {
+    console.error('Failed to sync employee:', err);
+    return;
+  }
     setIsModalOpen(true);
   };
 
