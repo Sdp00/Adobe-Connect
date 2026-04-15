@@ -29,8 +29,8 @@ async function fetchIcon(name) {
    STATS
 ───────────────────────────────────────────── */
 const STATS = [
-  { icon: 'events',   count: '4', label: 'Events',    filter: 'event' },
-  { icon: 'training', count: '6', label: 'Trainings', filter: 'training' },
+  { icon: 'events',   count: '0', label: 'Events',    filter: 'event' },
+  { icon: 'training', count: '0', label: 'Trainings', filter: 'training' },
 ];
 
 function renderStats(container) {
@@ -74,14 +74,49 @@ function renderStats(container) {
 }
 
 /* ─────────────────────────────────────────────
-   DATA FETCH
+   DATA FETCH & SAVE
 ───────────────────────────────────────────── */
+const API_BASE = 'https://293924-adobeconnectmw-dev.adobeio-static.net/api/v1/web/adobe-connect';
+
 async function fetchData() {
-  const res = await fetch('/db.json');
-  if (!res.ok) throw new Error(`Failed to load db.json (${res.status})`);
+  const res = await fetch(`${API_BASE}/eventsAndTrainings`);
+  if (!res.ok) throw new Error(`Failed to load eventsAndTrainings (${res.status})`);
   const json = await res.json();
-  return json.eventsAndTrainings;
+  const items = Array.isArray(json) ? json : json.eventsAndTrainings;
+  return items.map((item) => ({ ...item, id: item.id ?? item._id }));
 }
+
+function buildPayload(data) {
+  // eslint-disable-next-line no-unused-vars
+  const { media, ...rest } = data;
+  return rest;
+}
+
+async function postItem(data) {
+  const res = await fetch(`${API_BASE}/eventsAndTrainings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(buildPayload(data)),
+  });
+  if (!res.ok) throw new Error(`Failed to create item (${res.status})`);
+  return res.json();
+}
+
+async function putItem(id, data) {
+  const res = await fetch(`${API_BASE}/eventsAndTrainings/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(buildPayload(data)),
+  });
+  if (!res.ok) throw new Error(`Failed to update item (${res.status})`);
+  return res.json();
+}
+
+const TABS = [
+  { key: 'all',      label: 'All' },
+  { key: 'event',    label: 'Events' },
+  { key: 'training', label: 'Trainings' },
+];
 
 /* ─────────────────────────────────────────────
    MAIN APP
@@ -111,38 +146,77 @@ function EventsTrainingsApp() {
     return () => document.removeEventListener('ac:filter-change', handler);
   }, []);
 
+  useEffect(() => {
+    const handler = ({ detail: id }) => {
+      setTimeout(() => {
+        const card = document.querySelector(`[data-id="${id}"]`);
+        if (!card) return;
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('ac-card--highlight');
+        setTimeout(() => card.classList.remove('ac-card--highlight'), 1800);
+      }, 350);
+    };
+    document.addEventListener('ac:highlight-item', handler);
+    return () => document.removeEventListener('ac:highlight-item', handler);
+  }, []);
+
   const upcomingItems = items.filter((i) => !isPastEvent(i));
   const pastEvents = items.filter(isPastEvent);
+
+  useEffect(() => {
+    if (loading) return;
+    const eventCount = upcomingItems.filter((i) => i.type === 'event').length;
+    const trainingCount = upcomingItems.filter((i) => i.type === 'training').length;
+    const countEls = document.querySelectorAll('.admin-stats-count');
+    if (countEls[0]) countEls[0].textContent = String(eventCount);
+    if (countEls[1]) countEls[1].textContent = String(trainingCount);
+  }, [items, loading]);
+
   const filtered = filter === 'all' ? upcomingItems : upcomingItems.filter((i) => i.type === filter);
 
-  const saveItem = (form, status) => {
+  const saveItem = async (form, status) => {
     const updated = { ...form, status };
-    setItems((prev) =>
-      editItem
-        ? prev.map((i) => (i.id === editItem.id ? { ...i, ...updated } : i))
-        : [...prev, { ...updated, id: Date.now(), responses: null }],
-    );
+    if (editItem) {
+      setItems((prev) => prev.map((i) => (i.id === editItem.id ? { ...i, ...updated } : i)));
+      try {
+        await putItem(editItem.id, updated);
+      } catch (err) {
+        console.error('Failed to update item:', err);
+      }
+    } else {
+      const tempId = Date.now();
+      setItems((prev) => [...prev, { ...updated, id: tempId, responses: null }]);
+      try {
+        const saved = await postItem(updated);
+        const realId = saved?.id ?? saved?._id;
+        if (realId) {
+          setItems((prev) => prev.map((i) => (i.id === tempId ? { ...i, id: realId } : i)));
+        }
+      } catch (err) {
+        console.error('Failed to create item:', err);
+        setItems((prev) => prev.filter((i) => i.id !== tempId));
+      }
+    }
   };
 
   const handleSaveMedia = (media) => {
     setItems((prev) => prev.map((i) => (i.id === mediaItem.id ? { ...i, media } : i)));
   };
 
-  const handleToggleStatus = (item) => {
-    setItems((prev) =>
-      prev.map((i) => (i.id === item.id ? { ...i, status: i.status === 'live' ? 'draft' : 'live' } : i)),
-    );
+  const handleToggleStatus = async (item) => {
+    const newStatus = item.status === 'live' ? 'draft' : 'live';
+    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: newStatus } : i)));
+    try {
+      await putItem(item.id, { ...item, status: newStatus });
+    } catch (err) {
+      console.error('Failed to toggle status:', err);
+      setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: item.status } : i)));
+    }
   };
 
   const openAdd = (type) => { setModalType(type); setEditItem(null); setModalOpen(true); };
   const openEdit = (item) => { setModalType(item.type); setEditItem(item); setModalOpen(true); };
   const closeModal = () => { setModalOpen(false); setEditItem(null); };
-
-  const TABS = [
-    { key: 'all',      label: 'All' },
-    { key: 'event',    label: 'Events' },
-    { key: 'training', label: 'Trainings' },
-  ];
 
   if (loading) return html`<div class="ac-state-loading"><span class="ac-spinner"></span>Loading...</div>`;
   if (error)   return html`<div class="ac-state-error">Failed to load data: ${error}</div>`;
@@ -247,7 +321,6 @@ function EventsTrainingsApp() {
                 key=${item.id}
                 item=${item}
                 onAddMedia=${(i) => setMediaItem(i)}
-                onInterested=${(i) => setInterestedItem(i)}
               />
             `)}
           </div>

@@ -82,7 +82,7 @@ export function EventCard({ item, onEdit, onPreview, onInterested, onToggleStatu
   const hasResponses = item.responses && item.responses.interested != null;
 
   return html`
-    <div class="ac-card">
+    <div class="ac-card" data-id=${item.id}>
       <div class="ac-card-badge ac-card-badge--event">EVENT</div>
       <h3 class="ac-card-title">${item.title}</h3>
       <p class="ac-card-desc">${item.description}</p>
@@ -180,7 +180,7 @@ export function AddMediaModal({ isOpen, onClose, item, onSave }) {
    INTERESTED USERS MODAL  (redesigned)
 ───────────────────────────────────────────── */
 
-const AVATAR_COLORS_EV = [
+const AVATAR_COLORS = [
   { bg: '#fff4ec', color: '#c2410c', border: '#fddcca' },
   { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' },
   { bg: '#f0fdf4', color: '#15803d', border: '#bbf7d0' },
@@ -189,18 +189,18 @@ const AVATAR_COLORS_EV = [
   { bg: '#fef2f2', color: '#b91c1c', border: '#fecaca' },
 ];
 
-function getEvUserColor(name) {
+function getUserColor(name) {
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  return AVATAR_COLORS_EV[Math.abs(hash) % AVATAR_COLORS_EV.length];
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-function getEvInitials(name) {
+function getInitials(name) {
   if (!name) return '?';
   return name.trim().split(/\s+/).map((n) => n[0].toUpperCase()).slice(0, 2).join('');
 }
 
-function toEvAdobeEmail(name) {
+function toAdobeEmail(name) {
   if (!name) return '';
   return name.trim().toLowerCase().replace(/\s+/g, '.') + '@adobe.com';
 }
@@ -215,12 +215,12 @@ function generateInterestedUsers(item) {
   const count = item.responses?.interested ?? 0;
   const existing = item.responses?.interestedUsers || [];
   if (existing.length > 0) {
-    return existing.map((u) => ({ ...u, color: getEvUserColor(u.name) }));
+    return existing.map((u) => ({ ...u, color: getUserColor(u.name) }));
   }
   return MOCK_INTERESTED_NAMES.slice(0, count).map((name) => ({
     name,
-    email: toEvAdobeEmail(name),
-    color: getEvUserColor(name),
+    email: toAdobeEmail(name),
+    color: getUserColor(name),
   }));
 }
 
@@ -294,7 +294,7 @@ export function InterestedModal({ isOpen, onClose, item }) {
             ` : users.map((u) => html`
               <div class="ac-resp-row">
                 <div class="ac-resp-avatar" style=${'background:' + u.color.bg + ';color:' + u.color.color + ';border-color:' + u.color.border}>
-                  ${getEvInitials(u.name)}
+                  ${getInitials(u.name)}
                 </div>
                 <div class="ac-resp-info">
                   <span class="ac-resp-name">${u.name}</span>
