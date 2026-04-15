@@ -1,9 +1,8 @@
 /**
  * events-training.js — Adobe Connect EDS block
  *
- * Fetches from /db.json (flat array of eventsAndTrainings)
- * Splits by type: "event" | "training"
- * Splits into upcoming/past by date at runtime
+ * Fetches from Adobe I/O endpoint (eventsAndTrainings)
+ * Endpoint is read from config.js — no hardcoding.
  *
  * DA.live authoring:
  *   | events-training          |
@@ -14,6 +13,7 @@
 import Modal from '../../helper/modal.js';
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState } from '../../vendor/preact-hooks.js';
+import getConfig from '../../scripts/config.js';
 
 /* ── SVG icons ──────────────────────────────────────────── */
 const icons = {
@@ -115,7 +115,6 @@ function isPastItem(item) {
   return d < new Date();
 }
 
-/* ── Format date for display ────────────────────────────── */
 function formatDate(dateStr) {
   if (!dateStr) return 'TBD';
   const d = parseDate(dateStr);
@@ -255,7 +254,6 @@ function buildEventCard(event, isPast, interestedLabel) {
   const meta = document.createElement('div');
   meta.className = 'et-card-meta';
 
-  // Use venue from db.json (mapped as location)
   const dateDisplay = event.date ? `${formatDate(event.date)} · ${event.time || ''}` : 'TBD';
   const dateEl = document.createElement('span');
   dateEl.className = 'et-meta-row';
@@ -270,7 +268,6 @@ function buildEventCard(event, isPast, interestedLabel) {
 
   if (!isPast) {
     body.append(buildTimer(event.date));
-
     const btn = document.createElement('button');
     btn.className = 'btn et-card-btn';
     btn.type = 'button';
@@ -296,7 +293,6 @@ function buildEventCard(event, isPast, interestedLabel) {
 
 /* ── Build TRAINING card ────────────────────────────────── */
 function buildTrainingCard(training, isPast) {
-  // db.json has totalSeats but no seatsOccupied — default to 0
   let seats = training.seatsOccupied ?? 0;
   const total = training.totalSeats ?? training.seatsTotal ?? 0;
 
@@ -325,7 +321,6 @@ function buildTrainingCard(training, isPast) {
   [
     { icon: icons.calendar, text: dateDisplay },
     { icon: icons.location, text: training.venue || 'TBD' },
-    // db.json uses trainerName instead of trainer
     { icon: icons.trainer,  text: `Trainer: <strong>${training.trainerName || 'TBD'}</strong>` },
   ].forEach(({ icon, text }) => {
     const row = document.createElement('span');
@@ -398,7 +393,6 @@ function splitByDate(items) {
   const upcoming = [];
   const past = [];
   items.forEach((item) => {
-    // Items with no date (TBD / draft) go to upcoming
     if (!item.date) {
       upcoming.push(item);
     } else if (isPastItem(item)) {
@@ -432,20 +426,12 @@ function buildEventsPanel(events, interestedLabel) {
   const panel = document.createElement('div');
   panel.className = 'et-panel';
   panel.dataset.tab = 'events';
-
   const { upcoming, past } = splitByDate(events);
-
   if (upcoming.length) {
-    panel.append(buildSection(
-      upcoming, '',
-      (evt) => buildEventCard(evt, false, interestedLabel),
-    ));
+    panel.append(buildSection(upcoming, '', (evt) => buildEventCard(evt, false, interestedLabel)));
   }
   if (past.length) {
-    panel.append(buildSection(
-      past, 'Past Events',
-      (evt) => buildEventCard(evt, true, interestedLabel),
-    ));
+    panel.append(buildSection(past, 'Past Events', (evt) => buildEventCard(evt, true, interestedLabel)));
   }
   return panel;
 }
@@ -455,22 +441,42 @@ function buildTrainingPanel(trainings) {
   const panel = document.createElement('div');
   panel.className = 'et-panel';
   panel.dataset.tab = 'training';
-
   const { upcoming, past } = splitByDate(trainings);
-
   if (upcoming.length) {
-    panel.append(buildSection(
-      upcoming, '',
-      (trn) => buildTrainingCard(trn, false),
-    ));
+    panel.append(buildSection(upcoming, '', (trn) => buildTrainingCard(trn, false)));
   }
   if (past.length) {
-    panel.append(buildSection(
-      past, 'Past Trainings',
-      (trn) => buildTrainingCard(trn, true),
-    ));
+    panel.append(buildSection(past, 'Past Trainings', (trn) => buildTrainingCard(trn, true)));
   }
   return panel;
+}
+
+/* ── Fetch from Adobe I/O ───────────────────────────────── */
+async function fetchEventsAndTrainings() {
+  const { adobeIoEndpoint } = getConfig();
+  const url = `${adobeIoEndpoint}/eventsAndTrainings`;
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+
+  /*
+   * Adobe I/O may return either:
+   *   { eventsAndTrainings: [...] }   ← same as db.json shape
+   *   [...]                           ← bare array
+   */
+  const all = Array.isArray(data)
+    ? data
+    : (data.eventsAndTrainings || data.body?.eventsAndTrainings || []);
+
+  return {
+    events:    all.filter((item) => item.type === 'event'),
+    trainings: all.filter((item) => item.type === 'training'),
+  };
 }
 
 /* ── EDS decorate ───────────────────────────────────────── */
@@ -484,27 +490,9 @@ export default async function decorate(block) {
   link.href = '/styles/buttons.css';
   document.head.append(link);
 
-  // Fetch from db.json at root
-  let events = [];
-  let trainings = [];
-
-  try {
-    const res = await fetch('/db.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-
-    // Flat array — split by type field
-    const all = data.eventsAndTrainings || [];
-    events    = all.filter((item) => item.type === 'event');
-    trainings = all.filter((item) => item.type === 'training');
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn('[events-training] db.json fetch failed:', err);
-  }
-
+  // Build tab shell immediately so layout doesn't jump
   block.innerHTML = '';
 
-  // Tab bar
   const tabBar = document.createElement('div');
   tabBar.className = 'et-tab-bar';
 
@@ -521,10 +509,31 @@ export default async function decorate(block) {
   tabTraining.dataset.target = 'training';
 
   tabBar.append(tabEvents, tabTraining);
+  block.append(tabBar);
+
+  // Loading state
+  const loader = document.createElement('p');
+  loader.className = 'et-loading';
+  loader.textContent = 'Loading…';
+  block.append(loader);
+
+  // Fetch from Adobe I/O
+  let events = [];
+  let trainings = [];
+
+  try {
+    ({ events, trainings } = await fetchEventsAndTrainings());
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('[events-training] Adobe I/O fetch failed:', err);
+    loader.textContent = 'Failed to load events. Please try again later.';
+    return;
+  }
+
+  loader.remove();
 
   const eventsPanel   = buildEventsPanel(events, interestedLabel);
   const trainingPanel = buildTrainingPanel(trainings);
-
   trainingPanel.classList.add('is-hidden');
 
   function switchTab(targetKey) {
@@ -539,5 +548,5 @@ export default async function decorate(block) {
   tabEvents.addEventListener('click',   () => switchTab('events'));
   tabTraining.addEventListener('click', () => switchTab('training'));
 
-  block.append(tabBar, eventsPanel, trainingPanel);
+  block.append(eventsPanel, trainingPanel);
 }
