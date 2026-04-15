@@ -1286,7 +1286,7 @@ html[data-theme="dark"] .ac-preview-notice {
 
 
 /* ─── Card highlight (from search) ─── */
-.ac-card--highlight {
+.ac-card-highlight {
   border-color: var(--ac-red-600) !important;
   animation: ac-card-pulse 1.8s ease;
 }
