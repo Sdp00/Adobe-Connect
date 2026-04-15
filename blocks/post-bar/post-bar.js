@@ -347,20 +347,22 @@ const submitPost = async () => {
     setIsModalOpen(true);
   };
 
-  const getProfile = () => {
-    return window.adobeIMS?.getProfile?.() || null;
-  };
+  // const getProfile = () => {
+  //   return window.adobeIMS?.getProfile?.() || null;
+  // };
 
-  const profile = getProfile();
+  // const profile = getProfile();
 
-  const initials = profile?.name
-    ? profile.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : 'NA';
+  // const initials = profile?.name
+  //   ? profile.name
+  //       .split(' ')
+  //       .map((n) => n[0])
+  //       .join('')
+  //       .slice(0, 2)
+  //       .toUpperCase()
+  //   : 'NA';
+
+  const initials='NA'
 
   
 
