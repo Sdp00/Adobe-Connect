@@ -152,8 +152,8 @@ function EventsTrainingsApp() {
         const card = document.querySelector(`[data-id="${id}"]`);
         if (!card) return;
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        card.classList.add('ac-card--highlight');
-        setTimeout(() => card.classList.remove('ac-card--highlight'), 1800);
+        card.classList.add('ac-card-highlight');
+        setTimeout(() => card.classList.remove('ac-card-highlight'), 1800);
       }, 350);
     };
     document.addEventListener('ac:highlight-item', handler);
