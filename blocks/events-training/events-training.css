@@ -279,7 +279,7 @@
   transform: none;
 }
 
-/* ── Decline button ──────────────────────────────────────── */
+/* ── Decline button — light mode ─────────────────────────── */
 .et-decline-btn {
   display: inline-flex;
   align-items: center;
@@ -308,8 +308,6 @@
   border-color: #e11d48;
 }
 
-
-/* two-class selector: higher specificity — must come after single-class svg rules */
 .et-decline-btn.is-declined svg {
   display: block;
   stroke: #fff;
@@ -325,8 +323,6 @@
 }
 
 /* ── Recording button ────────────────────────────────────── */
-
-/* placed AFTER .et-decline-btn.is-declined svg to avoid descending specificity */
 .et-recording-btn {
   width: 100%;
   display: inline-flex;
@@ -433,7 +429,6 @@
   transform: none;
 }
 
-/* placed AFTER .et-decline-btn.is-declined svg — same specificity tier */
 .et-modal-close svg {
   stroke: var(--spectrum-text-secondary, #8e8e8e);
 }
@@ -531,20 +526,23 @@ html[data-theme="dark"] .et-accept-btn:hover {
   color: #fff;
 }
 
+/* ── Decline button dark mode — matches accept (#eb5146) ─── */
 html[data-theme="dark"] .et-decline-btn {
-  background: #e11d48;
-  border-color: #e11d48;
+  background: #eb5146;
+  border-color: #eb5146;
   color: #fff;
 }
 
 html[data-theme="dark"] .et-decline-btn svg {
   stroke: #fff;
+  display: none;
 }
 
 html[data-theme="dark"] .et-decline-btn:hover {
-  background: #be123c;
-  border-color: #be123c;
+  background: #dc2626;
+  border-color: #dc2626;
   color: #fff;
+  transform: translateY(-1px);
 }
 
 html[data-theme="dark"] .et-decline-btn:hover svg {
@@ -552,9 +550,14 @@ html[data-theme="dark"] .et-decline-btn:hover svg {
 }
 
 html[data-theme="dark"] .et-decline-btn.is-declined {
-  background: #e11d48;
-  border-color: #e11d48;
+  background: #eb5146;
+  border-color: #eb5146;
   color: #fff;
+}
+
+html[data-theme="dark"] .et-decline-btn.is-declined svg {
+  display: block;
+  stroke: #fff;
 }
 
 html[data-theme="dark"] .et-recording-btn {
