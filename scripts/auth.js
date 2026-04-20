@@ -54,12 +54,12 @@ export async function syncAndGetEmployee(baseUrl) {
 
   try {
     profile = await window.adobeIMS.getProfile();
-    console.log('IMS PROFILE:', profile);
+    // console.log('IMS PROFILE:', profile);
   } catch (err) {
     console.error('IMS PROFILE FAILED:', err);
   }
 
-  console.log('IMS PROFILE:', profile);
+  // console.log('IMS PROFILE:', profile);
 
   const formData = new FormData();
   formData.append('email', profile.email);
@@ -70,9 +70,9 @@ export async function syncAndGetEmployee(baseUrl) {
   //   console.log('EMPLOYEE PAYLOAD:', key, value);
   // }
 
-  Array.from(formData.entries()).forEach(([key, value]) => {
-    console.log('EMPLOYEE PAYLOAD:', key, value);
-  });
+  // Array.from(formData.entries()).forEach(([key, value]) => {
+  //   console.log('EMPLOYEE PAYLOAD:', key, value);
+  // });
 
   const res = await fetch(`${baseUrl}/employee`, {
     method: 'POST',
@@ -95,13 +95,13 @@ export async function syncAndGetEmployee(baseUrl) {
   // return cachedEmployee;
   if (!res.ok) {
     const err = await res.text();
-    console.error('EMPLOYEE API ERROR:', err);
+    // console.error('EMPLOYEE API ERROR:', err);
     throw new Error(err);
   }
 
   const data = await res.json();
 
-  console.log('EMPLOYEE RESPONSE:', data);
+  // console.log('EMPLOYEE RESPONSE:', data);
 
   cachedEmployee = data;
   return cachedEmployee;
