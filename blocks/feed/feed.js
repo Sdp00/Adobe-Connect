@@ -2,6 +2,9 @@ import { html, render } from '../../vendor/htm-preact.js';
 import { useState, useEffect, useCallback, useRef } from '../../vendor/preact-hooks.js';
 import { readBlockConfig } from '../../scripts/aem.js';
 import getConfig from '../../scripts/config.js';
+import withAuth  from "../../scripts/auth-guard.js";
+import { isSignedInUser } from "../../scripts/auth.js";
+
 
 
 const DEFAULT_CONFIG = {
@@ -16,7 +19,7 @@ const DEFAULT_CONFIG = {
   dataUrl:"/feed"
 };
 
-function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike  }) {
+function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike,isPostingComment  }) {
   // const [current, setCurrent] = useState(startIndex);
   const safeIndex = Math.min(startIndex, mediaItems.length - 1);
 const [current, setCurrent] = useState(safeIndex);
@@ -165,10 +168,10 @@ const [current, setCurrent] = useState(safeIndex);
               placeholder="Write a comment…"
               value=${commentInput}
               onInput=${(e) => setCommentInput(e.target.value)}
-              onKeyDown=${(e) => e.key === 'Enter' && addComment()}
+              onKeyDown=${(e) => e.key === 'Enter' && addComment(current)}
             />
-            <button class="feed-comment-submit" onClick=${addComment} disabled=${!commentInput.trim()}>
-              Post
+            <button class="feed-comment-submit" onClick=${() =>addComment(current)} disabled=${!commentInput.trim() || isPostingComment}>
+              ${isPostingComment ? 'Posting...' : 'Post'}
             </button>
           </div>
         </div>
@@ -188,6 +191,7 @@ function FeedCard({ post ,config }) {
 
   const [commentsList, setCommentsList] = useState(post.commentsList || []);
   const [commentInput, setCommentInput] = useState('');
+  const [isPostingComment, setIsPostingComment] = useState(false);
   const { adobeIoEndpoint } = getConfig();
   const baseUrl = adobeIoEndpoint || '';
   
@@ -252,10 +256,18 @@ if (mediaState.length === 1) {
     ? "JN"
     : post.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
-  const toggleLike = () => {
-    setLiked(l => !l);
-    setLikes(n => liked ? n - 1 : n + 1);
-  };
+  // const toggleLike = () => {
+  //   setLiked(l => !l);
+  //   setLikes(n => liked ? n - 1 : n + 1);
+  // };
+  const toggleLike = withAuth(() => {
+  setLiked(l => !l);
+  setLikes(n => liked ? n - 1 : n + 1);
+});
+
+const handleToggleComments = withAuth(() => {
+  setShowComments(v => !v);
+});
 
 //   const addComment = () => {
 //   if (!commentInput.trim()) return;
@@ -331,17 +343,22 @@ if (mediaState.length === 1) {
 //   setCommentInput('');
 // };
 
-const addComment = async () => {
+const addComment = async (index) => {
   if (!commentInput.trim()) return;
 
-  const currentMedia = mediaState[lightbox];
+  setIsPostingComment(true);
+
+  // const currentMedia = mediaState[lightbox];
+  const currentMedia = mediaState[index];
 
   const payload = {
     comment: commentInput,
     feedId: post.id,
+    like:false,
     mediaId: currentMedia._id, 
-    userId: "YOUR_USER_ID" // replace with auth user
+    userId: 'user-id' // replace with auth user
   };
+  
 
   try {
     const res = await fetch(`${baseUrl}/comments`, {
@@ -366,9 +383,19 @@ const addComment = async () => {
     //  Update MEDIA comments
     setMediaState(prev => {
       const updated = [...prev];
-      const item = updated[lightbox];
+      // const item = updated[lightbox];
+      const item = updated[index];
 
-      updated[lightbox] = {
+      // updated[lightbox] = {
+      //   ...item,
+      //   comments: [...(item.comments || []), newComment],
+      //   stats: {
+      //     ...item.stats,
+      //     commentsCount: (item.stats?.commentsCount || 0) + 1
+      //   }
+      // };
+
+      updated[index] = {
         ...item,
         comments: [...(item.comments || []), newComment],
         stats: {
@@ -383,7 +410,10 @@ const addComment = async () => {
     setCommentInput('');
   } catch (err) {
     console.error("Failed to post comment", err);
+  } finally {
+    setIsPostingComment(false); // END loading
   }
+
 };
 
 const toggleMediaLike = (index) => {
@@ -405,10 +435,21 @@ const toggleMediaLike = (index) => {
 
   // Grid image click → open lightbox at hero(0) + grid offset
   // const openLightbox = (imgIndex) => setLightbox(imgIndex);
-  const openLightbox = (imgIndex) => {
+  // const openLightbox = (imgIndex) => {
+  // if (imgIndex >= mediaState.length) return;
+  // setLightbox(imgIndex);
+  // };
+
+  const openLightbox = withAuth((imgIndex) => {
   if (imgIndex >= mediaState.length) return;
   setLightbox(imgIndex);
-};
+});
+
+const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+useEffect(() => {
+  isSignedInUser().then(setIsUserLoggedIn);
+}, []);
 
   return html`
     <div class="feed-card">
@@ -437,6 +478,7 @@ const toggleMediaLike = (index) => {
       ${!config.hideImages && heroItem && html`
         <div
           class="feed-media-hero-wrap"
+          title=${!isUserLoggedIn ? "Login to access" : ""}
           onClick=${() => !config.disableLightbox && openLightbox(0)}
         >
           ${heroItem.type?.startsWith('video/') ? html`
@@ -467,6 +509,7 @@ const toggleMediaLike = (index) => {
           ${gridItems.map((item, i) => html`
             <div
               class="feed-image-grid-item ${i === gridItems.length - 1 && extraCount > 0 ? 'feed-image-grid-item--overlay' : ''}"
+              title=${!isUserLoggedIn ? "Login to access" : ""}
               onClick=${() => !config.disableLightbox &&  openLightbox(heroItem ? i + 1 : i)}
             >
               ${item.type?.startsWith('video/') ? html`
@@ -498,6 +541,7 @@ const toggleMediaLike = (index) => {
       ${!config.hideLikeIcon && html`
         <button
           class="feed-action-btn ${liked ? 'feed-action-btn-liked' : ''}"
+          title=${!isUserLoggedIn ? "Login to access" : ""}
           onClick=${toggleLike}
           aria-label="Like"
         >
@@ -519,7 +563,8 @@ const toggleMediaLike = (index) => {
       ${!config.hideCommentIcon && html`
         <button
           class="feed-action-btn ${showComments ? 'feed-action-btn-active' : ''}"
-          onClick=${() => setShowComments(v => !v)}
+          title=${!isUserLoggedIn ? "Login to access" : ""}
+          onClick=${handleToggleComments}
           aria-label="Comment"
         >
           <svg class="feed-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -584,6 +629,7 @@ const toggleMediaLike = (index) => {
           commentInput=${commentInput}
           setCommentInput=${setCommentInput}
           addComment=${addComment}
+          isPostingComment=${isPostingComment}
         />
       `}
 
