@@ -881,12 +881,12 @@ opacity: 0.65;
   fill:var(--spectrum-red-600);
 }
 
-.feed-media-hero-wrap[title],
+/* .feed-media-hero-wrap[title],
 .feed-image-grid-item[title],
 .feed-action-btn[title] {
   cursor: not-allowed;
   opacity: 0.85;
-}
+} */
 
 /* ── Tablet (≥ 600 px) ───────────────────────────────────────────── */
 
