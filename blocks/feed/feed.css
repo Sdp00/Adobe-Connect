@@ -94,7 +94,7 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 6px;
-  color: #111;
+  color: var(--spectrum-text-primary);
   font-family: var(--spectrum-global-font-family-base);
 }
 

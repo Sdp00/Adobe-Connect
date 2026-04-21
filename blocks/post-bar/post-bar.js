@@ -191,20 +191,20 @@ const resetForm = () => {
   const baseUrl = adobeIoEndpoint || '';
   // const profile = window.adobeIMS.getProfile();
 
-//   async function getCurrentUser(baseUrl) {
-//   const token = window.adobeIMS.getAccessToken();
+  async function getCurrentUser(baseUrl) {
+  const token = window.adobeIMS.getAccessToken();
 
-//   const res = await fetch(`${baseUrl}/employee/`, {
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//       'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
-//     }
-//   });
+  const res = await fetch(`${baseUrl}/employee/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
+    }
+  });
 
-//   if (!res.ok) throw new Error('Failed to fetch current user');
+  if (!res.ok) throw new Error('Failed to fetch current user');
 
-//   return res.json(); 
-// }
+  return res.json(); 
+}
 
 const submitPost = async () => {
   const validationErrors = validatePost({ title, text, files });
@@ -228,7 +228,29 @@ const submitPost = async () => {
 
 
     // const userId = profile?.userId || profile?.sub;
-    // const currentUser = await getCurrentUser(baseUrl);
+    const users = await getCurrentUser(baseUrl);
+    // const token = window.adobeIMS.getAccessToken();
+    const sid = token?.sid;
+
+        // try match
+    let employee = users.find(user => user.imsId === sid);
+
+        // fallback (important)
+        if (!employee) {
+          console.warn('SID match failed, fallback to email');
+
+          const profile = window.adobeIMS.getProfile();
+
+          employee = users.find(
+            user => user.email === profile?.email
+          );
+        }
+
+        if (!employee?._id) {
+          throw new Error('Employee not found');
+        }
+
+    
     // const userId = currentUser._id;
     // const employee = getCachedEmployee();
     // if (!employee?._id) throw new Error('Employee not loaded');
@@ -338,12 +360,12 @@ const submitPost = async () => {
       return;
     }
     //  await syncUserToEmployee(baseUrl);
-  //   try {
-  //   await syncAndGetEmployee(baseUrl); // syncs + caches employee on first call
-  // } catch (err) {
-  //   console.error('Failed to sync employee:', err);
-  //   return;
-  // }
+    try {
+    await syncAndGetEmployee(baseUrl); // syncs + caches employee on first call
+  } catch (err) {
+    console.error('Failed to sync employee:', err);
+    return;
+  }
     setIsModalOpen(true);
   };
 
