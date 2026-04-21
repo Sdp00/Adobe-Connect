@@ -142,7 +142,7 @@ export async function syncAndGetEmployee(baseUrl) {
     // console.log('TOKEN DECODED:', decoded);
 
     payload = {
-      email: tokenObj?.email || 'akars@adobe.com',
+      email: 'akars@adobe.com',
       first_name: tokenObj?.first_name || '',
       last_name: tokenObj?.last_name || '',
       imsId: sid, // fallback chain
