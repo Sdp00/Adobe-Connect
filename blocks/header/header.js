@@ -1,5 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { updateEmployee } from '../../scripts/auth.js';
+import getConfig from '../../scripts/config.js';
 import { loadFragment } from '../fragment/fragment.js';
 
 const iconCache = {};
@@ -443,6 +444,9 @@ function openProfileModal(nav) {
   !imsProfile ||
   !imsProfile.userId ||
   !imsProfile.email;
+
+  const { adobeIoEndpoint } = getConfig();
+  const baseUrl = adobeIoEndpoint || '';
  
   const overlay = document.createElement('div');
   overlay.className = 'profile-modal-overlay';
@@ -568,7 +572,7 @@ function openProfileModal(nav) {
     }
 
     try {
-      await updateEmployee(payload);
+      await updateEmployee(payload,baseUrl);
     } catch (e) {
       console.error('Update failed:', e);
     }
