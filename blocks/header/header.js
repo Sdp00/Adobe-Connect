@@ -438,7 +438,11 @@ function openProfileModal(nav) {
   const isEdit = localStorage.getItem('profileComplete') === 'true';
 
   const imsProfile = window?.adobeIMS?.getProfile?.();
-  const isProfileMissing = !imsProfile;
+  // const isProfileMissing = !imsProfile;
+  const isProfileMissing =
+  !imsProfile ||
+  !imsProfile.userId ||
+  !imsProfile.email;
  
   const overlay = document.createElement('div');
   overlay.className = 'profile-modal-overlay';
