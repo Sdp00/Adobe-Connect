@@ -229,7 +229,7 @@ export async function getCurrentUser(baseUrl) {
 }
 
 export async function updateEmployee(data, baseUrl) {
-  const user = await getCurrentUser(); // you already use this elsewhere
+  const user = await getCurrentUser(baseUrl); // you already use this elsewhere
 
   // eslint-disable-next-line no-underscore-dangle
   const employeeId = user?._id;
