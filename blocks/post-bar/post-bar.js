@@ -3,7 +3,7 @@ import { useState,useEffect } from '../../vendor/preact-hooks.js';
 import Modal from '../../helper/modal.js';
 import MediaUpload from '../../helper/media-upload.js';
 // import { isSignedInUser } from '../../scripts/auth.js';
-import { isSignedInUser, syncAndGetEmployee, getCachedEmployee } from '../../scripts/auth.js';
+import { isSignedInUser, syncAndGetEmployee, getCachedEmployee, getCurrentUser } from '../../scripts/auth.js';
 import getConfig from '../../scripts/config.js';
 // import {getConfig as authConfig} from '../../scripts/config.js';
 
@@ -191,20 +191,7 @@ const resetForm = () => {
   const baseUrl = adobeIoEndpoint || '';
   // const profile = window.adobeIMS.getProfile();
 
-  async function getCurrentUser(baseUrl) {
-  const token = window.adobeIMS.getAccessToken();
-
-  const res = await fetch(`${baseUrl}/employee/`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg'
-    }
-  });
-
-  if (!res.ok) throw new Error('Failed to fetch current user');
-
-  return res.json(); 
-}
+  
 
 const submitPost = async () => {
   const validationErrors = validatePost({ title, text, files });

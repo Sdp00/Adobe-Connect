@@ -116,6 +116,28 @@ export async function syncAndGetEmployee(baseUrl) {
   const accessToken = tokenObj?.token;
   const sid = tokenObj?.sid;
 
+  const res = await fetch(`${baseUrl}/employee`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch employees');
+  }
+
+  const employees = await res.json();
+
+  //  Check if user exists
+  const existing = employees.find((emp) => emp.imsId === sid);
+
+  if (existing) {
+    console.log('EMPLOYEE FOUND:', existing);
+    cachedEmployee = existing;
+    return existing; //  STOP → do not POST
+  }
+
   let profile = null;
   let payload = {};
 
@@ -161,7 +183,7 @@ export async function syncAndGetEmployee(baseUrl) {
   formData.append('last_name', payload.last_name);
   formData.append('imsId', payload.imsId);
 
-  const res = await fetch(`${baseUrl}/employee`, {
+  const response = await fetch(`${baseUrl}/employee`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -170,12 +192,12 @@ export async function syncAndGetEmployee(baseUrl) {
     body: formData,
   });
 
-  if (!res.ok) {
+  if (!response.ok) {
     const err = await res.text();
     throw new Error(err);
   }
 
-  const data = await res.json();
+  const data = await response.json();
 
   console.log('EMPLOYEE SAVED:', data);
 
@@ -189,4 +211,49 @@ export async function syncAndGetEmployee(baseUrl) {
  */
 export function getCachedEmployee() {
   return cachedEmployee;
+}
+
+export async function getCurrentUser(baseUrl) {
+  const token = window.adobeIMS.getAccessToken();
+
+  const res = await fetch(`${baseUrl}/employee/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg',
+    },
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch current user');
+
+  return res.json();
+}
+
+export async function updateEmployee(data) {
+  const user = await getCurrentUser(); // you already use this elsewhere
+
+  // eslint-disable-next-line no-underscore-dangle
+  const employeeId = user?._id;
+
+  if (!employeeId) {
+    throw new Error('No employee ID found');
+  }
+
+  const payload = { ...data };
+  // eslint-disable-next-line no-underscore-dangle
+  delete payload._id; // prevent MongoDB error
+
+  const response = await fetch(`/api/employees/${employeeId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Failed to update employee: ${text}`);
+  }
+
+  return response.json();
 }

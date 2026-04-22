@@ -361,7 +361,7 @@ const addComment = async (index) => {
   
 
   try {
-    const res = await fetch(`${baseUrl}/comments`, {
+    const response = await fetch(`${baseUrl}/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -369,7 +369,7 @@ const addComment = async (index) => {
       body: JSON.stringify(payload)
     });
 
-    const savedComment = await res.json();
+    const savedComment = await response.json();
 
     const newComment = {
       id: savedComment._id,
