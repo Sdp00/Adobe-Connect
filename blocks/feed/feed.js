@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from '../../vendor/preact-ho
 import { readBlockConfig } from '../../scripts/aem.js';
 import getConfig from '../../scripts/config.js';
 import withAuth  from "../../scripts/auth-guard.js";
-import { isSignedInUser } from "../../scripts/auth.js";
+import { getCachedEmployee, isSignedInUser, syncAndGetEmployee } from "../../scripts/auth.js";
 
 
 
@@ -348,6 +348,16 @@ const addComment = async (index) => {
 
   setIsPostingComment(true);
 
+    let employee = getCachedEmployee();
+
+    if (!employee?._id) {
+      employee = await syncAndGetEmployee(baseUrl);
+    }
+
+    if (!employee?._id) {
+      throw new Error("Employee not found");
+    }
+
   // const currentMedia = mediaState[lightbox];
   const currentMedia = mediaState[index];
 
@@ -356,7 +366,7 @@ const addComment = async (index) => {
     feedId: post.id,
     like:false,
     mediaId: currentMedia._id, 
-    userId: 'user-id' // replace with auth user
+    userId: 'employee._id' // replace with auth user
   };
   
 
