@@ -228,7 +228,7 @@ export async function getCurrentUser(baseUrl) {
   return res.json();
 }
 
-export async function updateEmployee(data) {
+export async function updateEmployee(data, baseUrl) {
   const user = await getCurrentUser(); // you already use this elsewhere
 
   // eslint-disable-next-line no-underscore-dangle
@@ -242,7 +242,7 @@ export async function updateEmployee(data) {
   // eslint-disable-next-line no-underscore-dangle
   delete payload._id; // prevent MongoDB error
 
-  const response = await fetch(`/api/employees/${employeeId}`, {
+  const response = await fetch(`${baseUrl}/employee/${employeeId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
