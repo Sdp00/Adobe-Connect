@@ -1,4 +1,5 @@
 import { getMetadata } from '../../scripts/aem.js';
+import { updateEmployee } from '../../scripts/auth.js';
 import { loadFragment } from '../fragment/fragment.js';
 
 const iconCache = {};
@@ -435,6 +436,9 @@ function openProfileModal(nav) {
   const savedDate = localStorage.getItem('profileBirthday') || '';
   const savedInterests = JSON.parse(localStorage.getItem('profileInterests') || '[]');
   const isEdit = localStorage.getItem('profileComplete') === 'true';
+
+  const imsProfile = window?.adobeIMS?.getProfile?.();
+  const isProfileMissing = !imsProfile;
  
   const overlay = document.createElement('div');
   overlay.className = 'profile-modal-overlay';
@@ -446,6 +450,20 @@ function openProfileModal(nav) {
         <button class="modal-close">✕</button>
       </div>
       <div class="profile-modal-body">
+        ${
+        isProfileMissing
+          ? `
+        <label>First Name</label>
+        <input type="text" class="first-name" placeholder="Enter first name" />
+
+        <label>Last Name</label>
+        <input type="text" class="last-name" placeholder="Enter last name" />
+
+        <label>Email</label>
+        <input type="email" class="email" placeholder="Enter email" />
+      `
+          : ''
+      }
         <label>Birthday</label>
         <div class="date-field">
           <input type="date" value="${savedDate}" />
@@ -485,28 +503,78 @@ function openProfileModal(nav) {
     });
   });
  
-  updateBtn.addEventListener('click', () => {
-    const dateInput = overlay.querySelector('input[type="date"]');
-    if (!dateInput.value) {
-      dateInput.setAttribute('required', 'true');
-      dateInput.reportValidity();
-      return;
-    }
+  // updateBtn.addEventListener('click', () => {
+  //   const dateInput = overlay.querySelector('input[type="date"]');
+  //   if (!dateInput.value) {
+  //     dateInput.setAttribute('required', 'true');
+  //     dateInput.reportValidity();
+  //     return;
+  //   }
  
-    const selectedInterests = [...overlay.querySelectorAll('.interest-chip.selected')]
-      .map((c) => c.textContent.trim());
-    localStorage.setItem('profileBirthday', dateInput.value);
-    localStorage.setItem('profileInterests', JSON.stringify(selectedInterests));
-    localStorage.setItem('profileComplete', 'true');
+  //   const selectedInterests = [...overlay.querySelectorAll('.interest-chip.selected')]
+  //     .map((c) => c.textContent.trim());
+  //   localStorage.setItem('profileBirthday', dateInput.value);
+  //   localStorage.setItem('profileInterests', JSON.stringify(selectedInterests));
+  //   localStorage.setItem('profileComplete', 'true');
  
-    const label = nav?.querySelector('.add-info-label');
-    if (label) label.textContent = 'Edit Info';
-    overlay.remove();
-  });
+  //   const label = nav?.querySelector('.add-info-label');
+  //   if (label) label.textContent = 'Edit Info';
+  //   overlay.remove();
+  // });
  
   overlay.querySelector('.modal-close').onclick = () => overlay.remove();
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) overlay.remove();
   });
+
+    updateBtn.addEventListener('click', async () => {
+    const dateInput = overlay.querySelector('input[type="date"]');
+
+    if (!dateInput.value) {
+      dateInput.setAttribute('required', 'true');
+      dateInput.reportValidity();
+      return;
+    }
+
+    const selectedInterests = [...overlay.querySelectorAll('.interest-chip.selected')]
+      .map((c) => c.textContent.trim());
+
+    let payload = {
+      birthday: dateInput.value,
+      interests: selectedInterests,
+    };
+
+    //  Add extra fields only if IMS profile missing
+    if (isProfileMissing) {
+      const firstName = overlay.querySelector('.first-name')?.value?.trim();
+      const lastName = overlay.querySelector('.last-name')?.value?.trim();
+      const email = overlay.querySelector('.email')?.value?.trim();
+
+      if (!firstName || !lastName || !email) {
+        alert('Please fill all required fields');
+        return;
+      }
+
+      payload = {
+        ...payload,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+      };
+    }
+
+    try {
+      await updateEmployee(payload);
+    } catch (e) {
+      console.error('Update failed:', e);
+    }
+
+    localStorage.setItem('profileBirthday', dateInput.value);
+    localStorage.setItem('profileInterests', JSON.stringify(selectedInterests));
+    localStorage.setItem('profileComplete', 'true');
+
+    overlay.remove();
+  });
+  
 }
  
