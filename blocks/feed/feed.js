@@ -366,7 +366,7 @@ const addComment = async (index) => {
     feedId: post.id,
     like:false,
     mediaId: currentMedia._id, 
-    userId: 'employee._id' // replace with auth user
+    userId: employee._id // replace with auth user
   };
   
 
