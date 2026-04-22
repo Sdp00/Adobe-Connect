@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from '../../vendor/preact-ho
 import { readBlockConfig } from '../../scripts/aem.js';
 import getConfig from '../../scripts/config.js';
 import withAuth  from "../../scripts/auth-guard.js";
-import { getCachedEmployee, isSignedInUser, syncAndGetEmployee } from "../../scripts/auth.js";
+import { getCachedEmployee, getCurrentUser, isSignedInUser, syncAndGetEmployee } from "../../scripts/auth.js";
 
 
 
@@ -348,15 +348,36 @@ const addComment = async (index) => {
 
   setIsPostingComment(true);
 
-    let employee = getCachedEmployee();
+    // let employee = getCachedEmployee();
 
-    if (!employee?._id) {
-      employee = await syncAndGetEmployee(baseUrl);
-    }
+    // if (!employee?._id) {
+    //   employee = await syncAndGetEmployee(baseUrl);
+    // }
 
-    if (!employee?._id) {
-      throw new Error("Employee not found");
-    }
+    // if (!employee?._id) {
+    //   throw new Error("Employee not found");
+    // }
+    const users = await getCurrentUser(baseUrl);
+        const token = window.adobeIMS.getAccessToken();
+        const sid = token?.sid;
+    
+            // try match
+        let employee = users.find(user => user.imsId === sid);
+    
+        // fallback (important)
+        if (!employee) {
+          console.warn('SID match failed, fallback to email');
+    
+          const profile = window.adobeIMS.getProfile();
+    
+          employee = users.find(
+            user => user.email === profile?.email
+            );
+          }
+    
+          if (!employee?._id) {
+            throw new Error('Employee not found');
+          }
 
   // const currentMedia = mediaState[lightbox];
   const currentMedia = mediaState[index];
