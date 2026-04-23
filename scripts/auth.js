@@ -268,7 +268,7 @@ export async function updateEmployee(data, baseUrl) {
   // const tokenObj = window.adobeIMS.getAccessToken();
   // const accessToken = token?.token;
 
-  const response = await fetch(`${baseUrl}/employee/${employeeId}`, {
+  const response = await fetch(`${baseUrl}/employee/?id=${employeeId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
