@@ -229,23 +229,51 @@ export async function getCurrentUser(baseUrl) {
 }
 
 export async function updateEmployee(data, baseUrl) {
-  const user = await getCurrentUser(baseUrl); // you already use this elsewhere
+  const token = window.adobeIMS.getAccessToken();
+  const accessToken = token?.token;
+  const profile = window.adobeIMS.getProfile();
+  const users = await getCurrentUser(baseUrl); // you already use this elsewhere
+
+  const sid = token?.sid;
 
   // eslint-disable-next-line no-underscore-dangle
-  const employeeId = user?._id;
+  // const employeeId = user?._id;
+
+  // if (!employeeId) {
+  //   throw new Error('No employee ID found');
+  // }
+
+  let employee = users.find((user) => user.imsId === sid);
+
+  // fallback (important)
+  if (!employee) {
+    console.warn('SID match failed, fallback to email');
+
+    employee = users.find(
+      (user) => user.email === profile?.email,
+    );
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  const employeeId = employee?._id;
 
   if (!employeeId) {
-    throw new Error('No employee ID found');
+    throw new Error('Employee not found');
   }
 
   const payload = { ...data };
   // eslint-disable-next-line no-underscore-dangle
   delete payload._id; // prevent MongoDB error
 
+  // const tokenObj = window.adobeIMS.getAccessToken();
+  // const accessToken = token?.token;
+
   const response = await fetch(`${baseUrl}/employee/${employeeId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+      'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg',
     },
     body: JSON.stringify(payload),
   });
