@@ -371,6 +371,14 @@ header {
   display: block;
   margin-bottom: 6px;
 }
+
+.profile-modal-body input {
+  width: 100%;
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--spectrum-gray-200);
+  margin-bottom: 1px;
+}
  
 .date-field input {
   width: 100%;
