@@ -427,7 +427,8 @@ export default async function decorate(block) {
  
   block.append(nav);
 
-  await updateHeaderUser(nav);
+  // await updateHeaderUser(nav);
+  updateHeaderUser(nav);
   window.addEventListener('focus', () => {
   updateHeaderUser(nav);
 });
