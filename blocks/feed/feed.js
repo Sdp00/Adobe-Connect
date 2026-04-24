@@ -85,7 +85,7 @@ const [current, setCurrent] = useState(safeIndex);
       </div>`;
   };
 
-  // const { name, initials } = getUserInfo();
+  const { name, initials } = getUserInfo();
 
   return html`
     <div class="lightbox-backdrop" onClick=${onClose}>
@@ -165,13 +165,14 @@ const [current, setCurrent] = useState(safeIndex);
             `)}
           </div>
           <div class="lightbox-comment-input-row">
-            <div class="feed-comment-avatar">JN</div>
+            <div class="feed-comment-avatar">${initials}</div>
             <input
               class="feed-comment-input"
               placeholder="Write a comment…"
               value=${commentInput}
               onInput=${(e) => setCommentInput(e.target.value)}
               onKeyDown=${(e) => e.key === 'Enter' && addComment(current)}
+              disabled=${isPostingComment}
             />
             <button class="feed-comment-submit" onClick=${() =>addComment(current)} disabled=${!commentInput.trim() || isPostingComment}>
               ${isPostingComment ? 'Posting...' : 'Post'}

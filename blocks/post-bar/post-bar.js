@@ -5,6 +5,7 @@ import MediaUpload from '../../helper/media-upload.js';
 // import { isSignedInUser } from '../../scripts/auth.js';
 import { isSignedInUser, syncAndGetEmployee, getCachedEmployee, getCurrentUser } from '../../scripts/auth.js';
 import getConfig from '../../scripts/config.js';
+import getUserInfo from '../../scripts/user.js';
 // import {getConfig as authConfig} from '../../scripts/config.js';
 
 
@@ -370,8 +371,8 @@ const submitPost = async () => {
   //       .slice(0, 2)
   //       .toUpperCase()
   //   : 'NA';
-
-  const initials='NA'
+  const { name, initials } = getUserInfo();
+  // const initials='NA'
 
   
 
