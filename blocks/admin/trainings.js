@@ -65,18 +65,7 @@ function getUserColor(name) {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-/* ── Read users directly from item ───────────────────────── */
-function getUsersFromItem(item) {
-  const accepted = (item.responses?.acceptedUsers || []).map((u) => ({
-    ...u,
-    color: getUserColor(u.name),
-  }));
-  const declined = (item.responses?.declinedUsers || []).map((u) => ({
-    ...u,
-    color: getUserColor(u.name),
-  }));
-  return { accepted, declined };
-}
+const API_BASE = 'https://293924-adobeconnectmw-dev.adobeio-static.net/api/v1/web/adobe-connect';
 
 /* ── Export to CSV ────────────────────────────────────────── */
 function exportToExcel(item, accepted, declined) {
@@ -100,16 +89,40 @@ function exportToExcel(item, accepted, declined) {
 }
 
 /* ─────────────────────────────────────────────
-   RESPONSES MODAL  (View → accepted / declined)
+   RESPONSES MODAL  (accepted / declined)
 ───────────────────────────────────────────── */
 export function TrainingResponsesModal({ isOpen, onClose, item }) {
   const [activeTab, setActiveTab] = useState('accepted');
+  const [accepted, setAccepted] = useState([]);
+  const [declined, setDeclined] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || !item) return;
+    setLoading(true);
+    setAccepted([]);
+    setDeclined([]);
+    fetch(`${API_BASE}/eventsAndTrainings/${item.id}/responses`)
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then((data) => {
+        const acc = Array.isArray(data.accepted) ? data.accepted : (data.acceptedUsers || []);
+        const dec = Array.isArray(data.declined) ? data.declined : (data.declinedUsers || []);
+        setAccepted(acc.map((u) => ({ ...u, color: getUserColor(u.name) })));
+        setDeclined(dec.map((u) => ({ ...u, color: getUserColor(u.name) })));
+      })
+      .catch(() => {
+        const fallbackAcc = item.responses?.acceptedUsers || [];
+        const fallbackDec = item.responses?.declinedUsers || [];
+        setAccepted(fallbackAcc.map((u) => ({ ...u, color: getUserColor(u.name) })));
+        setDeclined(fallbackDec.map((u) => ({ ...u, color: getUserColor(u.name) })));
+      })
+      .finally(() => setLoading(false));
+  }, [isOpen, item?.id]);
 
   if (!item) return null;
-
-  const { accepted, declined } = getUsersFromItem(item);
-
-  const handleExport = () => exportToExcel(item, accepted, declined);
 
   const UserRow = ({ user, showReason }) => {
     const col = user.color;
@@ -132,111 +145,68 @@ export function TrainingResponsesModal({ isOpen, onClose, item }) {
     `;
   };
 
+  const hasAny = accepted.length > 0 || declined.length > 0;
+  const modalActions = hasAny
+    ? [{ label: 'Export as CSV', variant: 'modal-btn--draft', onClick: () => exportToExcel(item, accepted, declined) }]
+    : [];
+
   return html`
-    ${isOpen ? html`
-      <div class="ac-resp-backdrop" onClick=${(e) => { if (e.target === e.currentTarget) onClose(); }}>
-        <div class="ac-resp-modal">
-
-          <!-- Header -->
-          <div class="ac-resp-header">
-            <div class="ac-resp-header-left">
-              <div class="ac-resp-header-icon">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                  <path d="M13 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                  <path d="M2 17c0-3.314 3.582-6 8-6s8 2.686 8 6"/>
-                </svg>
-              </div>
-              <div>
-                <h2 class="ac-resp-title">Responses</h2>
-                <p class="ac-resp-subtitle">${item.title}</p>
-              </div>
-            </div>
-            <button class="ac-resp-close" onClick=${onClose} aria-label="Close">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
-                <path d="M3 3l10 10M13 3L3 13"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Summary Pills -->
-          <div class="ac-resp-summary">
-            <div class="ac-resp-pill ac-resp-pill--accepted">
-              <span class="ac-resp-pill-dot ac-resp-pill-dot--green"></span>
-              <strong>${accepted.length}</strong> Accepted
-            </div>
-            <div class="ac-resp-divider-v"></div>
-            <div class="ac-resp-pill ac-resp-pill--declined">
-              <span class="ac-resp-pill-dot ac-resp-pill-dot--red"></span>
-              <strong>${declined.length}</strong> Declined
-            </div>
-            <div class="ac-resp-total">
-              ${accepted.length + declined.length} total responses
-            </div>
-          </div>
-
-          <!-- Tabs -->
-          <div class="ac-resp-tabs">
-            <button
-              class=${'ac-resp-tab' + (activeTab === 'accepted' ? ' active' : '')}
-              onClick=${() => setActiveTab('accepted')}
-            >
-              <span class="ac-resp-tab-dot ac-resp-tab-dot--green"></span>
-              Accepted
-              <span class="ac-resp-tab-count ac-resp-tab-count--accepted">${accepted.length}</span>
-            </button>
-            <button
-              class=${'ac-resp-tab' + (activeTab === 'declined' ? ' active' : '')}
-              onClick=${() => setActiveTab('declined')}
-            >
-              <span class="ac-resp-tab-dot ac-resp-tab-dot--red"></span>
-              Declined
-              <span class="ac-resp-tab-count ac-resp-tab-count--declined">${declined.length}</span>
-            </button>
-          </div>
-
-          <!-- User List -->
-          <div class="ac-resp-list">
-            ${activeTab === 'accepted' && accepted.length === 0 ? html`
-              <div class="ac-resp-empty">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="opacity:0.3">
-                  <circle cx="24" cy="18" r="9"/>
-                  <path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18"/>
-                </svg>
-                <p>No accepted responses yet</p>
-              </div>
-            ` : ''}
-            ${activeTab === 'declined' && declined.length === 0 ? html`
-              <div class="ac-resp-empty">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="opacity:0.3">
-                  <circle cx="24" cy="18" r="9"/>
-                  <path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18"/>
-                </svg>
-                <p>No declined responses yet</p>
-              </div>
-            ` : ''}
-            ${activeTab === 'accepted'
-              ? accepted.map((u) => html`<${UserRow} user=${u} showReason=${false} />`)
-              : declined.map((u) => html`<${UserRow} user=${u} showReason=${true} />`)
-            }
-          </div>
-
-          <!-- Footer -->
-          <div class="ac-resp-footer">
-            <button class="ac-resp-export-btn" onClick=${handleExport}>
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
-                <path d="M8 2v8M5 7l3 3 3-3"/>
-                <path d="M2 12v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1"/>
-              </svg>
-              Export as Excel
-            </button>
-            <button class="ac-resp-close-btn" onClick=${onClose}>
-              Close
-            </button>
-          </div>
-
-        </div>
+    <${Modal}
+      isOpen=${isOpen}
+      onClose=${onClose}
+      modalHeader=${'Responses — ' + item.title}
+      actions=${modalActions}
+      onSubmit=${onClose}
+      submitLabel="Close"
+      showCancel=${false}
+    >
+      <div class="ac-resp-tabs">
+        <button
+          class=${'ac-resp-tab' + (activeTab === 'accepted' ? ' active' : '')}
+          onClick=${() => setActiveTab('accepted')}
+        >
+          <span class="ac-resp-tab-dot ac-resp-tab-dot--green"></span>
+          Accepted
+          <span class="ac-resp-tab-count ac-resp-tab-count--accepted">${accepted.length}</span>
+        </button>
+        <button
+          class=${'ac-resp-tab' + (activeTab === 'declined' ? ' active' : '')}
+          onClick=${() => setActiveTab('declined')}
+        >
+          <span class="ac-resp-tab-dot ac-resp-tab-dot--red"></span>
+          Declined
+          <span class="ac-resp-tab-count ac-resp-tab-count--declined">${declined.length}</span>
+        </button>
       </div>
-    ` : ''}
+
+      <div class="ac-resp-list">
+        ${loading ? html`
+          <div class="ac-resp-empty">
+            <span class="ac-spinner"></span>
+            <p>Loading...</p>
+          </div>
+        ` : activeTab === 'accepted' && accepted.length === 0 ? html`
+          <div class="ac-resp-empty">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="opacity:0.3">
+              <circle cx="24" cy="18" r="9"/>
+              <path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18"/>
+            </svg>
+            <p>No accepted responses yet</p>
+          </div>
+        ` : activeTab === 'declined' && declined.length === 0 ? html`
+          <div class="ac-resp-empty">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="opacity:0.3">
+              <circle cx="24" cy="18" r="9"/>
+              <path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18"/>
+            </svg>
+            <p>No declined responses yet</p>
+          </div>
+        ` : activeTab === 'accepted'
+          ? accepted.map((u) => html`<${UserRow} user=${u} showReason=${false} />`)
+          : declined.map((u) => html`<${UserRow} user=${u} showReason=${true} />`)
+        }
+      </div>
+    </${Modal}>
   `;
 }
 
@@ -270,7 +240,8 @@ function PreviewCard({ form }) {
 ───────────────────────────────────────────── */
 export function TrainingCard({ item, onEdit, onPreview, onToggleStatus, onViewResponses }) {
   const isLive = item.status === 'live';
-  const hasResponses = item.responses && item.responses.accepted != null;
+  const acceptedCount = item.responses?.accepted ?? 0;
+  const declinedCount = item.responses?.declined ?? 0;
 
   return html`
     <div class="ac-card" data-id=${item.id}>
@@ -284,19 +255,12 @@ export function TrainingCard({ item, onEdit, onPreview, onToggleStatus, onViewRe
         </span>
       </div>
       <div class="ac-card-responses">
-        ${hasResponses
-          ? html`
-              <span class="ac-chip ac-chip--accepted"><span class="ac-dot ac-dot--green"></span>${item.responses.accepted} accepted</span>
-              <span class="ac-chip ac-chip--declined"><span class="ac-dot ac-dot--red"></span>${item.responses.declined} declined</span>
-              <a class="ac-view-link" href="#" onClick=${(e) => { e.preventDefault(); onViewResponses && onViewResponses(item); }}>View →</a>
-            `
-          : html`
-              <span class="ac-upcoming">
-                <${Icon} name="info" width=16 height=16 />
-                Upcoming — no responses yet
-              </span>
-            `
-        }
+        <span class="ac-chip ac-chip--accepted ac-chip-clickable" onClick=${() => onViewResponses && onViewResponses(item)}>
+          <span class="ac-dot ac-dot--green"></span>${acceptedCount} accepted
+        </span>
+        <span class="ac-chip ac-chip--declined ac-chip-clickable" onClick=${() => onViewResponses && onViewResponses(item)}>
+          <span class="ac-dot ac-dot--red"></span>${declinedCount} declined
+        </span>
       </div>
       <div class="ac-card-actions">
         <button class="ac-action-btn" onClick=${() => onEdit(item)}>Edit</button>
