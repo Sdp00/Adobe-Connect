@@ -453,21 +453,109 @@ const addComment = async (index) => {
 
 };
 
-const toggleMediaLike = (index) => {
-  setMediaState(prev => {
-    const updated = [...prev];
-    const item = updated[index];
-    const wasLiked = item.liked;
-    updated[index] = {
-      ...item,
-      liked: !wasLiked,
-      stats: {
-        ...item.stats,
-        likes: wasLiked ? item.stats.likes - 1 : item.stats.likes + 1
-      }
-    };
-    return updated;
-  });
+// const toggleMediaLike = (index) => {
+//   setMediaState(prev => {
+//     const updated = [...prev];
+//     const item = updated[index];
+//     const wasLiked = item.liked;
+//     updated[index] = {
+//       ...item,
+//       liked: !wasLiked,
+//       stats: {
+//         ...item.stats,
+//         likes: wasLiked ? item.stats.likes - 1 : item.stats.likes + 1
+//       }
+//     };
+//     return updated;
+//   });
+// };
+
+const toggleMediaLike = async (index) => {
+  const currentMedia = mediaState[index];
+
+  try {
+    // const employee = await getLoggedInEmployee(baseUrl);
+    const users = await getCurrentUser(baseUrl);
+        const token = window.adobeIMS.getAccessToken();
+        const sid = token?.sid;
+    
+            // try match
+        let employee = users.find(user => user.imsId === sid);
+    
+        // fallback (important)
+        if (!employee) {
+          console.warn('SID match failed, fallback to email');
+    
+          const profile = window.adobeIMS.getProfile();
+    
+          employee = users.find(
+            user => user.email === profile?.email
+            );
+          }
+    
+          if (!employee?._id) {
+            throw new Error('Employee not found');
+          }
+
+    const existingLike = currentMedia.comments.find(
+      c => c.userId === employee._id && c.like === true
+    );
+
+    const commentId=existingLike._id;
+
+    let payload;
+    let method = 'PATCH';
+
+    if (existingLike) {
+      //  UNLIKE
+      payload = {
+        feedId: post.id,
+        mediaId: currentMedia._id,
+        like: false,
+        userId: employee._id,
+      };
+    } else {
+      //  LIKE
+      payload = {
+        feedId: post.id,
+        mediaId: currentMedia._id,
+        userId: employee._id,
+        like: true
+      };
+    }
+
+    const response = await fetch(`${baseUrl}/comments/?id=${commentId}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) throw new Error('Like toggle failed');
+
+    //  Update UI
+    setMediaState(prev => {
+      const updated = [...prev];
+      const item = updated[index];
+
+      updated[index] = {
+        ...item,
+        liked: !existingLike,
+        stats: {
+          ...item.stats,
+          likes: existingLike
+            ? item.stats.likes - 1
+            : item.stats.likes + 1
+        }
+      };
+
+      return updated;
+    });
+
+  } catch (err) {
+    console.error("Like toggle failed", err);
+  }
 };
 
   // Grid image click → open lightbox at hero(0) + grid offset
@@ -917,6 +1005,8 @@ if (mime.startsWith('image/')) {
     .filter(c => c.mediaId === m._id)
     .map(c => ({
       id: c._id,
+      userId: c.user?._id,   // 
+    like: c.like,
       name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
       text: c.comment
     }))
