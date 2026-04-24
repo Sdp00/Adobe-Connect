@@ -6,7 +6,8 @@ export default function getUserInfo() {
 
   const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
   const initials = fullName
-    ? fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    ? fullName.split(' ').map((n) => n[0]).join('').slice(0, 2)
+      .toUpperCase()
     : 'NA';
 
   return { name: fullName || 'User', initials, email: user.email || '' };
