@@ -79,7 +79,7 @@ function PreviewCard({ form }) {
 ───────────────────────────────────────────── */
 export function EventCard({ item, onEdit, onPreview, onInterested, onToggleStatus }) {
   const isLive = item.status === 'live';
-  const hasResponses = item.responses && item.responses.interested != null;
+  const interestedCount = item.responses?.interested ?? 0;
 
   return html`
     <div class="ac-card" data-id=${item.id}>
@@ -93,20 +93,10 @@ export function EventCard({ item, onEdit, onPreview, onInterested, onToggleStatu
         </span>
       </div>
       <div class="ac-card-responses">
-        ${hasResponses
-          ? html`
-              <span class="ac-chip ac-chip--interested ac-chip-clickable" onClick=${() => onInterested(item)}>
-                <${Icon} name="users" width=16 height=16 />
-                ${item.responses.interested} interested
-              </span>
-            `
-          : html`
-              <span class="ac-upcoming">
-                <${Icon} name="info" width=16 height=16 />
-                Upcoming — no responses yet
-              </span>
-            `
-        }
+        <span class="ac-chip ac-chip--interested ac-chip-clickable" onClick=${() => onInterested(item)}>
+          <${Icon} name="users" width=16 height=16 />
+          ${interestedCount} interested
+        </span>
       </div>
       <div class="ac-card-actions">
         <button class="ac-action-btn" onClick=${() => onEdit(item)}>Edit</button>
@@ -177,7 +167,7 @@ export function AddMediaModal({ isOpen, onClose, item, onSave }) {
 }
 
 /* ─────────────────────────────────────────────
-   INTERESTED USERS MODAL  (redesigned)
+   INTERESTED USERS MODAL
 ───────────────────────────────────────────── */
 
 const AVATAR_COLORS = [
@@ -200,29 +190,7 @@ function getInitials(name) {
   return name.trim().split(/\s+/).map((n) => n[0].toUpperCase()).slice(0, 2).join('');
 }
 
-function toAdobeEmail(name) {
-  if (!name) return '';
-  return name.trim().toLowerCase().replace(/\s+/g, '.') + '@adobe.com';
-}
-
-const MOCK_INTERESTED_NAMES = [
-  'Rahul Verma', 'Meera Nambiar', 'Siddharth Rao', 'Kavya Reddy',
-  'Aditya Bhatt', 'Nisha Pillai', 'Kiran Menon', 'Ravi Shankar',
-  'Anita Desai', 'Suresh Kumar', 'Lakshmi Iyer', 'Vijay Nair',
-];
-
-function generateInterestedUsers(item) {
-  const count = item.responses?.interested ?? 0;
-  const existing = item.responses?.interestedUsers || [];
-  if (existing.length > 0) {
-    return existing.map((u) => ({ ...u, color: getUserColor(u.name) }));
-  }
-  return MOCK_INTERESTED_NAMES.slice(0, count).map((name) => ({
-    name,
-    email: toAdobeEmail(name),
-    color: getUserColor(name),
-  }));
-}
+const API_BASE = 'https://293924-adobeconnectmw-dev.adobeio-static.net/api/v1/web/adobe-connect';
 
 function exportInterestedToExcel(item, users) {
   const rows = [
@@ -243,82 +211,72 @@ function exportInterestedToExcel(item, users) {
 }
 
 export function InterestedModal({ isOpen, onClose, item }) {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || !item) return;
+    setLoading(true);
+    setUsers([]);
+    fetch(`${API_BASE}/eventsAndTrainings/${item.id}/interested`)
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then((data) => {
+        const list = Array.isArray(data) ? data : (data.interestedUsers || data.users || []);
+        setUsers(list.map((u) => ({ ...u, color: getUserColor(u.name) })));
+      })
+      .catch(() => {
+        const fallback = item.responses?.interestedUsers || [];
+        setUsers(fallback.map((u) => ({ ...u, color: getUserColor(u.name) })));
+      })
+      .finally(() => setLoading(false));
+  }, [isOpen, item?.id]);
+
   if (!item) return null;
-  const users = generateInterestedUsers(item);
+
+  const modalActions = users.length > 0
+    ? [{ label: 'Export as CSV', variant: 'modal-btn--draft', onClick: () => exportInterestedToExcel(item, users) }]
+    : [];
 
   return html`
-    ${isOpen ? html`
-      <div class="ac-resp-backdrop" onClick=${(e) => { if (e.target === e.currentTarget) onClose(); }}>
-        <div class="ac-resp-modal">
-
-          <!-- Header -->
-          <div class="ac-resp-header">
-            <div class="ac-resp-header-left">
-              <div class="ac-resp-header-icon">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                  <path d="M13 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                  <path d="M2 17c0-3.314 3.582-6 8-6s8 2.686 8 6"/>
-                </svg>
-              </div>
-              <div>
-                <h2 class="ac-resp-title">Interested</h2>
-                <p class="ac-resp-subtitle">${item.title}</p>
-              </div>
+    <${Modal}
+      isOpen=${isOpen}
+      onClose=${onClose}
+      modalHeader=${'Interested — ' + item.title}
+      actions=${modalActions}
+      onSubmit=${onClose}
+      submitLabel="Close"
+      showCancel=${false}
+    >
+      <div class="ac-resp-list">
+        ${loading ? html`
+          <div class="ac-resp-empty">
+            <span class="ac-spinner"></span>
+            <p>Loading...</p>
+          </div>
+        ` : users.length === 0 ? html`
+          <div class="ac-resp-empty">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="opacity:0.3">
+              <circle cx="24" cy="18" r="9"/>
+              <path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18"/>
+            </svg>
+            <p>No interested users yet</p>
+          </div>
+        ` : users.map((u) => html`
+          <div class="ac-resp-row">
+            <div class="ac-resp-avatar" style=${'background:' + u.color.bg + ';color:' + u.color.color + ';border-color:' + u.color.border}>
+              ${getInitials(u.name)}
             </div>
-            <button class="ac-resp-close" onClick=${onClose} aria-label="Close">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16">
-                <path d="M3 3l10 10M13 3L3 13"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Summary -->
-          <div class="ac-resp-summary">
-            <div class="ac-resp-pill ac-resp-pill--interested-ev">
-              <span class="ac-resp-pill-dot" style="background:#f59e0b"></span>
-              <strong>${users.length}</strong> Interested
+            <div class="ac-resp-info">
+              <span class="ac-resp-name">${u.name}</span>
+              <a class="ac-resp-email" href=${'mailto:' + u.email}>${u.email}</a>
             </div>
-            <div class="ac-resp-total">${users.length} total</div>
           </div>
-
-          <!-- User List -->
-          <div class="ac-resp-list">
-            ${users.length === 0 ? html`
-              <div class="ac-resp-empty">
-                <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="40" height="40" style="opacity:0.3">
-                  <circle cx="24" cy="18" r="9"/>
-                  <path d="M6 42c0-9.941 8.059-18 18-18s18 8.059 18 18"/>
-                </svg>
-                <p>No interested users yet</p>
-              </div>
-            ` : users.map((u) => html`
-              <div class="ac-resp-row">
-                <div class="ac-resp-avatar" style=${'background:' + u.color.bg + ';color:' + u.color.color + ';border-color:' + u.color.border}>
-                  ${getInitials(u.name)}
-                </div>
-                <div class="ac-resp-info">
-                  <span class="ac-resp-name">${u.name}</span>
-                  <a class="ac-resp-email" href=${'mailto:' + u.email}>${u.email}</a>
-                </div>
-              </div>
-            `)}
-          </div>
-
-          <!-- Footer -->
-          <div class="ac-resp-footer">
-            <button class="ac-resp-export-btn" onClick=${() => exportInterestedToExcel(item, users)}>
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
-                <path d="M8 2v8M5 7l3 3 3-3"/>
-                <path d="M2 12v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1"/>
-              </svg>
-              Export as Excel
-            </button>
-            <button class="ac-resp-close-btn" onClick=${onClose}>Close</button>
-          </div>
-
-        </div>
+        `)}
       </div>
-    ` : ''}
+    </${Modal}>
   `;
 }
 
