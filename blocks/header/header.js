@@ -40,6 +40,8 @@ async function searchEmployees() {
 /* ── Admin search (events & trainings) ── */
 const AC_API = 'https://293924-adobeconnectmw-dev.adobeio-static.net/api/v1/web/adobe-connect';
 let acItemsCache = null;
+let isUpdatingUser = false;
+let focusDebounce = null;
 
 async function fetchAdminItems() {
   if (acItemsCache) return acItemsCache;
@@ -203,6 +205,8 @@ function attachSearch(inputEl) {
 }
 
 async function updateHeaderUser(nav) {
+  if (isUpdatingUser) return;           // guard against loop
+  isUpdatingUser = true;
   try {
     const isSignedIn = window?.adobeIMS?.isSignedInUser?.();
 
@@ -224,7 +228,7 @@ async function updateHeaderUser(nav) {
 
     const user = await syncAndGetEmployee(baseUrl);
     window.currentUser = user;
-    window.dispatchEvent(new Event('user:updated'));
+    window.dispatchEvent(new Event('user:ready'));
 
     if (!user) return;
 
@@ -250,6 +254,8 @@ async function updateHeaderUser(nav) {
 
   } catch (e) {
     console.error('Header user update failed:', e);
+  } finally {
+    isUpdatingUser = false;             // always release guard
   }
 }
  
@@ -430,8 +436,12 @@ export default async function decorate(block) {
   // await updateHeaderUser(nav);
   updateHeaderUser(nav);
   window.addEventListener('focus', () => {
-  updateHeaderUser(nav);
-});
+    clearTimeout(focusDebounce);
+    focusDebounce = setTimeout(() => updateHeaderUser(nav), 500);
+  });
+//   window.addEventListener('focus', () => {
+//   updateHeaderUser(nav);
+// });
 
 // optional: custom event trigger anywhere in app
 window.addEventListener('user:updated', () => {
