@@ -25,6 +25,8 @@ async function fetchIcon(name) {
 ───────────────────────────────────────────── */
 const HAMBURGER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`;
 const CLOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+const LOGO_LIGHT = '/blocks/header/logo-light.png';
+const LOGO_DARK = '/blocks/header/logo-dark.png';
  
 /* ─────────────────────────────────────────────
    SEARCH
@@ -227,8 +229,7 @@ export default async function decorate(block) {
   nav.innerHTML = `
     <div class="nav-left">
       <button class="hamburger-btn icon-btn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="ac-sidebar"></button>
-      <a href="${isAdminPage ? '/admin' : '/'}"><img class="nav-logo-img" src="/blocks/header/Adobe-logo.jpeg" alt="Adobe" /></a>
-      <span class="nav-title">${title}</span>
+      <a href="${isAdminPage ? '/admin' : '/'}"><img class="nav-logo-img" alt='Adobe-logo'/></a>
     </div>
  
  
@@ -371,6 +372,13 @@ export default async function decorate(block) {
 });
  
   block.append(nav);
+
+//   const logoImg = nav.querySelector('.nav-logo-img');
+// const savedTheme = localStorage.getItem('theme') || 'light';
+
+// logoImg.src = savedTheme === 'dark' ? LOGO_DARK : LOGO_LIGHT;
+
+
  
   /* ── Hamburger → sidebar wiring ── */
   const hamburgerBtn = nav.querySelector('.hamburger-btn');
@@ -409,6 +417,8 @@ export default async function decorate(block) {
   const themeBtn = nav.querySelector('.theme-toggle-btn');
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
+  const logoImg = nav.querySelector('.nav-logo-img');
+  logoImg.src = savedTheme === 'dark' ? LOGO_DARK : LOGO_LIGHT;
 
   const [moonSvg, sunSvg, bellSvg] = await Promise.all([
     fetchIcon('moon'),
@@ -424,6 +434,7 @@ export default async function decorate(block) {
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
     themeBtn.innerHTML = next === 'dark' ? sunSvg : moonSvg;
+    logoImg.src = next === 'dark' ? LOGO_DARK : LOGO_LIGHT;
   });
 
   const notifyBtn = nav.querySelector('.notify-trigger');

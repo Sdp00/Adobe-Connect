@@ -108,7 +108,9 @@ main > .section.calendar-container > .fragment-wrapper {
 .cal-popover-mount {
   display: none;
 }
- 
+ .cal-popover__trigger {
+  color: var(--spectrum-gray-500);
+}
 .cal-popover__trigger {
   background: none;
   border: none;
