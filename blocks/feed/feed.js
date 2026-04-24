@@ -4,7 +4,7 @@ import { readBlockConfig } from '../../scripts/aem.js';
 import getConfig from '../../scripts/config.js';
 import withAuth  from "../../scripts/auth-guard.js";
 import { getCachedEmployee, getCurrentUser, isSignedInUser, syncAndGetEmployee } from "../../scripts/auth.js";
-import  getUserInfo  from '../../scripts/user.js';
+import  getUserInfo, { useCurrentUser }  from '../../scripts/user.js';
 
 
 
@@ -85,7 +85,8 @@ const [current, setCurrent] = useState(safeIndex);
       </div>`;
   };
 
-  const { name, initials } = getUserInfo();
+  // const { name, initials } = getUserInfo();
+  const { name, initials } = useCurrentUser();
 
   return html`
     <div class="lightbox-backdrop" onClick=${onClose}>
@@ -256,10 +257,11 @@ if (mediaState.length === 1) {
 // const gridImages = rest.slice(0, 3);
 // const extraCount = rest.length > 3 ? rest.length - 3 : 0;
 
-const { name: currentName, initials: currentInitials } = getUserInfo();
+// const { name: currentName, initials: currentInitials } = getUserInfo();
+const { name: currentName, initials: currentInitials } = useCurrentUser();
 
   const initials = post.name === "You"
-    ? {currentInitials}
+    ? currentInitials
     : post.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   // const toggleLike = () => {
