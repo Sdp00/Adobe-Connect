@@ -1,5 +1,5 @@
 import { getMetadata } from '../../scripts/aem.js';
-import { updateEmployee } from '../../scripts/auth.js';
+import { syncAndGetEmployee, updateEmployee } from '../../scripts/auth.js';
 import getConfig from '../../scripts/config.js';
 import { loadFragment } from '../fragment/fragment.js';
 
@@ -201,6 +201,57 @@ function attachSearch(inputEl) {
     }
   });
 }
+
+async function updateHeaderUser(nav) {
+  try {
+    const isSignedIn = window?.adobeIMS?.isSignedInUser?.();
+
+    if (!isSignedIn) {
+      // reset UI
+      const avatarEl = nav.querySelector('.avatar');
+      const nameEl = nav.querySelector('.profile-name');
+      const roleEl = nav.querySelector('.profile-role');
+
+      if (avatarEl) avatarEl.textContent = 'NA';
+      if (nameEl) nameEl.textContent = 'Guest';
+      if (roleEl) roleEl.textContent = '';
+
+      return;
+    }
+
+    const { adobeIoEndpoint } = getConfig();
+    const baseUrl = adobeIoEndpoint || '';
+
+    const user = await syncAndGetEmployee(baseUrl);
+    window.currentUser = user;
+    window.dispatchEvent(new Event('user:updated'));
+
+    if (!user) return;
+
+    const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+
+    const avatarEl = nav.querySelector('.avatar');
+    const nameEl = nav.querySelector('.profile-name');
+    const roleEl = nav.querySelector('.profile-role');
+
+    if (nameEl) nameEl.textContent = fullName || 'User';
+    if (roleEl) roleEl.textContent = user.email || '';
+
+    if (avatarEl) {
+      avatarEl.textContent = fullName
+        ? fullName
+            .split(' ')
+            .map(n => n[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase()
+        : 'NA';
+    }
+
+  } catch (e) {
+    console.error('Header user update failed:', e);
+  }
+}
  
 /* ─────────────────────────────────────────────
    MAIN DECORATE
@@ -366,12 +417,25 @@ export default async function decorate(block) {
   nav.querySelector('.menu-logout')?.addEventListener('click', () => {
   if (window?.adobeIMS) {
     window.adobeIMS.signOut();
+    updateHeaderUser(nav);
+    window.currentUser = null;
+    window.dispatchEvent(new Event('user:updated'));
   } else {
     console.error('Adobe IMS not available');
   }
 });
  
   block.append(nav);
+
+  await updateHeaderUser(nav);
+  window.addEventListener('focus', () => {
+  updateHeaderUser(nav);
+});
+
+// optional: custom event trigger anywhere in app
+window.addEventListener('user:updated', () => {
+  updateHeaderUser(nav);
+});
 
 //   const logoImg = nav.querySelector('.nav-logo-img');
 // const savedTheme = localStorage.getItem('theme') || 'light';

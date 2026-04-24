@@ -4,6 +4,7 @@ import { readBlockConfig } from '../../scripts/aem.js';
 import getConfig from '../../scripts/config.js';
 import withAuth  from "../../scripts/auth-guard.js";
 import { getCachedEmployee, getCurrentUser, isSignedInUser, syncAndGetEmployee } from "../../scripts/auth.js";
+import  getUserInfo  from '../../scripts/user.js';
 
 
 
@@ -19,7 +20,7 @@ const DEFAULT_CONFIG = {
   dataUrl:"/feed"
 };
 
-function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike,isPostingComment  }) {
+function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike,isPostingComment,postName,postInitials,postTime  }) {
   // const [current, setCurrent] = useState(startIndex);
   const safeIndex = Math.min(startIndex, mediaItems.length - 1);
 const [current, setCurrent] = useState(safeIndex);
@@ -84,6 +85,8 @@ const [current, setCurrent] = useState(safeIndex);
       </div>`;
   };
 
+  // const { name, initials } = getUserInfo();
+
   return html`
     <div class="lightbox-backdrop" onClick=${onClose}>
       <div class="lightbox-container" onClick=${(e) => e.stopPropagation()}>
@@ -121,10 +124,10 @@ const [current, setCurrent] = useState(safeIndex);
         <!-- RIGHT: COMMENTS -->
         <div class="lightbox-side">
           <div class="lightbox-side-header">
-            <div class="feed-avatar">JN</div>
+            <div class="feed-avatar">${postInitials}</div>
             <div>
-              <div class="feed-name">You</div>
-              <div class="feed-meta">Now</div>
+              <div class="feed-name">${postName}</div>
+              <div class="feed-meta">${postTime}</div>
             </div>
           </div>
           <!-- Stats bar -->
@@ -252,8 +255,10 @@ if (mediaState.length === 1) {
 // const gridImages = rest.slice(0, 3);
 // const extraCount = rest.length > 3 ? rest.length - 3 : 0;
 
+const { name: currentName, initials: currentInitials } = getUserInfo();
+
   const initials = post.name === "You"
-    ? "JN"
+    ? {currentInitials}
     : post.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
   // const toggleLike = () => {
@@ -661,6 +666,14 @@ useEffect(() => {
           setCommentInput=${setCommentInput}
           addComment=${addComment}
           isPostingComment=${isPostingComment}
+          postName=${post.name}
+          postInitials=${post.name
+            .split(' ')
+            .map(n => n[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase()}
+          postTime=${post.time}
         />
       `}
 
