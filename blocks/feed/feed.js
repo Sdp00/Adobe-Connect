@@ -67,7 +67,7 @@ const [current, setCurrent] = useState(safeIndex);
     }
     // plain image string or object
     const src = typeof item === 'string' ? item : item.url;
-    return html`<img class="lightbox-img" src=${src} alt="" />`;
+    return html`<img class="lightbox-img" loading="lazy" src=${src} alt="feedimage" />`;
   };
 
   const getThumb = (m) => {
@@ -756,7 +756,7 @@ useEffect(() => {
               <span>${heroItem.name}</span>
             </div>
           ` : html`
-            <img class="feed-image-hero" src=${heroItem.url} alt="" />
+            <img class="feed-image-hero" src=${heroItem.url} alt="feedimage" />
           `}
         </div>
       `}
@@ -784,7 +784,7 @@ useEffect(() => {
                   <span>${item.name}</span>
                 </div>
               ` : html`
-                <img src=${item.url} alt="" />
+                <img loading="lazy" src=${item.url} alt="feedimage" />
               `}
               ${i === gridItems.length - 1 && extraCount > 0 && html`
                 <span class="feed-image-overlay-count">+${extraCount}</span>
