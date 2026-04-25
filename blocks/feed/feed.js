@@ -500,11 +500,26 @@ const toggleMediaLike = async (index) => {
             throw new Error('Employee not found');
           }
 
-    const existingLike = currentMedia.comments.find(
-      c => c.userId === employee._id && c.like === true
-    );
+    // const existingLike = currentMedia.comments.find(
+    //   c => c.userId === employee._id && c.like === true
+    // );
 
-    const commentId=existingLike?._id;
+    // const commentId=existingLike?._id;
+
+    //  STEP 1: fetch real comments from backend
+const commentsRes = await fetch(`${baseUrl}/comments`);
+const allComments = await commentsRes.json();
+
+//  STEP 2: find correct like for this user + media
+const existingLike = allComments
+  .filter(c =>
+    c.mediaId === currentMedia._id &&
+    c.userId === employee._id &&
+    c.like === true
+  )
+  .pop(); // take latest (important)
+
+const commentId = existingLike?._id;
 
     // let payload;
     // let method = 'PATCH';
@@ -549,7 +564,7 @@ if (existingLike) {
   };
 
   method = 'PATCH';
-  url = `${baseUrl}/comments?id=${existingLike._id}`;
+  url = `${baseUrl}/comments?id=${commentId}`;
 
 } else {
   //  LIKE → create new comment
@@ -571,6 +586,7 @@ const response = await fetch(url, {
   },
   body: JSON.stringify(payload)
 });
+const saved = await response.json();
 
     if (!response.ok) throw new Error('Like toggle failed');
 
@@ -607,7 +623,8 @@ const response = await fetch(url, {
   } else {
     // add like entry
     newComments.push({
-      _id: 'temp-' + Date.now(),
+      // _id: 'temp-' + Date.now(),
+      _id:saved._id,
       userId: employee._id,
       like: true,
       name: 'You',
