@@ -7,9 +7,9 @@ main {
   display: flex !important;
   flex-direction: row !important;
   align-items: flex-start !important;
-  gap: 24px !important;
-  max-width: 1280px;
-  margin: 0 auto;
+  /* gap: 24px !important; */
+  /* max-width: 1280px; */
+  /* margin: 0 auto; */
   box-sizing: border-box;
 }
  
