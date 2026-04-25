@@ -1044,7 +1044,7 @@ if (mime.startsWith('image/')) {
   comments: (apiPost.comments || [])
     .filter(c => c.mediaId === m._id)
     .map(c => ({
-      id: c._id,
+      _id: c._id,
       userId: c.user?._id || c?.userId,   // 
       like: c.like,
       name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
