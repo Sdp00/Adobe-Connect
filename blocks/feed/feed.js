@@ -5,6 +5,7 @@ import getConfig from '../../scripts/config.js';
 import withAuth  from "../../scripts/auth-guard.js";
 import { getCachedEmployee, getCurrentUser, isSignedInUser, syncAndGetEmployee } from "../../scripts/auth.js";
 import  getUserInfo, { useCurrentUser }  from '../../scripts/user.js';
+import formatPostTime from '../../utils/timeConfig.js';
 
 
 
@@ -503,7 +504,7 @@ const toggleMediaLike = async (index) => {
       c => c.userId === employee._id && c.like === true
     );
 
-    const commentId=existingLike._id;
+    const commentId=existingLike?._id;
 
     let payload;
     let method = 'PATCH';
@@ -537,23 +538,60 @@ const toggleMediaLike = async (index) => {
     if (!response.ok) throw new Error('Like toggle failed');
 
     //  Update UI
+    // setMediaState(prev => {
+    //   const updated = [...prev];
+    //   const item = updated[index];
+
+    //   updated[index] = {
+    //     ...item,
+    //     liked: !existingLike,
+    //     stats: {
+    //       ...item.stats,
+    //       likes: existingLike
+    //         ? item.stats.likes - 1
+    //         : item.stats.likes + 1
+    //     }
+    //   };
+
+    //   return updated;
+    // });
+
     setMediaState(prev => {
-      const updated = [...prev];
-      const item = updated[index];
+  const updated = [...prev];
+  const item = updated[index];
 
-      updated[index] = {
-        ...item,
-        liked: !existingLike,
-        stats: {
-          ...item.stats,
-          likes: existingLike
-            ? item.stats.likes - 1
-            : item.stats.likes + 1
-        }
-      };
+  let newComments = [...(item.comments || [])];
 
-      return updated;
+  if (existingLike) {
+    // remove like
+    newComments = newComments.map(c =>
+      c._id === existingLike._id ? { ...c, like: false } : c
+    );
+  } else {
+    // add like entry
+    newComments.push({
+      _id: 'temp-' + Date.now(),
+      userId: employee._id,
+      like: true,
+      name: 'You',
+      text: ''
     });
+  }
+
+  updated[index] = {
+    ...item,
+    comments: newComments,
+    liked: !existingLike,
+    stats: {
+      ...item.stats,
+      likes: existingLike
+        ? item.stats.likes - 1
+        : item.stats.likes + 1
+    }
+  };
+
+  return updated;
+});
 
   } catch (err) {
     console.error("Like toggle failed", err);
@@ -1007,8 +1045,8 @@ if (mime.startsWith('image/')) {
     .filter(c => c.mediaId === m._id)
     .map(c => ({
       id: c._id,
-      userId: c.user?._id,   // 
-    like: c.like,
+      userId: c.user?._id || c?.userId,   // 
+      like: c.like,
       name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
       text: c.comment
     }))
@@ -1038,7 +1076,8 @@ if (mime.startsWith('image/')) {
      name: `${apiPost.author?.first_name || ''} ${apiPost.author?.last_name || ''}`.trim() || 'User',
     // role: apiPost.author?.role || '',
     role: apiPost.author?.email || '',
-    time: new Date(apiPost.createdAt).toLocaleString(),
+    // time: new Date(apiPost.createdAt).toLocaleString(),
+    time: formatPostTime(apiPost.createdAt),
     // title: apiPost.content?.title || "",
     title: apiPost?.title || "",
     // text: apiPost.content?.text || "",
