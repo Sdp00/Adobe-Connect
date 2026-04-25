@@ -940,7 +940,8 @@ opacity: 0.65;
 
 @media (width >= 1024px) {
   .feed {
-    max-width: 960px;
+    /* max-width: 960px; */
+    width: 100%;
 
     /* margin: 16px auto 0; */
 
