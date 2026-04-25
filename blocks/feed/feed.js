@@ -200,7 +200,39 @@ function FeedCard({ post ,config }) {
   const [isPostingComment, setIsPostingComment] = useState(false);
   const { adobeIoEndpoint } = getConfig();
   const baseUrl = adobeIoEndpoint || '';
+
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+useEffect(() => {
+  (async () => {
+    const users = await getCurrentUser(baseUrl);
+    const token = window.adobeIMS.getAccessToken();
+    const sid = token?.sid;
+
+    let employee = users.find(u => u.imsId === sid);
+
+    if (!employee) {
+      const profile = window.adobeIMS.getProfile();
+      employee = users.find(u => u.email === profile?.email);
+    }
+
+    setCurrentUserId(employee?._id);
+  })();
+}, []);
   
+
+useEffect(() => {
+  if (!currentUserId) return;
+
+  setMediaState(prev =>
+    prev.map(item => ({
+      ...item,
+      liked: item.comments?.some(
+        c => c.userId === currentUserId && c.like === true
+      ) || false
+    }))
+  );
+}, [currentUserId]);
 
   // const allImages = post.images || [];
   // const [hero, ...rest] = allImages;
@@ -230,7 +262,14 @@ const allMedia = (post.mediaWithComments || []).map(m => {
              : m.type === 'video' ? 'video/mp4'
              : m.type === 'pdf'   ? 'application/pdf'
              : m.type;
-  return { ...m, type, liked: false };  //  ADD liked: false
+  // return { ...m, type, liked: false };  //  ADD liked: false
+  return {
+    ...m,
+    type,
+    liked: m.comments?.some(
+      c => c.userId === currentUserId && c.like === true
+    ) || false
+  };
 });
 const [mediaState, setMediaState] = useState(allMedia);
 
