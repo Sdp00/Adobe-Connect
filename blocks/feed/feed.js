@@ -506,34 +506,71 @@ const toggleMediaLike = async (index) => {
 
     const commentId=existingLike?._id;
 
+    // let payload;
+    // let method = 'PATCH';
+
+    // if (existingLike) {
+    //   //  UNLIKE
+    //   payload = {
+    //     feedId: post.id,
+    //     mediaId: currentMedia._id,
+    //     like: false,
+    //     userId: employee._id,
+    //   };
+    // } else {
+    //   //  LIKE
+    //   payload = {
+    //     feedId: post.id,
+    //     mediaId: currentMedia._id,
+    //     userId: employee._id,
+    //     like: true
+    //   };
+    // }
+
+    // const response = await fetch(`${baseUrl}/comments/?id=${commentId}`, {
+    //   method,
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify(payload)
+    // });
+
     let payload;
-    let method = 'PATCH';
+let method;
+let url;
 
-    if (existingLike) {
-      //  UNLIKE
-      payload = {
-        feedId: post.id,
-        mediaId: currentMedia._id,
-        like: false,
-        userId: employee._id,
-      };
-    } else {
-      //  LIKE
-      payload = {
-        feedId: post.id,
-        mediaId: currentMedia._id,
-        userId: employee._id,
-        like: true
-      };
-    }
+if (existingLike) {
+  //  UNLIKE → update existing comment
+  payload = {
+    feedId: post.id,
+    mediaId: currentMedia._id,
+    like: false,
+    userId: employee._id,
+  };
 
-    const response = await fetch(`${baseUrl}/comments/?id=${commentId}`, {
-      method,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
+  method = 'PATCH';
+  url = `${baseUrl}/comments?id=${existingLike._id}`;
+
+} else {
+  //  LIKE → create new comment
+  payload = {
+    feedId: post.id,
+    mediaId: currentMedia._id,
+    userId: employee._id,
+    like: true
+  };
+
+  method = 'POST';
+  url = `${baseUrl}/comments`;   // NO ID HERE
+}
+
+const response = await fetch(url, {
+  method,
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(payload)
+});
 
     if (!response.ok) throw new Error('Like toggle failed');
 
