@@ -854,18 +854,25 @@ useEffect(() => {
 
           <!-- Input -->
           ${config.allowComments && html`
-          <div class="feed-comment-input-row">
-            <div class="feed-comment-avatar">JN</div>
+          <div class="feed-comment-input-row"
+            onClick=${() => !config.disableLightbox && openLightbox(0)}
+          >
+            <div class="feed-comment-avatar">${currentInitials}</div>
             <input
               class="feed-comment-input"
               placeholder="Write a comment…"
               value=${commentInput}
+              onClick=${(e) => e.stopPropagation()}
               onInput=${(e) => setCommentInput(e.target.value)}
               onKeyDown=${(e) => e.key === 'Enter' && addComment()}
+              disabled
             />
             <button
               class="feed-comment-submit"
-              onClick=${addComment}
+              onClick=${(e) => {
+                e.stopPropagation();
+                addComment();
+              }}
               disabled=${!commentInput.trim()}
             >
               Post
