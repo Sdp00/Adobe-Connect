@@ -943,6 +943,9 @@ function Feed({ config }) {
       // .then(data =>setPosts(data))
       .then(data => {
         const transformed = data.map(transformPost);
+        transformed.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
         console.log(data)
         setPosts(transformed);
       })
@@ -980,8 +983,8 @@ function Feed({ config }) {
   };
 
 
-    window.addEventListener('create-post', handler);
-    return () => window.removeEventListener('create-post', handler);
+    window.addEventListener('post-created-success', handler);
+    return () => window.removeEventListener('post-created-success', handler);
   }, []);
 
 //   function transformPost(apiPost) {
@@ -1214,6 +1217,7 @@ if (mime.startsWith('image/')) {
     // role: apiPost.author?.role || '',
     role: apiPost.author?.email || '',
     // time: new Date(apiPost.createdAt).toLocaleString(),
+    createdAt: apiPost.createdAt,
     time: formatPostTime(apiPost.createdAt),
     // title: apiPost.content?.title || "",
     title: apiPost?.title || "",
