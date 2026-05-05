@@ -51,6 +51,16 @@ function PostBar({config={}}) {
     files: [],
   });
 
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+    useEffect(() => {
+      isSignedInUser().then(setIsUserLoggedIn);
+    }, []);
+
+    const tooltipText = !isUserLoggedIn
+  ? 'Login to create post'
+  : '';
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function validateMedia(files = []) {
@@ -394,7 +404,7 @@ const submitPost = async () => {
 
       <button
         class="postbar-button"
-        
+        title=${tooltipText}
         onClick=${handleOpenPostComposer}
       >
         ${postButtonLabel}
@@ -405,6 +415,7 @@ const submitPost = async () => {
     ${showFab && html`
       <button
         class="postbar-fab"
+        title=${tooltipText}
         onClick=${handleOpenPostComposer}
         aria-label="Create post"
       >
