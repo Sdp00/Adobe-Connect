@@ -473,9 +473,20 @@ async function fetchEventsAndTrainings() {
     ? data
     : (data.eventsAndTrainings || data.body?.eventsAndTrainings || []);
 
+  const published = all.filter((item) => item.status === 'live');
+
+  // Sort newest-first: MongoDB ObjectIds embed creation timestamp in the first 8 hex chars
+  published.sort((a, b) => {
+    const idA = a._id || a.id || '';
+    const idB = b._id || b.id || '';
+    if (idB > idA) return 1;
+    if (idB < idA) return -1;
+    return 0;
+  });
+
   return {
-    events:    all.filter((item) => item.type === 'event'),
-    trainings: all.filter((item) => item.type === 'training'),
+    events:    published.filter((item) => item.type === 'event'),
+    trainings: published.filter((item) => item.type === 'training'),
   };
 }
 

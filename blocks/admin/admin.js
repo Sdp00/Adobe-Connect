@@ -92,24 +92,34 @@ function buildPayload(data) {
   return rest;
 }
 
+function getAuthHeaders() {
+  const tokenObj = window.adobeIMS?.getAccessToken();
+  const accessToken = tokenObj?.token;
+  if (!accessToken) return {};
+  return {
+    Authorization: `Bearer ${accessToken}`,
+    'x-gw-ims-org-id': '8B2628265E74EE890A495EDA@AdobeOrg',
+  };
+}
+
 async function postItem(data) {
   const res = await fetch(`${API_BASE}/eventsAndTrainings`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(buildPayload(data)),
   });
   if (!res.ok) throw new Error(`Failed to create item (${res.status})`);
-  return res.json();
+  try { return await res.json(); } catch { return {}; }
 }
 
 async function putItem(id, data) {
   const res = await fetch(`${API_BASE}/eventsAndTrainings/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify(buildPayload(data)),
   });
   if (!res.ok) throw new Error(`Failed to update item (${res.status})`);
-  return res.json();
+  try { return await res.json(); } catch { return {}; }
 }
 
 const TABS = [
@@ -177,15 +187,19 @@ function EventsTrainingsApp() {
   const saveItem = async (form, status) => {
     const updated = { ...form, status };
     if (editItem) {
-      setItems((prev) => prev.map((i) => (i.id === editItem.id ? { ...i, ...updated } : i)));
+      const editId = editItem.id;
+      setItems((prev) => {
+        const existing = prev.find((i) => i.id === editId) || {};
+        return [{ ...existing, ...updated }, ...prev.filter((i) => i.id !== editId)];
+      });
       try {
-        await putItem(editItem.id, updated);
+        await putItem(editId, updated);
       } catch (err) {
         console.error('Failed to update item:', err);
       }
     } else {
       const tempId = Date.now();
-      setItems((prev) => [...prev, { ...updated, id: tempId, responses: null }]);
+      setItems((prev) => [{ ...updated, id: tempId, responses: null }, ...prev]);
       try {
         const saved = await postItem(updated);
         const realId = saved?.id ?? saved?._id;
