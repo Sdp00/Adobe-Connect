@@ -1,0 +1,219 @@
+/* ── PostBar — mobile-first ────────────────────────────────────────── */
+
+.postbar-wrapper {
+  width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
+
+  /* margin-top: 16px; */
+  margin-top: 16px;
+}
+
+/* Card container */
+.postbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  background: var(--spectrum-gray-50);
+  border: 1px solid var(--spectrum-border-divider);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
+  padding: 10px 12px;
+  box-sizing: border-box;
+}
+
+/* Avatar circle */
+.postbar-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--spectrum-red-600);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  user-select: none;
+}
+
+/* Ghost pill input */
+.postbar-input {
+  flex: 1;
+  min-width: 0; /* prevents overflow on small screens */
+  border: none;
+  outline: none;
+  background: var(--spectrum-gray-100);
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-family: var(--spectrum-font-family);
+  color: var(--spectrum-text-primary);
+  line-height: 1.4;
+}
+
+.postbar-input::placeholder {
+  color: var(--spectrum-text-secondary);
+  font-size: 14px;
+}
+
+/* Red pill button */
+.postbar-button {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--spectrum-red-600);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--spectrum-font-family);
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.postbar-button:hover {
+  filter: brightness(0.9);
+}
+
+.postbar-button:active {
+  transform: scale(0.97);
+}
+
+.postbar-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--spectrum-red-600);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
+  /* box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22); */
+  box-shadow:0 4px 18px rgb(232 61 61 / 45%);
+ 
+  /* Animate in/out */
+  animation: fab-pop-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+ 
+.postbar-fab:hover {
+  filter: brightness(0.9);
+  transform: scale(1.07);
+}
+ 
+.postbar-fab:active {
+  transform: scale(0.95);
+}
+ 
+@keyframes fab-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.field-error {
+  color: #e53935;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.modal-input.error,
+.modal-textarea.error {
+  border: 1px solid #e53935;
+}
+
+
+
+/* ── Tablet (≥ 600 px) ───────────────────────────────────────────── */
+@media (width >= 600px) {
+  .postbar-wrapper {
+    padding: 0 20px;
+    margin-top: 20px;
+  }
+
+  .postbar {
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 16px;
+  }
+
+  .postbar-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .postbar-input {
+    padding: 10px 16px;
+    font-size: 15px;
+  }
+
+  .postbar-button {
+    height: 40px;
+    padding: 0 20px;
+    font-size: 14px;
+  }
+}
+
+/* ── Desktop (≥ 1024 px) ─────────────────────────────────────────── */
+@media (width >= 1024px) {
+  .postbar-wrapper {
+    max-width: 760px;
+    margin: 24px auto 0;
+    padding: 0;
+  }
+
+  .postbar {
+    gap: 14px;
+    padding: 14px 20px;
+    border-radius: 18px;
+  }
+
+  .postbar-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .postbar-input {
+    padding: 12px 18px;
+    font-size: 16px;
+  }
+
+  .postbar-button {
+    height: 42px;
+    padding: 0 24px;
+    font-size: 15px;
+  }
+
+  /* .postbar-fab {
+    right: 340px; 
+  } */
+}
+

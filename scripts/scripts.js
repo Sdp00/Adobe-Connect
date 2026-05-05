@@ -1,7 +1,9 @@
 import {
   buildBlock,
+  decorateBlock,
+  loadBlock,
   loadHeader,
-  loadFooter,
+  // loadFooter,
   decorateIcons,
   decorateSections,
   decorateBlocks,
@@ -10,7 +12,88 @@ import {
   loadSection,
   loadSections,
   loadCSS,
+  loadScript,
 } from './aem.js';
+import getConfig from './config.js';
+
+async function loadSidebar() {
+  const block = buildBlock('sidebar', '');
+  document.body.prepend(block);
+  decorateBlock(block);
+  return loadBlock(block);
+}
+
+/* ─────────────────────────────────────────────
+   SCROLL SPY  (admin pages only)
+   Watches sections on the page and highlights
+   the matching sidebar link as you scroll.
+
+   Sections are identified by the hash in the
+   sidebar link href:
+     /admin           → top of page (Dashboard)
+     /admin#events-training → #events-training
+     /admin#participation   → #participation
+───────────────────────────────────────────── */
+function initScrollSpy() {
+  // Only run on admin pages
+  if (!window.location.pathname.startsWith('/admin')) return;
+
+  // Wait for sidebar to appear in the DOM, then wire up
+  const waitForSidebar = setInterval(() => {
+    const links = document.querySelectorAll('a.ac-sidebar-link');
+    if (!links.length) return;
+    clearInterval(waitForSidebar);
+
+    // Build a map of { sectionEl → linkEl }
+    // For /admin (no hash) we treat the very top as "Dashboard"
+    const sectionMap = [];
+
+    links.forEach((link) => {
+      const url = new URL(link.href, window.location.origin);
+      if (url.pathname !== window.location.pathname) return;
+
+      if (url.hash) {
+        const target = document.querySelector(url.hash);
+        if (target) sectionMap.push({ section: target, link });
+      } else {
+        // Dashboard — sentinel element at top of main
+        const sentinel = document.querySelector('main') || document.body;
+        sectionMap.push({ section: sentinel, link });
+      }
+    });
+
+    if (!sectionMap.length) return;
+
+    function setActive(activeLink) {
+      links.forEach((l) => {
+        l.classList.remove('is-active');
+        l.setAttribute('aria-current', 'false');
+      });
+      activeLink.classList.add('is-active');
+      activeLink.setAttribute('aria-current', 'page');
+    }
+
+    function onScroll() {
+      const { scrollY } = window;
+      const offset = 120; // px from top before switching — tweak as needed
+
+      // Walk sections from bottom to top; first one whose top ≤ scrollY+offset wins
+      let active = sectionMap[0];
+      for (let i = sectionMap.length - 1; i >= 0; i -= 1) {
+        const top = sectionMap[i].section.getBoundingClientRect().top + scrollY;
+        if (scrollY + offset >= top) {
+          active = sectionMap[i];
+          break;
+        }
+      }
+      setActive(active.link);
+    }
+
+    // Kick off immediately + on scroll
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }, 100);
+}
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -21,9 +104,8 @@ function buildHeroBlock(main) {
   const picture = main.querySelector('picture');
   // eslint-disable-next-line no-bitwise
   if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
-    // Check if h1 or picture is already inside a hero block
     if (h1.closest('.hero') || picture.closest('.hero')) {
-      return; // Don't create a duplicate hero block
+      return;
     }
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
@@ -49,7 +131,6 @@ async function loadFonts() {
  */
 function buildAutoBlocks(main) {
   try {
-    // auto load `*/fragments/*` references
     const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')].filter((f) => !f.closest('.fragment'));
     if (fragments.length > 0) {
       // eslint-disable-next-line import/no-cycle
@@ -84,22 +165,19 @@ function decorateButtons(main) {
     const p = a.closest('p');
     const text = a.textContent.trim();
 
-    // quick structural checks
     if (a.querySelector('img') || p.textContent.trim() !== text) return;
 
-    // skip URL display links
     try {
       if (new URL(a.href).href === new URL(text, window.location).href) return;
     } catch { /* continue */ }
 
-    // require authored formatting for buttonization
     const strong = a.closest('strong');
     const em = a.closest('em');
     if (!strong && !em) return;
 
     p.className = 'button-wrapper';
     a.className = 'button';
-    if (strong && em) { // high-impact call-to-action
+    if (strong && em) {
       a.classList.add('accent');
       const outer = strong.contains(em) ? strong : em;
       outer.replaceWith(a);
@@ -141,7 +219,6 @@ async function loadEager(doc) {
   }
 
   try {
-    /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
     if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
       loadFonts();
     }
@@ -151,11 +228,52 @@ async function loadEager(doc) {
 }
 
 /**
+ * Loads Adobe IMS library and initializes the IMS object.
+ * @returns {Promise<void>} - Resolves when IMS is ready or rejects on timeout/error.
+ */
+export async function loadIms() {
+  const { ims } = getConfig();
+  window.imsLoaded = window.imsLoaded || new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error('IMS timeout')), 5000);
+    window.adobeid = {
+      scope: 'AdobeID,additional_info.company,additional_info.ownerOrg,avatar,openid,read_organizations,read_pc,session,account_cluster.read',
+      locale: 'en',
+      ...ims,
+      onReady: () => {
+        // eslint-disable-next-line no-console
+        console.log('Adobe IMS Ready!');
+        resolve(); // resolve the promise, consumers can now use window.adobeIMS
+        clearTimeout(timeout);
+      },
+      onError: reject,
+    };
+    loadScript('https://auth.services.adobe.com/imslib/imslib.min.js');
+  });
+  return window.imsLoaded;
+}
+
+/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
   loadHeader(doc.querySelector('header'));
+  loadIms();
+  // ── SIDEBAR ────────────────────────────────────────────────
+  loadSidebar();
+  // ──────────────────────────────────────────────────────────
+
+  // ── SCROLL SPY ────────────────────────────────────────────
+  initScrollSpy();
+  // ──────────────────────────────────────────────────────────
+
+  // ── MOBILE CALENDAR ICON (all pages except admin) ─────────
+  if (!window.location.pathname.startsWith('/admin')) {
+    import('../blocks/calendar/calendar.js').then(({ injectMobileCalendarIcon }) => {
+      injectMobileCalendarIcon();
+    });
+  }
+  // ──────────────────────────────────────────────────────────
 
   const main = doc.querySelector('main');
   await loadSections(main);
@@ -164,9 +282,12 @@ async function loadLazy(doc) {
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadFooter(doc.querySelector('footer'));
+  // loadFooter(doc.querySelector('footer'));
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  if (!window.location.pathname.startsWith('/admin')) {
+    loadCSS(`${window.hlx.codeBasePath}/styles/rightpanel.css`);
+  }
   loadFonts();
 }
 
@@ -177,7 +298,6 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
-  // load anything that can be postponed to the latest here
 }
 
 async function loadPage() {
@@ -185,5 +305,4 @@ async function loadPage() {
   await loadLazy(document);
   loadDelayed();
 }
-
 loadPage();

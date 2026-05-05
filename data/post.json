@@ -1,0 +1,215 @@
+[
+  {
+    "_id": "post_1",
+    "author": {
+      "avatar": "avatar.jpg",
+      "name": "Sarah Chen",
+      "role": "Senior UX Designer",
+      "userId": "user_1"
+    },
+    "createdAt": "2026-03-30T10:00:00Z",
+    "content": {
+      "title": "",
+      "text": "Just finished the new design system...",
+      "media": [
+        {
+          "_id": "media_1_1",
+          "type": "image",
+          "url": "https://picsum.photos/seed/main/800/420",
+          "stats": { "likes": 24, "commentsCount": 2 },
+          "comments": [
+            {
+              "_id": "c1",
+              "author": { "name": "Alex", "userId": "u1" },
+              "createdAt": "2026-03-30T10:10:00Z",
+              "text": "This looks super clean 🔥"
+            },
+            {
+              "_id": "c2",
+              "author": { "name": "Maya", "userId": "u2" },
+              "createdAt": "2026-03-30T10:12:00Z",
+              "text": "Love the spacing and typography!"
+            }
+          ]
+        },
+        {
+          "_id": "media_1_2",
+          "type": "image",
+          "url": "https://picsum.photos/seed/aa/400/300",
+          "stats": { "likes": 5, "commentsCount": 2 },
+          "comments": [
+            {
+              "_id": "c3",
+              "author": { "name": "John", "userId": "u3" },
+              "createdAt": "2026-03-30T10:15:00Z",
+              "text": "Nice layout!"
+            },
+            {
+              "_id": "c4",
+              "author": { "name": "Sara", "userId": "u4" },
+              "createdAt": "2026-03-30T10:18:00Z",
+              "text": "Very intuitive 👍"
+            }
+          ]
+        },
+        {
+          "_id": "media_1_3",
+          "type": "image",
+          "url": "https://picsum.photos/seed/bb/400/300",
+          "stats": { "likes": 3, "commentsCount": 2 },
+          "comments": [
+            {
+              "_id": "c5",
+              "author": { "name": "Leo", "userId": "u5" },
+              "createdAt": "2026-03-30T10:20:00Z",
+              "text": "Colors are great!"
+            },
+            {
+              "_id": "c6",
+              "author": { "name": "Emma", "userId": "u6" },
+              "createdAt": "2026-03-30T10:22:00Z",
+              "text": "Looks modern!"
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  {
+    "_id": "post_3",
+    "author": {
+      "avatar": "avatar.jpg",
+      "name": "Priya Nair",
+      "role": "Product Manager",
+      "userId": "user_3"
+    },
+    "createdAt": "2026-03-29T10:00:00Z",
+    "content": {
+      "title": "",
+      "text": "Wrapped up our Q1 roadmap review...",
+      "media": [
+        {
+          "_id": "media_3_1",
+          "type": "image",
+          "url": "https://picsum.photos/seed/roadmap/800/400",
+          "stats": { "likes": 18, "commentsCount": 2 },
+          "comments": [
+            {
+              "_id": "c7",
+              "author": { "name": "Rahul", "userId": "u7" },
+              "createdAt": "2026-03-29T10:10:00Z",
+              "text": "Excited for Q2 🚀"
+            },
+            {
+              "_id": "c8",
+              "author": { "name": "Neha", "userId": "u8" },
+              "createdAt": "2026-03-29T10:12:00Z",
+              "text": "Great roadmap!"
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  {
+    "_id": "post_4",
+    "author": {
+      "avatar": "avatar.jpg",
+      "name": "James Okafor",
+      "role": "Senior Data Analyst",
+      "userId": "user_4"
+    },
+    "createdAt": "2026-03-29T09:00:00Z",
+    "content": {
+      "title": "",
+      "text": "Built a new real-time dashboard...",
+      "media": [
+        {
+          "_id": "media_4_1",
+          "type": "image",
+          "url": "https://picsum.photos/seed/dash/800/420",
+          "stats": { "likes": 33, "commentsCount": 2 },
+          "comments": [
+            {
+              "_id": "c9",
+              "author": { "name": "Kiran", "userId": "u9" },
+              "createdAt": "2026-03-29T09:10:00Z",
+              "text": "This is powerful!"
+            },
+            {
+              "_id": "c10",
+              "author": { "name": "Amit", "userId": "u10" },
+              "createdAt": "2026-03-29T09:12:00Z",
+              "text": "Can you share access?"
+            }
+          ]
+        },
+        {
+          "_id": "media_4_2",
+          "type": "image",
+          "url": "https://picsum.photos/seed/chart1/400/300",
+          "stats": { "likes": 4, "commentsCount": 2 },
+          "comments": [
+            {
+              "_id": "c11",
+              "author": { "name": "Riya", "userId": "u11" },
+              "createdAt": "2026-03-29T09:15:00Z",
+              "text": "Nice visualization!"
+            },
+            {
+              "_id": "c12",
+              "author": { "name": "Sam", "userId": "u12" },
+              "createdAt": "2026-03-29T09:18:00Z",
+              "text": "Very insightful"
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  {
+    "_id": "post_7",
+    "author": {
+      "avatar": "avatar.jpg",
+      "name": "Ananya Bhatt",
+      "role": "Content Strategist",
+      "userId": "user_7"
+    },
+    "createdAt": "2026-03-27T10:00:00Z",
+    "content": {
+      "title": "",
+      "text": "Our refreshed brand voice guide is now live...",
+      "media": [
+        {
+          "_id": "media_7_1",
+          "type": "image",
+          "url": "https://picsum.photos/seed/brand1/400/300",
+          "stats": { "likes": 15, "commentsCount": 3 },
+          "comments": [
+            {
+              "_id": "c13",
+              "author": { "name": "Alex", "userId": "user_8" },
+              "createdAt": "2026-03-27T11:00:00Z",
+              "text": "This is amazing 👏"
+            },
+            {
+              "_id": "c14",
+              "author": { "name": "John", "userId": "user_9" },
+              "createdAt": "2026-03-27T11:05:00Z",
+              "text": "Loved the consistency point!"
+            },
+            {
+              "_id": "c15",
+              "author": { "name": "Meera", "userId": "user_10" },
+              "createdAt": "2026-03-27T11:07:00Z",
+              "text": "Super helpful guide!"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

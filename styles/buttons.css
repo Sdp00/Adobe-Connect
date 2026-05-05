@@ -1,0 +1,78 @@
+/* =========================================================
+   REUSABLE BUTTON SYSTEM - RED WITH WHITE TEXT
+   ========================================================= */
+ 
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-sizing: border-box;
+  font-family: inherit;
+  background: #eb5146;
+  color: #fff; /* ← WHITE TEXT */
+}
+ 
+.btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  color: #fff; /* ← KEEP WHITE ON HOVER */
+}
+ 
+.btn svg {
+  flex-shrink: 0;
+  stroke: #fff; /* ← WHITE ICONS */
+}
+ 
+.btn:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+ 
+.btn:disabled:hover {
+  transform: none;
+}
+ 
+.btn-danger {
+  background: #dc2626;
+}
+ 
+.btn-danger:hover {
+  background: #b91c1c;
+}
+ 
+/* ── Ghost / Outline variant (e.g. Decline button) ── */
+.btn-outline {
+  background: transparent;
+  border: 2px solid #c0c0c0;
+  color: #333;
+}
+ 
+.btn-outline:hover {
+  background: transparent;
+  border-color: #dc2626;
+  color: #dc2626;
+  transform: none;
+}
+ 
+[data-theme="dark"] .btn-outline {
+  background: transparent;
+  border-color: #888;
+  color: #ddd;
+}
+ 
+[data-theme="dark"] .btn-outline:hover {
+  background: transparent;
+  border-color: #e63535;
+  color: #e63535;
+}

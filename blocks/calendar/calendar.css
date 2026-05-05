@@ -1,0 +1,170 @@
+/* stylelint-disable */
+/* =============================================================
+   Calendar Block — Spectrum design tokens
+   ============================================================= */
+
+.calendar-block {
+  background: var(--spectrum-gray-50);
+  border-radius: var(--spectrum-corner-radius-200, 8px);
+  padding: var(--spectrum-spacing-400, 16px);
+  border: 1px solid var(--spectrum-gray-300, #e0e0e0);
+  font-family: var(--spectrum-sans-font-family-stack, 'Adobe Clean', adobe-clean, ui-sans-serif, system-ui, sans-serif);
+  font-size: var(--spectrum-font-size-100, 14px);
+}
+
+.calendar-block__header {
+  margin-bottom: var(--spectrum-spacing-300, 12px);
+}
+
+.calendar-block__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: var(--spectrum-spacing-100, 4px);
+}
+
+.calendar-block__nav-btn {
+  background: none;
+  border: 1px solid var(--spectrum-gray-300, #e0e0e0);
+  border-radius: var(--spectrum-corner-radius-100, 4px);
+  color: var(--spectrum-gray-700, #6e6e6e);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 8px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.calendar-block__nav-btn:hover {
+  background: var(--spectrum-gray-200, #f5f5f5);
+  color: var(--spectrum-gray-900, #1a1a1a);
+}
+
+.calendar-block__title {
+  font-size: var(--spectrum-font-size-300, 18px);
+  font-weight: var(--spectrum-bold-font-weight, 700);
+  color: var(--spectrum-gray-900, #1a1a1a);
+  margin: 0 0 var(--spectrum-spacing-100, 4px);
+  letter-spacing: -0.01em;
+}
+
+.calendar-block__month {
+  font-size: var(--spectrum-font-size-75, 12px);
+  font-weight: var(--spectrum-medium-font-weight, 500);
+  color: var(--spectrum-gray-700, #6e6e6e);
+  margin: 0 0 var(--spectrum-spacing-300, 12px);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.calendar-block__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.calendar-block__dayname {
+  font-size: var(--spectrum-font-size-75, 12px);
+  font-weight: var(--spectrum-bold-font-weight, 700);
+  color: var(--spectrum-gray-600, #909090);
+  text-align: center;
+  padding: 4px 0 6px;
+  letter-spacing: 0.04em;
+}
+
+.calendar-block__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 2px;
+  min-height: 34px;
+  border-radius: var(--spectrum-corner-radius-100, 4px);
+  cursor: default;
+}
+
+.calendar-block__cell--faded .calendar-block__num {
+  color: var(--spectrum-gray-400, #c0c0c0);
+}
+
+.calendar-block__cell--today {
+  background: var(--spectrum-red-700, #e63535);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 0;
+  min-height: unset;
+}
+
+.calendar-block__cell--today .calendar-block__num {
+  color: var(--spectrum-white, #fff);
+  font-weight: var(--spectrum-bold-font-weight, 700);
+}
+
+.calendar-block__num {
+  font-size: var(--spectrum-font-size-75, 12px);
+  color: var(--spectrum-gray-800, #222);
+  line-height: 1;
+  font-weight: var(--spectrum-regular-font-weight, 400);
+}
+
+.calendar-block__dots {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.calendar-block__dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-style: normal;
+}
+
+.calendar-block__legend {
+  display: flex;
+  gap: var(--spectrum-spacing-300, 12px);
+  margin-top: var(--spectrum-spacing-300, 12px);
+  font-size: var(--spectrum-font-size-75, 12px);
+  color: var(--spectrum-gray-700, #6e6e6e);
+  flex-wrap: wrap;
+}
+
+.calendar-block__legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spectrum-spacing-75, 4px);
+}
+
+/* Dark theme */
+[data-theme="dark"] .calendar-block {
+  background: var(--spectrum-gray-100, #1e1e1e);
+  border-color: var(--spectrum-gray-300, #3a3a3a);
+}
+
+[data-theme="dark"] .calendar-block__title {
+  color: var(--spectrum-gray-900, #f0f0f0);
+}
+
+[data-theme="dark"] .calendar-block__month,
+[data-theme="dark"] .calendar-block__legend {
+  color: var(--spectrum-gray-600, #999);
+}
+
+[data-theme="dark"] .calendar-block__num {
+  color: var(--spectrum-gray-800, #ccc);
+}
+
+[data-theme="dark"] .calendar-block__nav-btn {
+  border-color: var(--spectrum-gray-300, #3a3a3a);
+  color: var(--spectrum-gray-600, #999);
+}
+
+[data-theme="dark"] .calendar-block__nav-btn:hover {
+  background: var(--spectrum-gray-200, #2a2a2a);
+  color: var(--spectrum-gray-900, #f0f0f0);
+}

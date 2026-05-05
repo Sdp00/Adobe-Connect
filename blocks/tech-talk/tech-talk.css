@@ -1,0 +1,165 @@
+/* ============================================================
+   TECH-TALK BLOCK — Adobe Connect EDS
+   Specificity order strictly ascending throughout
+   ============================================================ */
+
+/* ── Wrapper ─────────────────────────────────────────────── */
+.tt-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 24px 72px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ── Title ───────────────────────────────────────────────── */
+.tt-title {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--spectrum-text-primary, #2c2c2c);
+  margin: 0 0 16px;
+  letter-spacing: -0.5px;
+}
+
+/* ── Subtitle ────────────────────────────────────────────── */
+.tt-subtitle {
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--spectrum-text-secondary, #8e8e8e);
+  margin: 0 0 40px;
+  max-width: 520px;
+}
+
+/* ── Button group ────────────────────────────────────────── */
+.tt-btn-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Button ──────────────────────────────────────────────── */
+.tt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  background: #e11d48;
+  color: #fff;
+  border: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.tt-btn svg {
+  stroke: #fff;
+  flex-shrink: 0;
+}
+
+/* .tt-btn:hover — single class + pseudo, same level as :any-link
+   :hover comes BEFORE :any-link:hover to keep specificity ascending */
+.tt-btn:hover {
+  background: #be123c;
+  color: #fff;
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+/* .tt-btn:any-link — single class + pseudo-class
+   beats global a:any-link { color } from styles.css */
+.tt-btn:any-link {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* .tt-btn:any-link:hover — two pseudo selectors, higher specificity
+   must come AFTER .tt-btn:hover */
+.tt-btn:any-link:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* ============================================================
+   DARK MODE — all after base rules
+   ============================================================ */
+/* stylelint-disable no-descending-specificity */
+html[data-theme="dark"] .tt-title {
+  color: #fff;
+}
+
+html[data-theme="dark"] .tt-subtitle {
+  color: #b3b3b3;
+}
+
+html[data-theme="dark"] .tt-btn {
+  background: #e11d48;
+  color: #fff;
+}
+
+html[data-theme="dark"] .tt-btn svg {
+  stroke: #fff;
+}
+
+html[data-theme="dark"] .tt-btn:hover {
+  background: #be123c;
+  color: #fff;
+}
+
+html[data-theme="dark"] .tt-btn:any-link {
+  color: #fff;
+}
+
+html[data-theme="dark"] .tt-btn:any-link:hover {
+  color: #fff;
+}
+
+/* stylelint-enable no-descending-specificity */
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (width <= 768px) {
+  .tt-wrapper {
+    padding: 48px 20px 56px;
+  }
+
+  .tt-title {
+    font-size: 32px;
+  }
+
+  .tt-subtitle {
+    font-size: 15px;
+  }
+
+  .tt-btn-group {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 320px;
+    gap: 12px;
+  }
+
+  .tt-btn {
+    width: 100%;
+  }
+}
+
+@media (width <= 480px) {
+  .tt-title {
+    font-size: 26px;
+  }
+
+  .tt-btn {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+}

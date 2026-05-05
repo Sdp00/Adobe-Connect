@@ -1,0 +1,266 @@
+/* ============================================================
+   SIDEBAR — Adobe Connect EDS
+   ============================================================ */
+ 
+:root {
+  --ac-sidebar-w: 56px;
+  --ac-sidebar-expanded-w: 220px;
+  --ac-sidebar-top: 64px;
+  --ac-sidebar-speed: 0.25s;
+  --ac-sidebar-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+ 
+/* ============================================================
+   OVERLAY
+   ============================================================ */
+.ac-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 42%);
+  z-index: 89;
+}
+ 
+.ac-sidebar-overlay.is-visible {
+  display: block;
+}
+ 
+/* ============================================================
+   SHELL — light mode first, then dark override
+   ============================================================ */
+.ac-sidebar {
+  --sb-bg: #fff;
+  --sb-border: #eaeaea;
+  --sb-hover-bg: #f4f4f4;
+  --sb-active-bg: #fef2f2;
+  --sb-active-text: #e11d48;
+  --sb-active-bar: #e11d48;
+  --sb-tip-bg: #2c2c2c;
+  --sb-tip-text: #fff;
+ 
+  position: fixed;
+  top: var(--ac-sidebar-top);
+  left: 0;
+  bottom: 0;
+  width: var(--ac-sidebar-w);
+  background: var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition:
+    width var(--ac-sidebar-speed) var(--ac-sidebar-ease),
+    box-shadow var(--ac-sidebar-speed) var(--ac-sidebar-ease);
+}
+ 
+.ac-sidebar:hover {
+  width: var(--ac-sidebar-expanded-w);
+  box-shadow: 4px 0 20px rgb(0 0 0 / 10%);
+  overflow: visible;
+}
+ 
+html[data-theme="dark"] .ac-sidebar {
+  --sb-bg: #1e1e1e;
+  --sb-border: #333;
+  --sb-hover-bg: #2a2a2a;
+  --sb-active-bg: #3f1212;
+  --sb-active-text: #fca5a5;
+  --sb-active-bar: #e11d48;
+  --sb-tip-bg: #fff;
+  --sb-tip-text: #111;
+}
+ 
+/* ============================================================
+   NAV LIST
+   ============================================================ */
+.ac-sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+ 
+.ac-sidebar-item {
+  position: relative;
+}
+ 
+/* ============================================================
+   LINK
+   ============================================================ */
+.ac-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0 10px 16px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #2c2c2c;
+  transition: background 0.15s, color 0.15s;
+}
+ 
+.ac-sidebar-link:hover {
+  background: var(--sb-hover-bg);
+  color: #2c2c2c;
+}
+ 
+.ac-sidebar-link.is-active {
+  background: var(--sb-active-bg);
+  color: var(--sb-active-text);
+  font-weight: 600;
+}
+ 
+.ac-sidebar-link.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--sb-active-bar);
+  border-radius: 0 3px 3px 0;
+}
+ 
+html[data-theme="dark"] .ac-sidebar-link {
+  color: #fff;
+}
+ 
+/* ============================================================
+   ICON
+   ============================================================ */
+.ac-sidebar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+ 
+.ac-sidebar-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+ 
+/* ============================================================
+   LABEL
+   ============================================================ */
+.ac-sidebar-label {
+  opacity: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  color: #2c2c2c;
+  transition: opacity 0.15s 0.04s;
+}
+ 
+html[data-theme="dark"] .ac-sidebar-label {
+  color: #fff;
+}
+ 
+.ac-sidebar:hover .ac-sidebar-label,
+.ac-sidebar.is-open .ac-sidebar-label {
+  opacity: 1;
+}
+ 
+.ac-sidebar-link.is-active .ac-sidebar-label {
+  color: var(--sb-active-text);
+}
+ 
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
+.ac-sidebar-tooltip {
+  display: none;
+  position: absolute;
+  left: calc(var(--ac-sidebar-w) + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--sb-tip-bg);
+  color: var(--sb-tip-text);
+  font-family: "Adobe Clean", system-ui, -apple-system, blinkmacsystemfont, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 7px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
+}
+ 
+.ac-sidebar-tooltip::before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: var(--sb-tip-bg);
+}
+ 
+.ac-sidebar:not(:hover, .is-open) .ac-sidebar-item:hover .ac-sidebar-tooltip {
+  display: block;
+}
+ 
+/* ============================================================
+   MOBILE ≤ 768px
+   ============================================================ */
+@media (width <= 768px) {
+  :root {
+    --ac-sidebar-top: 56px;
+  }
+ 
+  .ac-sidebar {
+    width: var(--ac-sidebar-expanded-w);
+    transform: translateX(-100%);
+    transition:
+      transform var(--ac-sidebar-speed) var(--ac-sidebar-ease),
+      box-shadow var(--ac-sidebar-speed) var(--ac-sidebar-ease);
+  }
+ 
+  .ac-sidebar:hover {
+    width: var(--ac-sidebar-expanded-w);
+    box-shadow: none;
+    overflow: hidden;
+  }
+ 
+  .ac-sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgb(0 0 0 / 20%);
+    overflow: visible;
+  }
+ 
+  .ac-sidebar-label {
+    opacity: 1;
+    transition: none;
+  }
+ 
+  .ac-sidebar-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+ 
+@media (width <= 375px) {
+  .ac-sidebar-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+}
