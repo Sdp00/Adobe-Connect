@@ -66,7 +66,7 @@ export default function Modal({
 
                 <!-- Submit -->
                 ${onSubmit && html`
-                <button class="modal-submit" onClick=${onSubmit}>
+                <button class="modal-submit" onClick=${onSubmit} disabled=${isSubmitting}>
                     ${isSubmitting ? 'Posting...' : submitLabel}
                 </button>
                 `}

@@ -441,6 +441,7 @@ const submitPost = async () => {
           <input
             class="modal-input"
             placeholder="Enter title"
+            disabled=${isSubmitting}
             value=${title}
             onInput=${(e) => {
               setTitle(e.target.value);
@@ -459,6 +460,7 @@ const submitPost = async () => {
       <textarea
         class="modal-textarea"
         placeholder="What's on your mind?"
+        disabled=${isSubmitting}
         value=${text}
         onInput=${(e) => {
           setText(e.target.value);
@@ -475,7 +477,7 @@ const submitPost = async () => {
         Upload Media
       </label>
 
-      <${MediaUpload} multiple value=${files} onChange=${(newFiles) => {
+      <${MediaUpload} multiple value=${files} disabled=${isSubmitting} onChange=${(newFiles) => {
     setFiles(newFiles);
     setErrors(prev => ({ ...prev, files: [] }));
   }} />
