@@ -21,6 +21,9 @@ const DEFAULT_CONFIG = {
   dataUrl:"/feed"
 };
 
+const isValidComment = (c) =>
+  c && c.text && c.text.trim() !== "";
+
 function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike,isPostingComment,postName,postInitials,postTime  }) {
   // const [current, setCurrent] = useState(startIndex);
   const safeIndex = Math.min(startIndex, mediaItems.length - 1);
@@ -149,12 +152,14 @@ const [current, setCurrent] = useState(safeIndex);
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
-              ${commentsList.filter(c => c.text && c.text.trim() !== "").length} comments
+              ${commentsList.filter(isValidComment).length} comments
             </span>
           </div>
 
           <div class="lightbox-comments">
-            ${commentsList.map(c => html`
+            ${commentsList
+              .filter(isValidComment)
+              .map(c => html`
               <div class="feed-comment">
                 <div class="feed-comment-avatar">
                   ${c.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
@@ -828,7 +833,7 @@ useEffect(() => {
           <svg class="feed-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          <span>${commentsList.filter(c => c.text && c.text.trim() !== "").length}</span>
+          <span>${commentsList.filter(isValidComment).length}</span>
         </button>
       `}
       </div>
@@ -839,6 +844,7 @@ useEffect(() => {
 
           <!-- Existing comments -->
           ${commentsList
+            .filter(isValidComment)
             .slice(0, config.maxCommentsVisible)
             .map(c => html`
             <div class="feed-comment">
@@ -1147,6 +1153,7 @@ if (mime.startsWith('image/')) {
   // stats: m.stats || { likes: 0, commentsCount: 0 },
   stats: {
         likes: totalLikes,
+        // commentsCount: mediaWithComments.length,
         commentsCount: commentsList.length
       },
   // comments: (m.comments || []).map(c => ({
