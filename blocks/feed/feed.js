@@ -149,7 +149,7 @@ const [current, setCurrent] = useState(safeIndex);
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
-              ${commentsList.length} comments
+              ${commentsList.filter(c => c.text && c.text.trim() !== "").length} comments
             </span>
           </div>
 
@@ -828,7 +828,7 @@ useEffect(() => {
           <svg class="feed-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          <span>${commentsList.length}</span>
+          <span>${commentsList.filter(c => c.text && c.text.trim() !== "").length}</span>
         </button>
       `}
       </div>
@@ -1052,11 +1052,24 @@ function transformPost(apiPost) {
   // let commentsList = [];
   // let totalLikes = 0;
 
-  const commentsList = (apiPost.comments || []).map(c => ({
-    id: c._id,
-    name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
-    text: c.comment
-  }));
+
+  const validComments = (apiPost.comments || []).filter(
+  c => c.comment && c.comment.trim() !== ""
+);
+
+const commentsList = validComments.map(c => ({
+  id: c._id,
+  name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+  text: c.comment
+}));
+
+  // const commentsList = (apiPost.comments || []).map(c => ({
+  //   id: c._id,
+  //   name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+  //   text: c.comment
+  // }));
+
+
 
   let totalLikes = apiPost.comments?.filter(c => c.like)?.length || 0;
 
@@ -1141,15 +1154,32 @@ if (mime.startsWith('image/')) {
   //   name: c.author?.name || 'User',
   //   text: c.text
   // }))
+
   comments: (apiPost.comments || [])
-    .filter(c => c.mediaId === m._id)
-    .map(c => ({
-      _id: c._id,
-      userId: c.user?._id || c?.userId,   // 
-      like: c.like,
-      name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
-      text: c.comment
-    }))
+  .filter(c =>
+    c.mediaId === m._id &&
+    c.comment &&
+    c.comment.trim() !== ""
+  )
+  .map(c => ({
+    _id: c._id,
+    userId: c.user?._id || c?.userId,
+    like: c.like,
+    name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+    text: c.comment
+  }))
+
+  // comments: (apiPost.comments || [])
+  //   .filter(c => c.mediaId === m._id)
+  //   .map(c => ({
+  //     _id: c._id,
+  //     userId: c.user?._id || c?.userId,   // 
+  //     like: c.like,
+  //     name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+  //     text: c.comment
+  //   }))
+
+
   // comments: commentsList
 });
 
