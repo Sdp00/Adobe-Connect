@@ -1,5 +1,6 @@
 import { html, render } from '../../vendor/htm-preact.js';
 import { useState, useEffect } from '../../vendor/preact-hooks.js';
+// import { isSignedInUser } from '../../scripts/auth.js';
 import {
   EventCard, EventItemModal, EventPreviewModal,
   InterestedModal, PastEventCard, AddMediaModal, isPastEvent,
@@ -83,7 +84,7 @@ async function fetchData() {
   if (!res.ok) throw new Error(`Failed to load eventsAndTrainings (${res.status})`);
   const json = await res.json();
   const items = Array.isArray(json) ? json : json.eventsAndTrainings;
-  return items.map((item) => ({ ...item, id: item.id ?? item._id }));
+  return items.map((item) => ({ ...item, id: item.id ?? item._id })).reverse();
 }
 
 function buildPayload(data) {
@@ -361,6 +362,12 @@ export function openCreateModal() {
 }
 
 export default async function decorate(block) {
+  // const signedIn = await isSignedInUser();
+  // if (!signedIn) {
+  //   window?.adobeIMS?.signIn();
+  //   return;
+  // }
+
   block.textContent = '';
 
   const statsContainer = document.createElement('div');
