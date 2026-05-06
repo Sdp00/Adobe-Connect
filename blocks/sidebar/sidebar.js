@@ -5,7 +5,6 @@ const PUBLIC_NAV = [
   { label: 'Events and Training', icon: 'events-training',  href: '/events-training' },
   { label: 'Tech Talk',           icon: 'tech-talk',        href: '/tech-talk' },
   { label: 'Nominations',         icon: 'nominations',      href: '/nominations' },
-  { label: 'My Team',             icon: 'my-team',          href: '/my-team' },
   { label: 'Industry Updates',    icon: 'industry-updates', href: '/industry-updates' },
   { label: 'Newsletters',         icon: 'newsletters',      href: '/newsletter' },
 ];
