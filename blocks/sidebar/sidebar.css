@@ -116,22 +116,6 @@ html[data-theme="dark"] .ac-sidebar {
   color: #2c2c2c;
 }
  
-.ac-sidebar-link.is-active {
-  background: var(--sb-active-bg);
-  color: var(--sb-active-text);
-  font-weight: 600;
-}
- 
-.ac-sidebar-link.is-active::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--sb-active-bar);
-  border-radius: 0 3px 3px 0;
-}
  
 html[data-theme="dark"] .ac-sidebar-link {
   color: #fff;
@@ -179,9 +163,6 @@ html[data-theme="dark"] .ac-sidebar-label {
   opacity: 1;
 }
  
-.ac-sidebar-link.is-active .ac-sidebar-label {
-  color: var(--sb-active-text);
-}
  
 /* ============================================================
    TOOLTIP

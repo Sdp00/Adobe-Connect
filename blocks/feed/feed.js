@@ -21,6 +21,9 @@ const DEFAULT_CONFIG = {
   dataUrl:"/feed"
 };
 
+const isValidComment = (c) =>
+  c && c.text && c.text.trim() !== "";
+
 function Lightbox({ mediaItems, startIndex, onClose, commentInput, setCommentInput, addComment ,toggleMediaLike,isPostingComment,postName,postInitials,postTime  }) {
   // const [current, setCurrent] = useState(startIndex);
   const safeIndex = Math.min(startIndex, mediaItems.length - 1);
@@ -149,12 +152,14 @@ const [current, setCurrent] = useState(safeIndex);
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
-              ${commentsList.length} comments
+              ${commentsList.filter(isValidComment).length} comments
             </span>
           </div>
 
           <div class="lightbox-comments">
-            ${commentsList.map(c => html`
+            ${commentsList
+              .filter(isValidComment)
+              .map(c => html`
               <div class="feed-comment">
                 <div class="feed-comment-avatar">
                   ${c.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()}
@@ -828,7 +833,7 @@ useEffect(() => {
           <svg class="feed-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          <span>${commentsList.length}</span>
+          <span>${commentsList.filter(isValidComment).length}</span>
         </button>
       `}
       </div>
@@ -839,6 +844,7 @@ useEffect(() => {
 
           <!-- Existing comments -->
           ${commentsList
+            .filter(isValidComment)
             .slice(0, config.maxCommentsVisible)
             .map(c => html`
             <div class="feed-comment">
@@ -937,6 +943,9 @@ function Feed({ config }) {
       // .then(data =>setPosts(data))
       .then(data => {
         const transformed = data.map(transformPost);
+        transformed.sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
         console.log(data)
         setPosts(transformed);
       })
@@ -974,8 +983,8 @@ function Feed({ config }) {
   };
 
 
-    window.addEventListener('create-post', handler);
-    return () => window.removeEventListener('create-post', handler);
+    window.addEventListener('post-created-success', handler);
+    return () => window.removeEventListener('post-created-success', handler);
   }, []);
 
 //   function transformPost(apiPost) {
@@ -1052,11 +1061,24 @@ function transformPost(apiPost) {
   // let commentsList = [];
   // let totalLikes = 0;
 
-  const commentsList = (apiPost.comments || []).map(c => ({
-    id: c._id,
-    name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
-    text: c.comment
-  }));
+
+  const validComments = (apiPost.comments || []).filter(
+  c => c.comment && c.comment.trim() !== ""
+);
+
+const commentsList = validComments.map(c => ({
+  id: c._id,
+  name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+  text: c.comment
+}));
+
+  // const commentsList = (apiPost.comments || []).map(c => ({
+  //   id: c._id,
+  //   name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+  //   text: c.comment
+  // }));
+
+
 
   let totalLikes = apiPost.comments?.filter(c => c.like)?.length || 0;
 
@@ -1134,6 +1156,7 @@ if (mime.startsWith('image/')) {
   // stats: m.stats || { likes: 0, commentsCount: 0 },
   stats: {
         likes: totalLikes,
+        // commentsCount: mediaWithComments.length,
         commentsCount: commentsList.length
       },
   // comments: (m.comments || []).map(c => ({
@@ -1141,15 +1164,32 @@ if (mime.startsWith('image/')) {
   //   name: c.author?.name || 'User',
   //   text: c.text
   // }))
+
   comments: (apiPost.comments || [])
-    .filter(c => c.mediaId === m._id)
-    .map(c => ({
-      _id: c._id,
-      userId: c.user?._id || c?.userId,   // 
-      like: c.like,
-      name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
-      text: c.comment
-    }))
+  .filter(c =>
+    c.mediaId === m._id &&
+    c.comment &&
+    c.comment.trim() !== ""
+  )
+  .map(c => ({
+    _id: c._id,
+    userId: c.user?._id || c?.userId,
+    like: c.like,
+    name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+    text: c.comment
+  }))
+
+  // comments: (apiPost.comments || [])
+  //   .filter(c => c.mediaId === m._id)
+  //   .map(c => ({
+  //     _id: c._id,
+  //     userId: c.user?._id || c?.userId,   // 
+  //     like: c.like,
+  //     name: `${c.user?.first_name || ''} ${c.user?.last_name || ''}`.trim() || 'User',
+  //     text: c.comment
+  //   }))
+
+
   // comments: commentsList
 });
 
@@ -1177,6 +1217,7 @@ if (mime.startsWith('image/')) {
     // role: apiPost.author?.role || '',
     role: apiPost.author?.email || '',
     // time: new Date(apiPost.createdAt).toLocaleString(),
+    createdAt: apiPost.createdAt,
     time: formatPostTime(apiPost.createdAt),
     // title: apiPost.content?.title || "",
     title: apiPost?.title || "",

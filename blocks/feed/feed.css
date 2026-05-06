@@ -9,16 +9,18 @@
   box-sizing: border-box;
 
   /* margin-top: 12px; */
-  margin-top:6px;
+  margin-top: 6px;
 }
 
 .feed-loader {
   text-align: center;
   padding: 20px;
-  color: var(--spectrum-global-color-gray-600);
+  color: var(--spectrum-text-primary);
   font-size: 13px;
   font-family: var(--spectrum-global-font-family-base);
-  min-height: 60px; /* keeps the sentinel always in the DOM */
+  min-height: 60px;
+
+  /* keeps the sentinel always in the DOM */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,7 +36,9 @@
 }
 
 @keyframes feed-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Card ─────────────────────────────────────────────────────────── */
@@ -90,7 +94,7 @@
 }
 
 /* ── Body text ────────────────────────────────────────────────────── */
- .feed-title {
+.feed-title {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 6px;
@@ -132,13 +136,18 @@
   overflow: hidden;
 }
 
-.feed-image-grid-1 { grid-template-columns: 1fr; }
+.feed-image-grid-1 {
+  grid-template-columns: 1fr;
+}
 
 /* .feed-image-grid-2 { grid-template-columns: 1fr 1fr; } */
 .feed-image-grid-2 {
   grid-template-columns: repeat(2, 1fr);
 }
-.feed-image-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.feed-image-grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
 
 .feed-image-grid-item {
   position: relative;
@@ -206,7 +215,7 @@
 
   /* color: var(--spectrum-global-color-gray-700); */
   color: var(--spectrum-text-primary);
-opacity: 0.65;
+  opacity: 0.65;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
@@ -333,12 +342,14 @@ opacity: 0.65;
 /* Close button top-right */
 .lightbox-close {
   position: absolute;
-  
+
   /* top: 14px;
   right: 16px; */
 
   top: 12px;
-  left: 12px;   /* ← move to left like FB */
+  left: 12px;
+
+  /* ← move to left like FB */
   right: auto;
   width: 38px;
   height: 38px;
@@ -428,8 +439,13 @@ opacity: 0.65;
   background: rgb(255 255 255 / 28%);
 }
 
-.lightbox-nav-prev { left: 16px; }
-.lightbox-nav-next { right: 16px; }
+.lightbox-nav-prev {
+  left: 16px;
+}
+
+.lightbox-nav-next {
+  right: 16px;
+}
 
 
 /* /// */
@@ -773,9 +789,9 @@ opacity: 0.65;
 
 /* .feed-image-grid-item { */
 
-  /* position: relative;  */
+/* position: relative;  */
 
-  /* ensure overlay children are positioned correctly */
+/* ensure overlay children are positioned correctly */
 
 /* } */
 
@@ -873,12 +889,12 @@ opacity: 0.65;
 }
 
 .lightbox-stat-liked {
-  color:var(--spectrum-red-600);
+  color: var(--spectrum-red-600);
 }
 
 .lightbox-stat-liked svg {
   stroke: var(--spectrum-red-600);
-  fill:var(--spectrum-red-600);
+  fill: var(--spectrum-red-600);
 }
 
 /* .feed-media-hero-wrap[title],
@@ -890,9 +906,9 @@ opacity: 0.65;
 
 /* ── Tablet (≥ 600 px) ───────────────────────────────────────────── */
 
-@media (width >= 600px) {
+@media (width >=600px) {
   .feed {
-    padding: 0 20px;
+    /* padding: 0 20px; */
     gap: 14px;
     margin-top: 16px;
   }
@@ -902,23 +918,40 @@ opacity: 0.65;
     border-radius: 16px;
   }
 
-  .feed-avatar { 
-    width: 42px; 
-    height: 42px; 
-    font-size: 14px; 
+  .feed-avatar {
+    width: 42px;
+    height: 42px;
+    font-size: 14px;
   }
-  .feed-name   { font-size: 15px; }
-  .feed-meta   { font-size: 13px; }
-  .feed-text   { font-size: 15px; }
 
-  .feed-image-hero { max-height: 380px; }
-
-  .lightbox-nav { 
-    width: 50px; 
-    height: 50px; 
+  .feed-name {
+    font-size: 15px;
   }
-  .lightbox-nav-prev { left: 24px; }
-  .lightbox-nav-next { right: 24px; }
+
+  .feed-meta {
+    font-size: 13px;
+  }
+
+  .feed-text {
+    font-size: 15px;
+  }
+
+  .feed-image-hero {
+    max-height: 380px;
+  }
+
+  .lightbox-nav {
+    width: 50px;
+    height: 50px;
+  }
+
+  .lightbox-nav-prev {
+    left: 24px;
+  }
+
+  .lightbox-nav-next {
+    right: 24px;
+  }
 
   .lightbox-container {
     flex-direction: row;
@@ -938,7 +971,7 @@ opacity: 0.65;
 
 /* ── Desktop (≥ 1024 px) ─────────────────────────────────────────── */
 
-@media (width >= 1024px) {
+@media (width >=1024px) {
   .feed {
     /* max-width: 960px; */
     width: 100%;
@@ -950,35 +983,46 @@ opacity: 0.65;
     gap: 16px;
   }
 
-  .feed-card    { 
-    padding: 20px; 
-    border-radius: 18px; 
+  .feed-card {
+    padding: 20px;
+    border-radius: 18px;
   }
 
-  .feed-avatar  { 
-    width: 44px; 
-    height: 44px; 
-    font-size: 15px; 
-  }
-  .feed-name    { font-size: 15px; }
-  .feed-meta    { font-size: 13px; }
-
-  .feed-text    { 
-    font-size: 15px; 
-    margin-bottom: 14px; 
+  .feed-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 15px;
   }
 
-  .feed-image-hero { max-height: 420px; }
-  .feed-image-grid { gap: 6px; }
-
-  .feed-action-btn { 
-    font-size: 14px; 
-    padding: 7px 14px; 
+  .feed-name {
+    font-size: 15px;
   }
 
-  .feed-action-icon { 
-    width: 17px; 
-    height: 17px; 
+  .feed-meta {
+    font-size: 13px;
+  }
+
+  .feed-text {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  .feed-image-hero {
+    max-height: 420px;
+  }
+
+  .feed-image-grid {
+    gap: 6px;
+  }
+
+  .feed-action-btn {
+    font-size: 14px;
+    padding: 7px 14px;
+  }
+
+  .feed-action-icon {
+    width: 17px;
+    height: 17px;
   }
 
   .lightbox-container {
@@ -990,9 +1034,9 @@ opacity: 0.65;
   }
 
   .lightbox-img {
-  max-width: 90%;
-  max-height: 90%;
-  object-fit: contain;
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
   }
 
   .lightbox-side {

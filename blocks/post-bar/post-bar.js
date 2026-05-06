@@ -51,6 +51,16 @@ function PostBar({config={}}) {
     files: [],
   });
 
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+    useEffect(() => {
+      isSignedInUser().then(setIsUserLoggedIn);
+    }, []);
+
+    const tooltipText = !isUserLoggedIn
+  ? 'Login to create post'
+  : '';
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function validateMedia(files = []) {
@@ -394,7 +404,7 @@ const submitPost = async () => {
 
       <button
         class="postbar-button"
-        
+        title=${tooltipText}
         onClick=${handleOpenPostComposer}
       >
         ${postButtonLabel}
@@ -405,6 +415,7 @@ const submitPost = async () => {
     ${showFab && html`
       <button
         class="postbar-fab"
+        title=${tooltipText}
         onClick=${handleOpenPostComposer}
         aria-label="Create post"
       >
@@ -430,6 +441,7 @@ const submitPost = async () => {
           <input
             class="modal-input"
             placeholder="Enter title"
+            disabled=${isSubmitting}
             value=${title}
             onInput=${(e) => {
               setTitle(e.target.value);
@@ -448,6 +460,7 @@ const submitPost = async () => {
       <textarea
         class="modal-textarea"
         placeholder="What's on your mind?"
+        disabled=${isSubmitting}
         value=${text}
         onInput=${(e) => {
           setText(e.target.value);
@@ -464,7 +477,7 @@ const submitPost = async () => {
         Upload Media
       </label>
 
-      <${MediaUpload} multiple value=${files} onChange=${(newFiles) => {
+      <${MediaUpload} multiple value=${files} disabled=${isSubmitting} onChange=${(newFiles) => {
     setFiles(newFiles);
     setErrors(prev => ({ ...prev, files: [] }));
   }} />

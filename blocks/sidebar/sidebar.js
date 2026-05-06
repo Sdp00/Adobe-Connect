@@ -12,7 +12,6 @@ const PUBLIC_NAV = [
 const ADMIN_NAV = [
   { label: 'Dashboard',           icon: 'dashboard',        href: '/admin' },
   { label: 'Events and Training', icon: 'events-training',  href: '/admin#events-training' },
-  { label: 'Participation',       icon: 'participation',    href: '/admin#participation' },
 ];
 
 /* ── Icon fetcher ─────────────────────────────────────────── */
@@ -153,18 +152,56 @@ function wireInteractions(sidebar, overlay) {
   });
 }
 
+/* ── Scroll-spy (admin only) ──────────────────────────────── */
+
+function wireScrollSpy(sidebar) {
+  const links = [...sidebar.querySelectorAll('.ac-sidebar-link')];
+  if (links.length < 2) return;
+
+  const setActive = (index) => {
+    links.forEach((a, i) => {
+      a.classList.toggle('is-active', i === index);
+      a.setAttribute('aria-current', i === index ? 'page' : 'false');
+    });
+  };
+
+  const attachObserver = (section) => {
+    // threshold=0 fires as soon as any pixel enters/leaves the top of viewport
+    const observer = new IntersectionObserver(
+      ([entry]) => { setActive(entry.isIntersecting ? 1 : 0); },
+      { root: null, rootMargin: '-10% 0px -80% 0px', threshold: 0 },
+    );
+    observer.observe(section);
+  };
+
+  const section = document.getElementById('events-training');
+  if (section) {
+    attachObserver(section);
+    return;
+  }
+
+  // Element not yet in DOM (Preact renders it async) — watch for it
+  const mo = new MutationObserver(() => {
+    const el = document.getElementById('events-training');
+    if (el) { mo.disconnect(); attachObserver(el); }
+  });
+  mo.observe(document.body, { childList: true, subtree: true });
+}
+
 /* ── Block decorator ──────────────────────────────────────── */
 
 export default async function decorate(block) {
 //   document.getElementById('ac-sidebar')?.remove();
 //   document.getElementById('ac-sidebar-overlay')?.remove();
 
-  const sidebar = await buildNav(isAdminPage());
+  const admin = isAdminPage();
+  const sidebar = await buildNav(admin);
   const overlay = buildOverlay();
 
   document.body.prepend(overlay);
   document.body.prepend(sidebar);
   wireInteractions(sidebar, overlay);
+  if (admin) wireScrollSpy(sidebar);
   syncLayout();
 
   block.remove();
