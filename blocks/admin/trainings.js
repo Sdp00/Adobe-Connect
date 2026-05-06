@@ -267,7 +267,8 @@ export function TrainingCard({ item, onEdit, onPreview, onToggleStatus, onViewRe
         <button class="ac-action-btn" onClick=${() => onPreview(item)}>Preview</button>
         <button
           class=${'ac-action-btn ' + (isLive ? 'ac-action-btn--live' : 'ac-action-btn--publish')}
-          onClick=${() => onToggleStatus(item)}
+          onClick=${!isLive ? () => onToggleStatus(item) : undefined}
+          disabled=${isLive}
         >${isLive ? 'Live' : 'Publish'}</button>
       </div>
     </div>
