@@ -216,7 +216,7 @@ async function updateHeaderUser(nav) {
       const nameEl = nav.querySelector('.profile-name');
       const roleEl = nav.querySelector('.profile-role');
 
-      if (avatarEl) avatarEl.textContent = 'NA';
+      if (avatarEl) avatarEl.textContent = 'G';
       if (nameEl) nameEl.textContent = 'Guest';
       if (roleEl) roleEl.textContent = '';
 
@@ -249,7 +249,7 @@ async function updateHeaderUser(nav) {
             .join('')
             .slice(0, 2)
             .toUpperCase()
-        : 'NA';
+        : 'G';
     }
 
   } catch (e) {
@@ -315,16 +315,9 @@ export default async function decorate(block) {
       <!-- Theme toggle -->
       <button class="icon-btn theme-toggle-btn" aria-label="Toggle theme"></button>
  
-      <!-- Notifications -->
-      <div class="notify">
-        <button class="icon-btn notify-trigger" aria-label="Notifications">
-          <span class="notify-dot"></span>
-        </button>
-      </div>
- 
       <div class="profile">
         <div class="profile-trigger" aria-label="Profile menu">
-          <div class="avatar">J</div>
+          <div class="avatar">U</div>
           <svg class="chevron" viewBox="0 0 24 24">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -333,8 +326,7 @@ export default async function decorate(block) {
  
         <div class="profile-menu">
           <div class="profile-info">
-            <div class="profile-name">Jaishree D G</div>
-            <div class="profile-role">Apprentice Tech</div>
+            <div class="profile-name">User</div>
           </div>
  
  
@@ -345,16 +337,6 @@ export default async function decorate(block) {
                 <path d="M5.5 21a6.5 6.5 0 0113 0"></path>
               </svg>
               <span class="add-info-label">${addInfoLabel}</span>
-            </li>
- 
- 
-            <li class="menu-posts">
-              <svg class="menu-icon" viewBox="0 0 24 24">
-                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-                <line x1="8" y1="8" x2="16" y2="8"></line>
-                <line x1="8" y1="12" x2="16" y2="12"></line>
-              </svg>
-              My Posts
             </li>
  
  
@@ -410,10 +392,6 @@ export default async function decorate(block) {
  
   document.addEventListener('click', (e) => {
     if (!nav.contains(e.target)) closeAll();
-  });
- 
-  nav.querySelector('.menu-posts')?.addEventListener('click', () => {
-    window.location.href = '/myposts';
   });
  
   nav.querySelector('.menu-add-info')?.addEventListener('click', () => {
@@ -495,10 +473,9 @@ window.addEventListener('user:updated', () => {
   const logoImg = nav.querySelector('.nav-logo-img');
   logoImg.src = savedTheme === 'dark' ? LOGO_DARK : LOGO_LIGHT;
 
-  const [moonSvg, sunSvg, bellSvg] = await Promise.all([
+  const [moonSvg, sunSvg] = await Promise.all([
     fetchIcon('moon'),
     fetchIcon('sun'),
-    fetchIcon('bell'),
   ]);
 
   themeBtn.innerHTML = savedTheme === 'dark' ? sunSvg : moonSvg;
@@ -511,9 +488,6 @@ window.addEventListener('user:updated', () => {
     themeBtn.innerHTML = next === 'dark' ? sunSvg : moonSvg;
     logoImg.src = next === 'dark' ? LOGO_DARK : LOGO_LIGHT;
   });
-
-  const notifyBtn = nav.querySelector('.notify-trigger');
-  notifyBtn.insertAdjacentHTML('afterbegin', bellSvg);
 }
 
 /* PROFILE MODAL */
@@ -671,4 +645,3 @@ function openProfileModal(nav) {
   });
   
 }
- 
