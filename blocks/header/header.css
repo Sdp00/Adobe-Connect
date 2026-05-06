@@ -360,6 +360,10 @@ header {
   font-size: 18px;
   cursor: pointer;
 }
+
+.profile-modal-body input{
+  font-size: 14px;
+}
  
 .profile-modal-body {
   margin-top: 16px;
